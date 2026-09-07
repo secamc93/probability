@@ -121,7 +121,20 @@ const ProductFamilyList = forwardRef<ProductFamilyListHandle, ProductFamilyListP
             await fetchModalVariants(family.id);
         };
 
-        const familyAxes: { key: string; label: string }[] = modalFamily?.variant_axes ?? [];
+        const definedAxes: { key: string; label: string }[] = modalFamily?.variant_axes ?? [];
+        const derivedAxes: { key: string; label: string }[] = (() => {
+            const keys: string[] = [];
+            for (const variant of modalVariants) {
+                const attrs = variant.variant_attributes;
+                if (attrs && typeof attrs === 'object') {
+                    for (const key of Object.keys(attrs)) {
+                        if (!keys.includes(key)) keys.push(key);
+                    }
+                }
+            }
+            return keys.map(key => ({ key, label: key.charAt(0).toUpperCase() + key.slice(1) }));
+        })();
+        const familyAxes = definedAxes.length > 0 ? definedAxes : derivedAxes;
 
         const Field = ({ label, value, children }: { label: string; value?: string | null; children?: ReactNode }) => (
             <div className="min-w-0">
