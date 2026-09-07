@@ -92,6 +92,24 @@ cliente que mande spam puede tumbar a todos los numeros alojados. Vigilar el
 `quality_rating` por numero (pendiente 5) deja de ser deseable y pasa a ser
 importante.
 
+## Alta de numero por API (2026-09-06)
+
+El negocio ya puede dar de alta su numero desde nuestra pantalla: agregar,
+pedir codigo, verificar y activar, sin ver Meta. Pendientes para que funcione:
+
+- **Ampliar el cupo de numeros del negocio en Meta Business Suite.** La API
+  responde hoy `Phone Numbers Count Exceeded Limit Per Business` (subcodigo
+  2388386): estamos en el tope. Lo pide el usuario.
+- **Suscribir el campo `phone_number_name_update`** en el webhook de la app
+  (hoy solo estan `messages` y `message_template_status_update`). Sin el no nos
+  enteramos de que Meta aprobo el nombre visible, y hay que volver a llamar
+  `register` despues de esa aprobacion.
+- **Probar el flujo completo con un numero real.** No se pudo: el cupo esta
+  lleno y ademas es una escritura contra Meta que crea estado.
+- **El PIN de 2FA queda cifrado en las credenciales de la integracion.** Si se
+  pierde, recuperar el numero es un tramite con Meta. Definir si se guarda
+  ademas en algun lado operativo.
+
 ## Corregido el 2026-09-06
 
 - **Un negocio podia quedarse con los mensajes de otro.** El formulario dejaba

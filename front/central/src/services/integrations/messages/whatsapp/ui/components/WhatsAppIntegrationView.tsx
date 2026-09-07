@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Alert, Button } from '@/shared/ui';
 import { ChatBubbleLeftRightIcon, CheckCircleIcon, PhoneIcon } from '@heroicons/react/24/outline';
 import WhatsAppConnectionForm from './WhatsAppConnectionForm';
+import WhatsAppNumberWizard from './WhatsAppNumberWizard';
 import WhatsAppTemplatesPanel from './WhatsAppTemplatesPanel';
 
 interface WhatsAppIntegrationViewProps {
@@ -241,11 +242,25 @@ export default function WhatsAppIntegrationView({
             )}
 
             {isActive && (
-                <WhatsAppConnectionForm
-                    config={integration.config || {}}
+                <WhatsAppNumberWizard
                     businessId={integration.business_id || undefined}
-                    onSaved={onRefresh}
+                    onChanged={onRefresh}
                 />
+            )}
+
+            {isActive && (
+                <details className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                    <summary className="text-sm font-medium text-gray-700 dark:text-gray-200 cursor-pointer">
+                        {'Ya tengo mi propia cuenta de WhatsApp Business'}
+                    </summary>
+                    <div className="mt-3">
+                        <WhatsAppConnectionForm
+                            config={integration.config || {}}
+                            businessId={integration.business_id || undefined}
+                            onSaved={onRefresh}
+                        />
+                    </div>
+                </details>
             )}
 
             {isActive && (

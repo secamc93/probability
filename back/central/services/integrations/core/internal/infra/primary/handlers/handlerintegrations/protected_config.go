@@ -9,7 +9,14 @@ import (
 const whatsAppIntegrationTypeID uint = 2
 
 var protectedConfigFields = map[uint][]string{
-	whatsAppIntegrationTypeID: {"phone_number_id", "waba_id", "use_platform_token"},
+	whatsAppIntegrationTypeID: {
+		"phone_number_id",
+		"waba_id",
+		"use_platform_token",
+		"hosted_by_platform",
+		"number_status",
+		"verified_name",
+	},
 }
 
 func protectConfigFields(integrationTypeID uint, incoming *map[string]any, existing *domain.Integration) {

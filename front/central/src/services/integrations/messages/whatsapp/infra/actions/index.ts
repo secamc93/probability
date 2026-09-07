@@ -4,8 +4,10 @@ import { cookies } from 'next/headers';
 import { WhatsAppApiRepository } from '../repository/api-repository';
 import { WhatsAppUseCases } from '../../app/use-cases';
 import {
+    WhatsAppAddNumberValues,
     WhatsAppConnectionResponse,
     WhatsAppConnectionValues,
+    WhatsAppNumberResponse,
     WhatsAppProvisionResponse,
     WhatsAppTemplatesResponse,
 } from '../../domain/types';
@@ -58,3 +60,39 @@ export const saveWhatsAppConnectionAction = async (
         return { success: false, message: error?.message || 'Error guardando la conexión de WhatsApp' };
     }
 };
+
+const numberAction = async (
+    run: (useCases: WhatsAppUseCases) => Promise<WhatsAppNumberResponse>,
+    token?: string | null
+): Promise<WhatsAppNumberResponse> => {
+    try {
+        const useCases = await getUseCases(token);
+        return await run(useCases);
+    } catch (error: any) {
+        return { success: false, message: error?.message || 'Error con el n\u00famero de WhatsApp' };
+    }
+};
+
+export const getWhatsAppNumberStateAction = async (businessId?: number, token?: string | null) =>
+    numberAction((useCases) => useCases.getNumberState(businessId), token);
+
+export const addWhatsAppNumberAction = async (
+    values: WhatsAppAddNumberValues,
+    businessId?: number,
+    token?: string | null
+) => numberAction((useCases) => useCases.addNumber(values, businessId), token);
+
+export const requestWhatsAppNumberCodeAction = async (
+    method: string,
+    businessId?: number,
+    token?: string | null
+) => numberAction((useCases) => useCases.requestNumberCode(method, businessId), token);
+
+export const verifyWhatsAppNumberCodeAction = async (
+    code: string,
+    businessId?: number,
+    token?: string | null
+) => numberAction((useCases) => useCases.verifyNumberCode(code, businessId), token);
+
+export const registerWhatsAppNumberAction = async (businessId?: number, token?: string | null) =>
+    numberAction((useCases) => useCases.registerNumber(businessId), token);

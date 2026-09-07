@@ -1,8 +1,10 @@
 import { env } from '@/shared/config/env';
 import { IWhatsAppRepository } from '../../domain/ports';
 import {
+    WhatsAppAddNumberValues,
     WhatsAppConnectionResponse,
     WhatsAppConnectionValues,
+    WhatsAppNumberResponse,
     WhatsAppProvisionResponse,
     WhatsAppTemplatesResponse,
 } from '../../domain/types';
@@ -74,5 +76,36 @@ export class WhatsAppApiRepository implements IWhatsAppRepository {
                 }),
             }
         );
+    }
+
+    async getNumberState(businessId?: number): Promise<WhatsAppNumberResponse> {
+        return this.request<WhatsAppNumberResponse>(`/integrations/whatsapp/numbers${this.query(businessId)}`);
+    }
+
+    async addNumber(values: WhatsAppAddNumberValues, businessId?: number): Promise<WhatsAppNumberResponse> {
+        return this.request<WhatsAppNumberResponse>(`/integrations/whatsapp/numbers${this.query(businessId)}`, {
+            method: 'POST',
+            body: JSON.stringify(values),
+        });
+    }
+
+    async requestNumberCode(method: string, businessId?: number): Promise<WhatsAppNumberResponse> {
+        return this.request<WhatsAppNumberResponse>(`/integrations/whatsapp/numbers/code${this.query(businessId)}`, {
+            method: 'POST',
+            body: JSON.stringify({ method }),
+        });
+    }
+
+    async verifyNumberCode(code: string, businessId?: number): Promise<WhatsAppNumberResponse> {
+        return this.request<WhatsAppNumberResponse>(`/integrations/whatsapp/numbers/verify${this.query(businessId)}`, {
+            method: 'POST',
+            body: JSON.stringify({ code }),
+        });
+    }
+
+    async registerNumber(businessId?: number): Promise<WhatsAppNumberResponse> {
+        return this.request<WhatsAppNumberResponse>(`/integrations/whatsapp/numbers/register${this.query(businessId)}`, {
+            method: 'POST',
+        });
     }
 }

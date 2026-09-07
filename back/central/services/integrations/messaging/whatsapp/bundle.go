@@ -9,6 +9,7 @@ import (
 	"github.com/secamc93/probability/back/central/services/integrations/core"
 	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/app/usecaseconnection"
 	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/app/usecasemessaging"
+	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/app/usecasenumbers"
 	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/app/usecasetemplates"
 	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/app/usecasetestconnection"
 	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/domain/dtos"
@@ -71,6 +72,7 @@ type bundle struct {
 	testUsecase      usecasetestconnection.ITestConnectionUseCase
 	templatesUseCase usecasetemplates.IUseCase
 	connectionUC     usecaseconnection.IUseCaseMutable
+	numbersUC        usecasenumbers.IUseCaseMutable
 	handler          handlers.IHandler
 	credsCache       cache.ICredentialsCacheMutable
 }
@@ -130,7 +132,16 @@ func New(config env.IConfig, logger log.ILogger, rabbit rabbitmq.IQueue, redisCl
 	templatesUseCase := usecasetemplates.New(credsCache, templatesCache, templatesAPIFactory, logger)
 	connectionUseCase := usecaseconnection.New(credsCache, templatesAPIFactory, logger)
 
-	handler := handlers.New(useCase, templatesUseCase, connectionUseCase, logger, config, rabbit)
+	phoneNumbersAPIFactory := func(baseURL string) ports.IPhoneNumbersAPI {
+		if baseURL == "" {
+			baseURL = whatsappURL
+		}
+		return client.NewPhoneNumbersClient(baseURL, logger)
+	}
+
+	numbersUseCase := usecasenumbers.New(credsCache, phoneNumbersAPIFactory, logger)
+
+	handler := handlers.New(useCase, templatesUseCase, connectionUseCase, numbersUseCase, logger, config, rabbit)
 
 	if rabbit != nil {
 		webhookConsumer := consumerwebhook.New(rabbit, useCase, templatesUseCase, logger)
@@ -197,6 +208,7 @@ func New(config env.IConfig, logger log.ILogger, rabbit rabbitmq.IQueue, redisCl
 		testUsecase:      testUsecase,
 		templatesUseCase: templatesUseCase,
 		connectionUC:     connectionUseCase,
+		numbersUC:        numbersUseCase,
 		handler:          handler,
 		credsCache:       credsCache,
 	}
@@ -213,6 +225,9 @@ func (b *bundle) SetPlatformCredsGetter(getter ports.IPlatformCredentialsGetter)
 	}
 	if b.connectionUC != nil {
 		b.connectionUC.SetResolver(getter)
+	}
+	if b.numbersUC != nil {
+		b.numbersUC.SetResolver(getter)
 	}
 }
 

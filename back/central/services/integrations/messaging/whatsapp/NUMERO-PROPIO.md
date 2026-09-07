@@ -92,15 +92,43 @@ integracion y se invalida al cambiarle el `config`.
 - Si no es de nadie (o es el numero de la plataforma): sigue el camino de
   siempre, el agente AI Sales.
 
-### Onboarding del modo por defecto (numero en el WABA de Probability)
+### Alta del numero desde nuestra propia pantalla (modo por defecto)
 
-1. El cliente aporta el numero (nuevo, o migrado desde WhatsApp Business App).
-2. Se agrega ese numero al WABA de Probability y se verifica con el OTP que
-   recibe el cliente; queda el PIN de 2FA.
-3. En el front, en la integracion de WhatsApp del negocio, se activa "Usar mi
-   propio numero", se deja marcada la opcion "En la cuenta de Probability" y se
-   pega el `Phone Number ID`. No hace falta WABA ID ni token.
-4. No hay paso de plantillas: el numero usa las que ya estan aprobadas.
+El negocio digita su numero en Probability y no ve nunca una pantalla de Meta.
+Los cuatro pasos son API, con el token del system user (`whatsapp_business_management`
++ `whatsapp_business_messaging`); **no requiere App Review ni Embedded Signup**.
+
+| Paso | Endpoint nuestro | Llamada a Meta | `number_status` |
+|---|---|---|---|
+| 1. Agregar el numero | `POST /whatsapp/numbers` | `POST /{waba_id}/phone_numbers` (`cc`, `phone_number`, `verified_name`) | `esperando_codigo` |
+| 2. Pedir el codigo | `POST /whatsapp/numbers/code` | `POST /{phone_number_id}/request_code` (SMS o VOICE) | `esperando_codigo` |
+| 3. Verificar | `POST /whatsapp/numbers/verify` | `POST /{phone_number_id}/verify_code` | `verificado` |
+| 4. Activar | `POST /whatsapp/numbers/register` | `POST /{phone_number_id}/register` con PIN | `registrado` |
+
+`GET /whatsapp/numbers` devuelve el estado, y lo completa con
+`GET /{phone_number_id}` de Meta (`display_phone_number`, `quality_rating`,
+`name_status`, `code_verification_status`).
+
+- El `use_platform_token` recien pasa a `false` en el paso 4: hasta que el numero
+  no esta registrado, el negocio sigue enviando por el numero de Probability.
+- El **PIN de 2FA lo genera el backend**, se guarda cifrado en las credenciales
+  de la integracion (`two_factor_pin`) y se le muestra al usuario UNA vez.
+- `number_status`, `verified_name` y `hosted_by_platform` son campos protegidos:
+  el `PUT /integrations/:id` generico no los puede tocar. Sin eso, un negocio
+  podria marcarse `registrado` sin haber verificado nada.
+- No hay paso de plantillas: el numero usa las que ya estan aprobadas.
+
+Limites de Meta que se van a ver en la practica:
+
+- **Cupo de numeros por negocio.** Hoy estamos en el tope: la API responde
+  `Phone Numbers Count Exceeded Limit Per Business` (subcodigo 2388386). Se pide
+  ampliacion en Meta Business Suite; no es App Review.
+- El numero no puede estar activo en WhatsApp normal.
+- El `verified_name` pasa por revision de Meta. El webhook
+  `phone_number_name_update` avisa cuando lo aprueban y **hay que volver a
+  llamar `register`**. Ese campo todavia NO esta suscrito en la app: hay que
+  agregarlo a la suscripcion del webhook.
+- Maximo 10 intentos de `register` por numero cada 72 horas.
 
 **Pendiente para este modelo: medir el consumo por numero y cobrarlo.** Hoy
 nadie cuenta cuantos mensajes manda cada negocio, asi que Probability pone la

@@ -3,3 +3,4 @@ export { default as WhatsAppTypeCredentialsForm } from './WhatsAppTypeCredential
 export type { WhatsAppPlatformCredentials } from './WhatsAppTypeCredentialsForm';
 export { default as WhatsAppConnectionForm } from './WhatsAppConnectionForm';
 export { default as WhatsAppTemplatesPanel } from './WhatsAppTemplatesPanel';
+export { default as WhatsAppNumberWizard } from './WhatsAppNumberWizard';

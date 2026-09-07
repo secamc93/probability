@@ -113,10 +113,21 @@ type ITemplateAPI interface {
 }
 
 type WABAPhoneNumber struct {
-	ID                 string
-	DisplayPhoneNumber string
-	VerifiedName       string
-	QualityRating      string
+	ID                     string
+	DisplayPhoneNumber     string
+	VerifiedName           string
+	QualityRating          string
+	CodeVerificationStatus string
+	NameStatus             string
+	Status                 string
+}
+
+type IPhoneNumbersAPI interface {
+	AddPhoneNumber(ctx context.Context, wabaID, accessToken, countryCode, phoneNumber, verifiedName string) (string, error)
+	RequestCode(ctx context.Context, phoneNumberID, accessToken, method, language string) error
+	VerifyCode(ctx context.Context, phoneNumberID, accessToken, code string) error
+	Register(ctx context.Context, phoneNumberID, accessToken, pin string) error
+	GetPhoneNumber(ctx context.Context, phoneNumberID, accessToken string) (*WABAPhoneNumber, error)
 }
 
 type TemplateDefinitionRemote struct {

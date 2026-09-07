@@ -92,6 +92,10 @@ func Dispatch(ctx context.Context, useCase usecasemessaging.IUseCase, templates 
 				); err != nil {
 					logger.Error(ctx).Err(err).Msg("Error actualizando estado de plantilla")
 				}
+			case "phone_number_name_update":
+				logger.Info(ctx).
+					Str("waba_id", entry.ID).
+					Msg("Meta reviso el nombre visible de un numero: hay que volver a llamar register")
 			default:
 				logger.Warn(ctx).Str("field", change.Field).Msg("Campo de webhook WhatsApp no reconocido")
 			}

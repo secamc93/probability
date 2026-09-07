@@ -67,3 +67,30 @@ export interface WhatsAppConnectionValues {
     access_token: string;
     use_platform_token: boolean;
 }
+
+export interface WhatsAppNumberState {
+    integration_id: number;
+    business_id: number;
+    phone_number_id: string;
+    status: string;
+    display_phone_number: string;
+    verified_name: string;
+    name_status: string;
+    code_verification_status: string;
+    quality_rating: string;
+    hosted_by_platform: boolean;
+    active: boolean;
+    pin: string;
+}
+
+export interface WhatsAppNumberResponse {
+    success: boolean;
+    message?: string;
+    data?: WhatsAppNumberState;
+}
+
+export interface WhatsAppAddNumberValues {
+    country_code: string;
+    phone_number: string;
+    verified_name: string;
+}
