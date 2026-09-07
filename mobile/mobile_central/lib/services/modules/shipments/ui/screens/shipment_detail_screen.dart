@@ -44,9 +44,9 @@ class _ShipmentDetailScreenState extends State<ShipmentDetailScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: const Text('Cancelar guia'),
+        title: const Text('Cancelar gu\u00eda'),
         content: const Text(
-          'Cancelar la guia en la transportadora no devuelve el saldo debitado de la billetera. Confirmas?',
+          'Cancelar la gu\u00eda en la transportadora no devuelve el saldo debitado de la billetera. Confirmas?',
         ),
         actions: [
           TextButton(
@@ -56,7 +56,7 @@ class _ShipmentDetailScreenState extends State<ShipmentDetailScreen> {
           FilledButton(
             style: FilledButton.styleFrom(backgroundColor: AppColors.error),
             onPressed: () => Navigator.pop(dialogContext, true),
-            child: const Text('Cancelar guia'),
+            child: const Text('Cancelar gu\u00eda'),
           ),
         ],
       ),
@@ -74,7 +74,7 @@ class _ShipmentDetailScreenState extends State<ShipmentDetailScreen> {
       if (ok) _shipment = provider.shipmentById(widget.shipmentId) ?? _shipment;
     });
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(ok ? 'Guia cancelada' : (provider.error ?? 'No se pudo cancelar'))),
+      SnackBar(content: Text(ok ? 'Gu\u00eda cancelada' : (provider.error ?? 'No se pudo cancelar'))),
     );
   }
 
@@ -83,21 +83,21 @@ class _ShipmentDetailScreenState extends State<ShipmentDetailScreen> {
     final shipment = _shipment;
 
     return AppScaffold(
-      title: shipment?.trackingNumber ?? 'Guia',
+      title: shipment?.trackingNumber ?? 'Gu\u00eda',
       subtitle: shipment?.carrier,
       onBack: () => Navigator.of(context).pop(),
       actions: [
         if (shipment != null)
           IconButton(
             icon: const Icon(Icons.copy_rounded, size: 20),
-            tooltip: 'Copiar guia',
+            tooltip: 'Copiar gu\u00eda',
             onPressed: _copyTracking,
           ),
       ],
       body: shipment == null
           ? const AppEmptyState(
               icon: Icons.local_shipping_outlined,
-              title: 'Guia no encontrada',
+              title: 'Gu\u00eda no encontrada',
               message: 'Vuelve al listado y abrela de nuevo.',
             )
           : ListView(
@@ -106,7 +106,7 @@ class _ShipmentDetailScreenState extends State<ShipmentDetailScreen> {
                 _Header(shipment: shipment),
                 const SizedBox(height: 18),
                 const AppSectionHeader(
-                  title: 'Costo de la guia',
+                  title: 'Costo de la gu\u00eda',
                   subtitle: 'Costo transportadora + margen aplicado',
                 ),
                 _CostCard(shipment: shipment),
@@ -114,7 +114,7 @@ class _ShipmentDetailScreenState extends State<ShipmentDetailScreen> {
                   const SizedBox(height: 18),
                   const AppSectionHeader(
                     title: 'Contra entrega',
-                    subtitle: 'Comision que descuenta la transportadora del recaudo',
+                    subtitle: 'Comisi\u00f3n que descuenta la transportadora del recaudo',
                   ),
                   _CodCard(shipment: shipment),
                 ],
@@ -139,7 +139,7 @@ class _ShipmentDetailScreenState extends State<ShipmentDetailScreen> {
                             child: CircularProgressIndicator(strokeWidth: 2),
                           )
                         : const Icon(Icons.cancel_outlined, size: 18),
-                    label: const Text('Cancelar guia'),
+                    label: const Text('Cancelar gu\u00eda'),
                   ),
                 const SizedBox(height: 28),
               ],
@@ -236,7 +236,7 @@ class _CostCard extends StatelessWidget {
           const Divider(height: 18),
           Row(
             children: [
-              Expanded(child: Text('Total de la guia', style: theme.textTheme.titleMedium)),
+              Expanded(child: Text('Total de la gu\u00eda', style: theme.textTheme.titleMedium)),
               Text(
                 AppFormat.money(shipment.totalCost),
                 style: theme.textTheme.titleLarge?.copyWith(color: AppColors.primary),
@@ -260,7 +260,7 @@ class _CodCard extends StatelessWidget {
       child: Column(
         children: [
           AppKeyValueRow(
-            label: 'Comision transportadora',
+            label: 'Comisi\u00f3n transportadora',
             value: AppFormat.money(shipment.codCarrierFee),
             dense: true,
           ),
@@ -290,9 +290,9 @@ class _DestinationCard extends StatelessWidget {
             value: shipment.clientName ?? shipment.customerName ?? '-',
           ),
           const Divider(height: 18),
-          AppKeyValueRow(label: 'Telefono', value: shipment.customerPhone ?? '-'),
+          AppKeyValueRow(label: 'Tel\u00e9fono', value: shipment.customerPhone ?? '-'),
           const Divider(height: 18),
-          AppKeyValueRow(label: 'Direccion', value: shipment.destinationAddress ?? '-'),
+          AppKeyValueRow(label: 'Direcci\u00f3n', value: shipment.destinationAddress ?? '-'),
           const Divider(height: 18),
           AppKeyValueRow(
             label: 'Ciudad',

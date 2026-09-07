@@ -117,7 +117,7 @@ class _DriverCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${driver.phone}  ·  Licencia ${driver.licenseType}',
+                  '${driver.phone}  \u00b7  Licencia ${driver.licenseType}',
                   style: theme.textTheme.labelSmall,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

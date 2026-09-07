@@ -27,12 +27,12 @@ class _OrderListScreenState extends State<OrderListScreen> {
     SearchField(
       key: 'order_number',
       label: 'N\u00ba orden',
-      hint: 'Numero de la orden',
+      hint: 'N\u00famero de la orden',
     ),
     SearchField(
       key: 'internal_number',
       label: 'N\u00ba interno',
-      hint: 'Numero interno',
+      hint: 'N\u00famero interno',
     ),
     SearchField(
       key: 'customer_email',
@@ -41,8 +41,8 @@ class _OrderListScreenState extends State<OrderListScreen> {
     ),
     SearchField(
       key: 'customer_phone',
-      label: 'Telefono',
-      hint: 'Telefono del cliente',
+      label: 'Tel\u00e9fono',
+      hint: 'Tel\u00e9fono del cliente',
     ),
   ];
 
@@ -155,7 +155,7 @@ class _OrderListScreenState extends State<OrderListScreen> {
   String? _summary(OrderProvider provider) {
     if (_selection.isEmpty && _searchController.text.trim().isEmpty) return null;
     if (provider.list.isLoading) return null;
-    return '${provider.list.total} de ${provider.unfilteredTotal} ordenes';
+    return '${provider.list.total} de ${provider.unfilteredTotal} \u00f3rdenes';
   }
 
   void _openDetail(Order order) {
@@ -187,13 +187,13 @@ class _OrderListScreenState extends State<OrderListScreen> {
             Expanded(
               child: PaginatedListView<Order>(
                 controller: provider.list,
-                unitLabel: 'ordenes',
+                unitLabel: '\u00f3rdenes',
                 placeholderHeight: 158,
                 emptyIcon: Icons.receipt_long_outlined,
-                emptyTitle: 'Sin ordenes',
+                emptyTitle: 'Sin \u00f3rdenes',
                 emptyMessage: filtering
                     ? 'Ninguna orden coincide con los filtros aplicados.'
-                    : 'Cuando entren pedidos desde tus canales los vas a ver aqui.',
+                    : 'Cuando entren pedidos desde tus canales los vas a ver aqu\u00ed.',
                 itemBuilder: (context, order, index) =>
                     OrderCard(order: order, onTap: () => _openDetail(order)),
               ),

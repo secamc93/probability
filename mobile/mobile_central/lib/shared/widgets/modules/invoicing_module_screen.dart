@@ -10,8 +10,8 @@ class InvoicingModuleScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ModuleTabsScaffold(
-      title: 'Facturacion',
-      subtitle: 'Facturas y notas credito',
+      title: 'Facturaci\u00f3n',
+      subtitle: 'Facturas y notas cr\u00e9dito',
       initialTab: initialTab,
       tabs: const ['Facturas'],
       builder: (context, businessId) => [

@@ -166,7 +166,7 @@ class _ChannelDataSheetState extends State<ChannelDataSheet> {
       if (result.batchId.isEmpty) {
         setState(() {
           _applying = false;
-          _error = 'No se pudo iniciar la actualizacion';
+          _error = 'No se pudo iniciar la actualizaci\u00f3n';
         });
         return;
       }
@@ -285,7 +285,7 @@ class _ChannelDataSheetState extends State<ChannelDataSheet> {
                     ],
                     const SizedBox(height: 4),
                     Text(
-                      'Queda registrado quien escribio cada dato y se puede '
+                      'Queda registrado quien escribi\u00f3 cada dato y se puede '
                       'deshacer completo despues de aplicar.',
                       style: theme.textTheme.labelSmall,
                     ),
@@ -447,7 +447,7 @@ class _Conflicts extends StatelessWidget {
               const SizedBox(width: 7),
               Expanded(
                 child: Text(
-                  'Ojo, este dato ya lo escribio alguien mas',
+                  'Ojo, este dato ya lo escribi\u00f3 alguien mas',
                   style: theme.textTheme.labelMedium?.copyWith(
                     fontWeight: FontWeight.w700,
                     color: AppColors.warning,

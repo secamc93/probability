@@ -59,7 +59,7 @@ class _ShippingQuoteScreenState extends State<ShippingQuoteScreen> {
       return;
     }
     if (_destinationController.text.trim().isEmpty) {
-      setState(() => _error = 'Escribe la direccion de destino');
+      setState(() => _error = 'Escribe la direcci\u00f3n de destino');
       return;
     }
 
@@ -139,7 +139,7 @@ class _ShippingQuoteScreenState extends State<ShippingQuoteScreen> {
               TextField(
                 controller: _destinationController,
                 decoration: const InputDecoration(
-                  hintText: 'Direccion de entrega',
+                  hintText: 'Direcci\u00f3n de entrega',
                   prefixIcon: Icon(Icons.place_outlined, size: 20),
                 ),
               ),
@@ -149,7 +149,7 @@ class _ShippingQuoteScreenState extends State<ShippingQuoteScreen> {
                 keyboardType: TextInputType.number,
                 inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 decoration: const InputDecoration(
-                  hintText: 'Codigo DANE de la ciudad',
+                  hintText: 'C\u00f3digo DANE de la ciudad',
                   prefixIcon: Icon(Icons.map_outlined, size: 20),
                 ),
               ),
@@ -193,7 +193,7 @@ class _ShippingQuoteScreenState extends State<ShippingQuoteScreen> {
                       onChanged: (value) => setState(() => _cod = value),
                       title: Text('Contra entrega', style: Theme.of(context).textTheme.titleSmall),
                       subtitle: Text(
-                        'Suma la comision de la transportadora al total',
+                        'Suma la comisi\u00f3n de la transportadora al total',
                         style: Theme.of(context).textTheme.labelSmall,
                       ),
                     ),
@@ -202,7 +202,7 @@ class _ShippingQuoteScreenState extends State<ShippingQuoteScreen> {
                       contentPadding: EdgeInsets.zero,
                       value: _insured,
                       onChanged: (value) => setState(() => _insured = value),
-                      title: Text('Asegurar envio', style: Theme.of(context).textTheme.titleSmall),
+                      title: Text('Asegurar env\u00edo', style: Theme.of(context).textTheme.titleSmall),
                       subtitle: Text(
                         'Agrega el seguro extra sobre el valor declarado',
                         style: Theme.of(context).textTheme.labelSmall,
@@ -247,7 +247,7 @@ class _ShippingQuoteScreenState extends State<ShippingQuoteScreen> {
                         child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                       )
                     : const Icon(Icons.calculate_outlined, size: 19),
-                label: Text(_quoting ? 'Cotizando' : 'Cotizar envio'),
+                label: Text(_quoting ? 'Cotizando' : 'Cotizar env\u00edo'),
               ),
               if (_rates.isNotEmpty) ...[
                 const SizedBox(height: 22),
@@ -311,12 +311,12 @@ class _SelectionBar extends StatelessWidget {
               onPressed: () {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text('Generar guia con ${rate.carrier} por ${AppFormat.money(total)}'),
+                    content: Text('Generar gu\u00eda con ${rate.carrier} por ${AppFormat.money(total)}'),
                   ),
                 );
               },
               icon: const Icon(Icons.local_shipping_outlined, size: 18),
-              label: const Text('Generar guia'),
+              label: const Text('Generar gu\u00eda'),
             ),
           ],
         ),

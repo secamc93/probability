@@ -10,14 +10,14 @@ class AmazonConfig {
   factory AmazonConfig.fromJson(Map<String, dynamic> json) {
     return AmazonConfig(
       marketplaceId: json['marketplace_id'],
-      region: json['region'],
+      region: json['regi\u00f3n'],
     );
   }
 
   Map<String, dynamic> toJson() {
     final json = <String, dynamic>{};
     if (marketplaceId != null) json['marketplace_id'] = marketplaceId;
-    if (region != null) json['region'] = region;
+    if (region != null) json['regi\u00f3n'] = region;
     return json;
   }
 }

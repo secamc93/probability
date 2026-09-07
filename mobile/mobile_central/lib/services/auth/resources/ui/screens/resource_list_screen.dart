@@ -42,7 +42,7 @@ class _ResourceListScreenState extends State<ResourceListScreen> {
       builder: (ctx) => AlertDialog(
         title: const Text('Eliminar Recurso'),
         content: Text(
-            '¿Estás seguro de que deseas eliminar el recurso "${resource.name}"? Esta acción no se puede deshacer.'),
+            '\u00bfEst\u00e1s seguro de que deseas eliminar el recurso "${resource.name}"? Esta acci\u00f3n no se puede deshacer.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -344,9 +344,9 @@ class _ResourceFormDialogState extends State<_ResourceFormDialog> {
               TextFormField(
                 controller: _descriptionCtrl,
                 decoration: const InputDecoration(
-                  labelText: 'Descripción',
+                  labelText: 'Descripci\u00f3n',
                   border: OutlineInputBorder(),
-                  hintText: 'Descripción del recurso',
+                  hintText: 'Descripci\u00f3n del recurso',
                 ),
                 maxLines: 3,
               ),

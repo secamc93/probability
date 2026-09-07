@@ -8,7 +8,7 @@ import '../providers/integration_provider.dart';
 
 const Map<String, String> integrationCategoryLabels = {
   'ecommerce': 'Tiendas',
-  'invoicing': 'Facturacion',
+  'invoicing': 'Facturaci\u00f3n',
   'messaging': 'Mensajeria',
   'shipping': 'Transporte',
   'payment': 'Pagos',
@@ -83,7 +83,7 @@ class _IntegrationListScreenState extends State<IntegrationListScreen> {
                 padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
                 child: AppSearchField(
                   controller: _searchController,
-                  hintText: 'Buscar integracion',
+                  hintText: 'Buscar integraci\u00f3n',
                   onChanged: (_) => setState(() {}),
                 ),
               ),
@@ -106,7 +106,7 @@ class _IntegrationListScreenState extends State<IntegrationListScreen> {
                     ? const AppEmptyState(
                         icon: Icons.search_off_rounded,
                         title: 'Sin resultados',
-                        message: 'Ninguna integracion coincide con el filtro.',
+                        message: 'Ninguna integraci\u00f3n coincide con el filtro.',
                       )
                     : GridView.builder(
                         physics: const AlwaysScrollableScrollPhysics(),

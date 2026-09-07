@@ -101,8 +101,8 @@ class _OrdersComparePanelState extends State<OrdersComparePanel> {
         title: const Text('Crear en Probability'),
         content: Text(
           'Se van a crear $count orden${count == 1 ? '' : 'es'} tomando los '
-          'datos del canal. Es una accion que escribe: no se puede deshacer '
-          'desde aqui.',
+          'datos del canal. Es una acci\u00f3n que escribe: no se puede deshacer '
+          'desde aqu\u00ed.',
         ),
         actions: [
           TextButton(
@@ -123,8 +123,8 @@ class _OrdersComparePanelState extends State<OrdersComparePanel> {
 
     messenger.showSnackBar(SnackBar(
       content: Text(ok
-          ? provider.lastApply?.summary ?? 'Ordenes enviadas a crear'
-          : provider.error ?? 'No se pudieron crear las ordenes'),
+          ? provider.lastApply?.summary ?? '\u00d3rdenes enviadas a crear'
+          : provider.error ?? 'No se pudieron crear las \u00f3rdenes'),
     ));
 
     if (ok) {
@@ -141,7 +141,7 @@ class _OrdersComparePanelState extends State<OrdersComparePanel> {
         icon: Icons.link_off_rounded,
         title: 'Sin canales para comparar',
         message:
-            'Ninguno de tus canales conectados permite comparar ordenes todavia.',
+            'Ninguno de tus canales conectados permite comparar \u00f3rdenes todavia.',
       );
     }
 
@@ -162,11 +162,11 @@ class _OrdersComparePanelState extends State<OrdersComparePanel> {
                       title: 'Compara con el canal',
                       message:
                           'Elige el canal y el rango de fechas, y toca Comparar '
-                          'para preguntarle sus ordenes.',
+                          'para preguntarle sus \u00f3rdenes.',
                     )
                   : PaginatedListView<OrderCompareRow>(
                       controller: provider.rows,
-                      unitLabel: 'ordenes',
+                      unitLabel: '\u00f3rdenes',
                       emptyIcon: Icons.check_circle_outline_rounded,
                       emptyTitle: 'Sin diferencias',
                       emptyMessage:
@@ -281,7 +281,7 @@ class _Controls extends StatelessWidget {
                   textInputAction: TextInputAction.search,
                   decoration: const InputDecoration(
                     isDense: true,
-                    hintText: 'Numero de orden o cliente',
+                    hintText: 'N\u00famero de orden o cliente',
                     prefixIcon: Icon(Icons.search_rounded, size: 19),
                   ),
                   onChanged: provider.setSearch,
@@ -353,7 +353,7 @@ class _DiffToggle extends StatelessWidget {
     final active = provider.onlyDiff;
 
     return Tooltip(
-      message: 'Ocultar las ordenes que ya estan iguales en los dos lados',
+      message: 'Ocultar las \u00f3rdenes que ya estan iguales en los dos lados',
       child: GestureDetector(
         onTap: provider.toggleOnlyDiff,
         behavior: HitTestBehavior.opaque,
@@ -414,7 +414,7 @@ class _Summary extends StatelessWidget {
             children: [
               _Kpi(label: 'En el canal', value: totals.inChannel),
               _Kpi(
-                label: 'Faltan aqui',
+                label: 'Faltan aqu\u00ed',
                 value: totals.toCreate,
                 color: AppColors.info,
               ),
@@ -521,7 +521,7 @@ class _InventoryNotice extends StatelessWidget {
           const SizedBox(width: 9),
           Expanded(
             child: Text(
-              '$count de las ordenes por crear entran como historicas: el canal '
+              '$count de las \u00f3rdenes por crear entran como historicas: el canal '
               'ya las dio por entregadas, despachadas, canceladas o devueltas, '
               'asi que se crean completas pero no mueven inventario.',
               style: Theme.of(context).textTheme.labelSmall,
@@ -622,7 +622,7 @@ class _OrderCard extends StatelessWidget {
                   size: 14, color: AppColors.textDisabled),
               Expanded(
                 child: _Side(
-                  label: 'Aqui',
+                  label: 'Aqu\u00ed',
                   value: row.localStatus ?? 'no existe',
                   muted: row.localStatus == null,
                 ),
@@ -729,7 +729,7 @@ class _ApplyBar extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                '$count seleccionada${count == 1 ? '' : 's'} para crear aqui',
+                '$count seleccionada${count == 1 ? '' : 's'} para crear aqu\u00ed',
                 style: Theme.of(context).textTheme.labelMedium,
               ),
             ),

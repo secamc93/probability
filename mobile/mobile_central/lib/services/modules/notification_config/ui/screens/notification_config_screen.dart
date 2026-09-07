@@ -8,10 +8,10 @@ import '../../domain/entities.dart';
 import '../providers/notification_config_provider.dart';
 
 const Map<String, String> notificationCategoryLabels = {
-  'order': 'Ordenes',
-  'shipment': 'Envios',
+  'order': '\u00d3rdenes',
+  'shipment': 'Env\u00edos',
   'wallet': 'Billetera',
-  'invoice': 'Facturacion',
+  'invoice': 'Facturaci\u00f3n',
 };
 
 class NotificationConfigScreen extends StatefulWidget {

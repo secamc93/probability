@@ -58,7 +58,7 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
             padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
             child: AppSearchField(
               controller: _searchController,
-              hintText: 'Nombre, correo, telefono o documento',
+              hintText: 'Nombre, correo, tel\u00e9fono o documento',
               onChanged: _onSearch,
             ),
           ),
@@ -72,7 +72,7 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                   emptyIcon: Icons.people_alt_outlined,
                   emptyTitle: 'Sin clientes',
                   emptyMessage: _searchController.text.isEmpty
-                      ? 'Los clientes se crean solos cuando entran ordenes de tus canales.'
+                      ? 'Los clientes se crean solos cuando entran \u00f3rdenes de tus canales.'
                       : 'Ningun cliente coincide con la busqueda.',
                   itemBuilder: (context, customer, index) => _CustomerCard(
                     customer: customer,
@@ -160,7 +160,7 @@ class _CustomerCard extends StatelessWidget {
                   style: theme.textTheme.titleSmall?.copyWith(fontSize: 14),
                 ),
                 const SizedBox(height: 2),
-                Text('${detail.orderCount} ordenes', style: theme.textTheme.labelSmall),
+                Text('${detail.orderCount} \u00f3rdenes', style: theme.textTheme.labelSmall),
               ],
             ),
         ],

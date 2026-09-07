@@ -26,8 +26,8 @@ class _ShipmentListScreenState extends State<ShipmentListScreen> {
   static const List<SearchField> _searchFields = [
     SearchField(
       key: 'tracking_number',
-      label: 'Guia',
-      hint: 'Numero de guia',
+      label: 'Gu\u00eda',
+      hint: 'N\u00famero de guia',
     ),
     SearchField(
       key: 'customer_name',
@@ -49,7 +49,7 @@ class _ShipmentListScreenState extends State<ShipmentListScreen> {
       options: [
         FilterOption(value: 'pending', label: 'Pendiente'),
         FilterOption(value: 'created', label: 'Generada'),
-        FilterOption(value: 'in_transit', label: 'En transito'),
+        FilterOption(value: 'in_transit', label: 'En tr\u00e1nsito'),
         FilterOption(value: 'delivered', label: 'Entregada'),
         FilterOption(value: 'returned', label: 'Devuelta'),
         FilterOption(value: 'cancelled', label: 'Cancelada'),
@@ -141,19 +141,19 @@ class _ShipmentListScreenState extends State<ShipmentListScreen> {
               selection: _selection,
               onSelectionChanged: _applySelection,
               summary: filtering && !provider.list.isLoading
-                  ? '${provider.list.total} de ${provider.unfilteredTotal} guias'
+                  ? '${provider.list.total} de ${provider.unfilteredTotal} gu\u00edas'
                   : null,
             ),
             Expanded(
               child: PaginatedListView<Shipment>(
                 controller: provider.list,
-                unitLabel: 'guias',
+                unitLabel: 'gu\u00edas',
                 placeholderHeight: 150,
                 emptyIcon: Icons.local_shipping_outlined,
-                emptyTitle: 'Sin guias',
+                emptyTitle: 'Sin gu\u00edas',
                 emptyMessage: filtering
-                    ? 'Ninguna guia coincide con los filtros aplicados.'
-                    : 'Cuando generes guias para tus ordenes las vas a ver aqui.',
+                    ? 'Ninguna gu\u00eda coincide con los filtros aplicados.'
+                    : 'Cuando generes gu\u00edas para tus \u00f3rdenes las vas a ver aqu\u00ed.',
                 itemBuilder: (context, shipment, index) => ShipmentCard(
                   shipment: shipment,
                   onTap: () => Navigator.of(context).push(

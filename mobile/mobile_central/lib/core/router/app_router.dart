@@ -78,7 +78,7 @@ class AppRouter {
             ),
           ),
 
-          // Dashboard (página inicial)
+          // Dashboard (pagina inicial)
           GoRoute(
             path: '/dashboard',
             builder: (context, state) => _withBusiness(
@@ -86,7 +86,7 @@ class AppRouter {
             ),
           ),
 
-          // ── Ventas ──
+          // -- Ventas --
           GoRoute(
             path: '/orders',
             builder: (context, state) =>
@@ -118,7 +118,7 @@ class AppRouter {
             builder: (context, state) => const InvoicingModuleScreen(),
           ),
 
-          // ── Inventario ──
+          // -- Inventario --
           GoRoute(
             path: '/inventory',
             builder: (context, state) =>
@@ -135,7 +135,7 @@ class AppRouter {
                 const InventoryModuleScreen(initialTab: 2),
           ),
 
-          // ── Logística / Última Milla ──
+          // -- Logistica / Ultima Milla --
           GoRoute(
             path: '/delivery',
             builder: (context, state) =>
@@ -152,7 +152,7 @@ class AppRouter {
                 const DeliveryModuleScreen(initialTab: 2),
           ),
 
-          // ── Integraciones ──
+          // -- Integraciones --
           GoRoute(
             path: '/integrations',
             builder: (context, state) =>
@@ -164,7 +164,7 @@ class AppRouter {
                 const IntegrationsModuleScreen(initialTab: 1),
           ),
 
-          // ── Configuración ──
+          // -- Configuracion --
           GoRoute(
             path: '/notifications',
             builder: (context, state) => const NotificationsModuleScreen(),
@@ -180,7 +180,7 @@ class AppRouter {
                 const StorefrontModuleScreen(initialTab: 1),
           ),
 
-          // ── Finanzas ──
+          // -- Finanzas --
           GoRoute(
             path: '/wallet',
             builder: (context, state) => _withBusiness(
@@ -192,7 +192,7 @@ class AppRouter {
             builder: (context, state) => const PayScreen(),
           ),
 
-          // ── IAM / Administración ──
+          // -- IAM / Administracion --
           GoRoute(
             path: '/iam',
             builder: (context, state) =>
@@ -232,7 +232,7 @@ class AppRouter {
             builder: (context, state) => const ProfileScreen(),
           ),
 
-          // ── Otros ──
+          // -- Otros --
           GoRoute(
             path: '/publicsite',
             builder: (context, state) => const PublicSiteScreen(),

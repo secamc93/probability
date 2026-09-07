@@ -80,7 +80,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
           padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
           child: AppSearchField(
             controller: _searchController,
-            hintText: 'Numero de factura, orden o cliente',
+            hintText: 'N\u00famero de factura, orden o cliente',
             onChanged: _onSearch,
           ),
         ),
@@ -103,7 +103,7 @@ class _InvoiceListScreenState extends State<InvoiceListScreen> {
                 emptyIcon: Icons.description_outlined,
                 emptyTitle: 'Sin facturas',
                 emptyMessage: _status.isEmpty && _searchController.text.isEmpty
-                    ? 'Cuando factures una orden vas a ver aqui el documento y su estado en la DIAN.'
+                    ? 'Cuando factures una orden vas a ver aqu\u00ed el documento y su estado en la DIAN.'
                     : 'Ninguna factura coincide con el filtro aplicado.',
                 itemBuilder: (context, invoice, index) => InvoiceCard(
                   invoice: invoice,
@@ -161,7 +161,7 @@ class InvoiceCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '${invoice.providerName ?? ''}  ·  ${invoice.orderNumber ?? ''}',
+                      '${invoice.providerName ?? ''}  \u00b7  ${invoice.orderNumber ?? ''}',
                       style: theme.textTheme.labelSmall,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

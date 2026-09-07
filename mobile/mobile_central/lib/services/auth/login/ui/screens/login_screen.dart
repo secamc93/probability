@@ -65,7 +65,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Ingresa a tu operacion: ordenes, envios, inventario y pagos en un solo lugar.',
+                      'Ingresa a tu operaci\u00f3n: \u00f3rdenes, env\u00edos, inventario y pagos en un solo lugar.',
                       style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.textMuted),
                     ),
                     const SizedBox(height: 32),
