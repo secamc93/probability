@@ -1,0 +1,81 @@
+---
+interface Props {
+    titulo: string;
+    actualizado?: string;
+    html?: string;
+}
+
+const { titulo, actualizado, html } = Astro.props;
+---
+
+<article class="mx-auto max-w-3xl px-6 py-16">
+    <a href="/" class="text-sm font-semibold text-[#8B5CF6] hover:text-[#7C3AED]">&larr; Volver al inicio</a>
+
+    <h1 class="mt-6 text-3xl font-bold text-gray-900 sm:text-4xl">{titulo}</h1>
+    {actualizado && <p class="mt-2 text-sm text-gray-500">Última actualización: {actualizado}</p>}
+
+    <div class="legal mt-10">
+        {html ? <Fragment set:html={html} /> : <slot />}
+    </div>
+
+    <hr class="my-12 border-gray-200" />
+
+    <p class="text-sm text-gray-500">
+        SERVICIOS DE TECNOLOGÍA LOGÍSTICA PARA ECOMMERCE S.A.S. · NIT 902.041.974-6 · Calle 152B #104-50,
+        Bogotá D.C., Colombia ·
+        <a href="mailto:comercial@probabilityapp.com" class="text-[#8B5CF6] hover:text-[#7C3AED]">
+            comercial@probabilityapp.com
+        </a>
+    </p>
+</article>
+
+<style is:global>
+    .legal {
+        color: #374151;
+        line-height: 1.75;
+    }
+    .legal h2 {
+        margin-top: 2.5rem;
+        margin-bottom: 0.75rem;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #111827;
+    }
+    .legal h3 {
+        margin-top: 1.75rem;
+        margin-bottom: 0.5rem;
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: #111827;
+    }
+    .legal p {
+        margin-bottom: 0.75rem;
+    }
+    .legal ul,
+    .legal ol {
+        margin: 0.75rem 0 1rem 1.5rem;
+        list-style: disc;
+    }
+    .legal ol {
+        list-style: decimal;
+    }
+    .legal li {
+        margin-bottom: 0.35rem;
+    }
+    .legal a {
+        color: #8b5cf6;
+        text-decoration: underline;
+    }
+    .legal table {
+        width: 100%;
+        margin: 1rem 0;
+        border-collapse: collapse;
+        font-size: 0.925rem;
+    }
+    .legal th,
+    .legal td {
+        border: 1px solid #e5e7eb;
+        padding: 0.5rem 0.75rem;
+        text-align: left;
+    }
+</style>

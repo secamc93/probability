@@ -1,0 +1,91 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import LegalPage from '../components/LegalPage.astro';
+
+const title = 'Eliminación de datos - ProbabilityIA';
+const description = 'Cómo solicitar la eliminación de tus datos personales y de los datos de tu cuenta en Probability, incluidos los datos de WhatsApp Business.';
+---
+
+<Layout title={title} description={description}>
+    <Header />
+    <main>
+        <LegalPage titulo="Eliminación de datos" actualizado="6 de septiembre de 2026">
+            <p>
+                Puedes pedir en cualquier momento que borremos tus datos personales y los datos de tu cuenta en
+                Probability. Esta página explica cómo hacerlo y qué pasa después.
+            </p>
+
+            <h2>Cómo solicitarlo</h2>
+            <p>
+                Escríbenos a
+                <a href="mailto:comercial@probabilityapp.com">comercial@probabilityapp.com</a>
+                desde el correo con el que está registrada tu cuenta, con el asunto
+                <strong>"Eliminación de datos"</strong>. Incluye:
+            </p>
+            <ul>
+                <li>El nombre del negocio y el correo de la cuenta.</li>
+                <li>Si quieres borrar toda la cuenta o solo un dato puntual (por ejemplo, un cliente).</li>
+                <li>Si conectaste tu número de WhatsApp, indícalo para desvincularlo de nuestra cuenta de Meta.</li>
+            </ul>
+            <p>
+                También puedes pedirlo desde el panel, escribiéndole a soporte con la cuenta ya iniciada. En ese caso
+                no tenemos que verificar tu identidad por separado.
+            </p>
+
+            <h2>Qué pasa después</h2>
+            <ul>
+                <li>
+                    <strong>Respondemos en máximo 10 días hábiles</strong> confirmando que recibimos la solicitud, tal
+                    como lo exige la Ley 1581 de 2012 de Colombia.
+                </li>
+                <li>
+                    <strong>Ejecutamos el borrado en máximo 30 días calendario</strong> desde la confirmación. Se
+                    eliminan los datos de tu negocio, tus clientes, tus órdenes, tus conversaciones de WhatsApp y los
+                    archivos asociados.
+                </li>
+                <li>
+                    Si tu número de WhatsApp estaba conectado a través de nuestra cuenta de Meta, lo desvinculamos y
+                    borramos los tokens y credenciales que teníamos guardados.
+                </li>
+            </ul>
+
+            <h2>Qué no podemos borrar de inmediato</h2>
+            <p>
+                Hay información que la ley nos obliga a conservar aunque cierres la cuenta. En esos casos la
+                bloqueamos: deja de usarse para cualquier fin y solo queda disponible para cumplir la obligación legal.
+            </p>
+            <ul>
+                <li>
+                    <strong>Facturas y soportes contables:</strong> se conservan mientras lo exija la normativa
+                    tributaria y comercial colombiana.
+                </li>
+                <li>
+                    <strong>Guías de envío y recaudos contra entrega en curso:</strong> se conservan hasta cerrar la
+                    operación y la liquidación con la transportadora.
+                </li>
+                <li>
+                    <strong>Registros exigidos por una autoridad</strong> en el marco de una investigación o proceso.
+                </li>
+            </ul>
+
+            <h2>Datos que vienen de Meta</h2>
+            <p>
+                Si conectaste tu cuenta de WhatsApp Business, guardamos los identificadores de tu cuenta y de tu
+                número, las credenciales de acceso cifradas y el historial de mensajes que pasa por la plataforma.
+                Todo eso se elimina con la solicitud descrita arriba. Puedes además revocar nuestro acceso en
+                cualquier momento desde tu Business Manager de Meta, sin avisarnos: al hacerlo dejamos de poder enviar
+                o recibir mensajes por tu número de inmediato.
+            </p>
+
+            <h2>Tus otros derechos</h2>
+            <p>
+                Además de la eliminación, puedes conocer, actualizar y rectificar tus datos, pedir prueba de la
+                autorización que otorgaste y revocarla. El detalle está en nuestra
+                <a href="/politica-de-privacidad">política de privacidad</a>.
+            </p>
+        </LegalPage>
+    </main>
+    <Footer />
+</Layout>

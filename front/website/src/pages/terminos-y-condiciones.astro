@@ -1,0 +1,18 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import LegalPage from '../components/LegalPage.astro';
+import terminos from '../content/legal/terminos.html?raw';
+
+const title = 'Términos y condiciones - ProbabilityIA';
+const description = 'Términos y condiciones de uso de la plataforma Probability.';
+---
+
+<Layout title={title} description={description}>
+    <Header />
+    <main>
+        <LegalPage titulo="Términos y condiciones" actualizado="9 de agosto de 2026" html={terminos} />
+    </main>
+    <Footer />
+</Layout>

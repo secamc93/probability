@@ -9,6 +9,8 @@ El codigo de las fases 1 a 5 esta escrito y compila; `go build ./...` y
 `go test ./...` de `back/central` pasan, y el front typechequea. Lo que sigue NO
 se ejecuto: esta sesion no tiene base de datos, ni Redis, ni token de Meta.
 
+**Los pasos, en orden y con casillas: `.claude/plan/whatsapp-numero-por-cliente-pasos.md`.**
+
 ## Revision del 2026-09-06
 
 Se reviso la rama y se verifico contra Meta con el token de `cam-adm`. Lo que se
