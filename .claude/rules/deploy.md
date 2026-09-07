@@ -82,6 +82,32 @@ Consecuencias que hay que tener presentes:
   desplegar backend y frontend a la vez a proposito** si el servidor esta justo
   de RAM.
 
+### El switch va bajo candado (desde 2026-09-07)
+
+`active.conf` tiene los dos upstreams en un mismo archivo, y backend y frontend
+se despliegan en paralelo cuando un push toca los dos. Antes cada script leia el
+color del OTRO servicio al empezar y reescribia el archivo entero al final, con
+minutos de diferencia.
+
+El 2026-09-07 se pisaron con 0,2 s de diferencia: el frontend escribio
+`backend=blue` con el dato que habia leido al inicio, cuando el backend ya se
+habia movido a green y apagado blue. nginx quedo apuntando a un contenedor
+inexistente y todo `/api/` devolvio 502; el login mostraba
+`Unexpected token '<'` porque recibia la pagina de error de nginx en vez de JSON.
+
+Por eso el cambio de color se hace con `bg_switch <back|front> <color>`
+(`bluegreen-lib.sh`), que:
+
+- toma un candado (`nginx-upstreams/.switch.lock`, `mkdir` atomico, espera hasta
+  180 s y descarta candados de mas de 5 minutos),
+- **relee el color del otro servicio dentro de la seccion critica**, nunca al
+  principio del deploy,
+- escribe por archivo temporal y `mv`, para que nginx no lea un archivo a medias,
+- y si `nginx -t` falla, restaura el color anterior sin soltar el candado.
+
+**Nunca llamar `bg_write_upstreams` + `bg_reload_nginx` sueltos desde un deploy.**
+Esa pareja es justo la que provoco el 502.
+
 ```bash
 # Que color esta sirviendo
 cat ~/probability/infra/compose-prod/nginx-upstreams/active.conf
