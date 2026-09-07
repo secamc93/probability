@@ -77,7 +77,11 @@ func (c *Client) SearchProducts(ctx context.Context, credentials dtos.Credential
 			if strings.TrimSpace(r.Code) == "" || !coincide(r.Code, r.Name, buscado) {
 				continue
 			}
-			item := dtos.ProductItem{ID: r.ID, Code: r.Code, Type: r.Type, Name: r.Name}
+			taxes := make([]dtos.ProductTax, 0, len(r.Taxes))
+			for _, t := range r.Taxes {
+				taxes = append(taxes, dtos.ProductTax{ID: t.ID, Name: t.Name, Type: t.Type, Percentage: t.Percentage})
+			}
+			item := dtos.ProductItem{ID: r.ID, Code: r.Code, Type: r.Type, Name: r.Name, Taxes: taxes}
 			if strings.EqualFold(strings.TrimSpace(r.Type), "Service") {
 				servicios = append(servicios, item)
 				continue

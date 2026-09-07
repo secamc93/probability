@@ -40,12 +40,20 @@ type ProductItem struct {
 	StockControl      bool
 	AvailableQuantity float64
 	Warehouses        []ProductWarehouseStock
+	Taxes             []ProductTax
 }
 
 type ProductWarehouseStock struct {
 	ID       int
 	Name     string
 	Quantity float64
+}
+
+type ProductTax struct {
+	ID         int
+	Name       string
+	Type       string
+	Percentage float64
 }
 
 type WarehouseItem struct {

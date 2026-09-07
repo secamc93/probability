@@ -39,6 +39,12 @@ type listProductsResponse struct {
 			Name     string  `json:"name"`
 			Quantity float64 `json:"quantity"`
 		} `json:"warehouses"`
+		Taxes []struct {
+			ID         int     `json:"id"`
+			Name       string  `json:"name"`
+			Type       string  `json:"type"`
+			Percentage float64 `json:"percentage"`
+		} `json:"taxes"`
 	} `json:"results"`
 }
 
@@ -98,6 +104,15 @@ func (c *Client) ListProducts(ctx context.Context, credentials dtos.Credentials,
 				Quantity: w.Quantity,
 			})
 		}
+		taxes := make([]dtos.ProductTax, 0, len(r.Taxes))
+		for _, t := range r.Taxes {
+			taxes = append(taxes, dtos.ProductTax{
+				ID:         t.ID,
+				Name:       t.Name,
+				Type:       t.Type,
+				Percentage: t.Percentage,
+			})
+		}
 		items = append(items, dtos.ProductItem{
 			ID:                r.ID,
 			Code:              r.Code,
@@ -111,6 +126,7 @@ func (c *Client) ListProducts(ctx context.Context, credentials dtos.Credentials,
 			StockControl:      r.StockControl,
 			AvailableQuantity: r.AvailableQuantity,
 			Warehouses:        warehouses,
+			Taxes:             taxes,
 		})
 	}
 

@@ -24,7 +24,7 @@ func (uc *invoicingUseCase) SearchProducts(ctx context.Context, integrationID ui
 
 	out := make([]dtos.CatalogItem, 0, len(items))
 	for _, i := range items {
-		out = append(out, dtos.CatalogItem{Code: i.Code, Name: i.Name, Detail: i.Type})
+		out = append(out, dtos.CatalogItem{Code: i.Code, Name: i.Name, Detail: i.Type, Taxes: i.Taxes})
 	}
 	return out, nil
 }

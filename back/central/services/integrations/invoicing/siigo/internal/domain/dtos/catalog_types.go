@@ -5,8 +5,9 @@ type CatalogItem struct {
 	Code    string `json:"code,omitempty"`
 	Name    string `json:"name"`
 	Detail  string `json:"detail,omitempty"`
-	Percent string `json:"percent,omitempty"`
-	Active  bool   `json:"active"`
+	Percent string       `json:"percent,omitempty"`
+	Active  bool         `json:"active"`
+	Taxes   []ProductTax `json:"taxes,omitempty"`
 }
 
 type Catalogs struct {
