@@ -23,3 +23,8 @@ type DemoVerifyOTPRequest struct {
 	Email string `json:"email" binding:"required,email"`
 	Code  string `json:"code" binding:"required,len=6,numeric"`
 }
+
+type GoogleDemoRegisterRequest struct {
+	SignupToken  string `json:"google_token" binding:"required"`
+	BusinessName string `json:"business_name" binding:"required,min=2,max=100"`
+}

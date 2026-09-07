@@ -10,25 +10,28 @@ import (
 )
 
 type AuthRepositoryMock struct {
-	GetUserByEmailFn                     func(ctx context.Context, email string) (*domain.UserAuthInfo, error)
-	HasPendingEmailVerificationFn        func(ctx context.Context, userID uint) (bool, error)
-	GetUserByIDFn                        func(ctx context.Context, userID uint) (*domain.UserAuthInfo, error)
-	CreatePasswordResetTokenFn           func(ctx context.Context, userID uint, tokenHash string, channel string, expiresAt time.Time) error
-	InvalidateUserPasswordResetTokensFn  func(ctx context.Context, userID uint) error
-	GetValidPasswordResetTokenFn         func(ctx context.Context, tokenHash string) (*domain.PasswordResetTokenInfo, error)
-	GetActiveOTPTokenFn                  func(ctx context.Context, userID uint) (*domain.PasswordResetTokenInfo, error)
+	GetUserByEmailFn                      func(ctx context.Context, email string) (*domain.UserAuthInfo, error)
+	HasPendingEmailVerificationFn         func(ctx context.Context, userID uint) (bool, error)
+	GetUserByIDFn                         func(ctx context.Context, userID uint) (*domain.UserAuthInfo, error)
+	CreatePasswordResetTokenFn            func(ctx context.Context, userID uint, tokenHash string, channel string, expiresAt time.Time) error
+	InvalidateUserPasswordResetTokensFn   func(ctx context.Context, userID uint) error
+	GetValidPasswordResetTokenFn          func(ctx context.Context, tokenHash string) (*domain.PasswordResetTokenInfo, error)
+	GetActiveOTPTokenFn                   func(ctx context.Context, userID uint) (*domain.PasswordResetTokenInfo, error)
 	IncrementPasswordResetTokenAttemptsFn func(ctx context.Context, tokenID uint) error
-	MarkPasswordResetTokenUsedFn         func(ctx context.Context, tokenID uint) error
-	GetUserRolesFn                       func(ctx context.Context, userID uint) ([]domain.Role, error)
-	GetRolePermissionsFn                 func(ctx context.Context, roleID uint) ([]domain.Permission, error)
-	UpdateLastLoginFn                    func(ctx context.Context, userID uint) error
-	ChangePasswordFn                     func(ctx context.Context, userID uint, newPassword string) error
-	GetUserBusinessesFn                  func(ctx context.Context, userID uint) ([]domain.BusinessInfoEntity, error)
-	GetUserRoleByBusinessFn              func(ctx context.Context, userID uint, businessID uint) (*domain.Role, error)
-	GetBusinessStaffRelationFn           func(ctx context.Context, userID uint, businessID *uint) (*domain.BusinessStaffRelation, error)
-	GetBusinessConfiguredResourcesIDsFn  func(ctx context.Context, businessID uint) ([]uint, error)
-	GetBusinessByIDFn                    func(ctx context.Context, businessID uint) (*domain.BusinessInfo, error)
-	GetRoleByIDFn                        func(ctx context.Context, id uint) (*domain.Role, error)
+	MarkPasswordResetTokenUsedFn          func(ctx context.Context, tokenID uint) error
+	GetUserRolesFn                        func(ctx context.Context, userID uint) ([]domain.Role, error)
+	GetRolePermissionsFn                  func(ctx context.Context, roleID uint) ([]domain.Permission, error)
+	UpdateLastLoginFn                     func(ctx context.Context, userID uint) error
+	ChangePasswordFn                      func(ctx context.Context, userID uint, newPassword string) error
+	GetUserBusinessesFn                   func(ctx context.Context, userID uint) ([]domain.BusinessInfoEntity, error)
+	GetUserRoleByBusinessFn               func(ctx context.Context, userID uint, businessID uint) (*domain.Role, error)
+	GetBusinessStaffRelationFn            func(ctx context.Context, userID uint, businessID *uint) (*domain.BusinessStaffRelation, error)
+	GetBusinessConfiguredResourcesIDsFn   func(ctx context.Context, businessID uint) ([]uint, error)
+	GetBusinessByIDFn                     func(ctx context.Context, businessID uint) (*domain.BusinessInfo, error)
+	GetRoleByIDFn                         func(ctx context.Context, id uint) (*domain.Role, error)
+	GetUserByGoogleIDFn                   func(ctx context.Context, googleID string) (*domain.UserAuthInfo, error)
+	LinkGoogleAccountFn                   func(ctx context.Context, userID uint, googleID string) error
+	UpdateAvatarIfEmptyFn                 func(ctx context.Context, userID uint, avatarURL string) error
 }
 
 var _ domain.IAuthRepository = (*AuthRepositoryMock)(nil)
@@ -167,9 +170,10 @@ func (m *AuthRepositoryMock) GetRoleByID(ctx context.Context, id uint) (*domain.
 }
 
 type JWTServiceMock struct {
-	GenerateTokenFn func(userID, businessID, businessTypeID, roleID uint, subscriptionStatus string) (string, error)
-	ValidateTokenFn func(tokenString string) (*domain.JWTClaims, error)
-	RefreshTokenFn  func(tokenString string) (string, error)
+	GenerateTokenFn             func(userID, businessID, businessTypeID, roleID uint, subscriptionStatus string) (string, error)
+	ValidateTokenFn             func(tokenString string) (*domain.JWTClaims, error)
+	RefreshTokenFn              func(tokenString string) (string, error)
+	GenerateGoogleSignupTokenFn func(googleID, email, name, picture string, ttl time.Duration) (string, error)
 }
 
 var _ domain.IJWTService = (*JWTServiceMock)(nil)
@@ -193,6 +197,13 @@ func (m *JWTServiceMock) RefreshToken(tokenString string) (string, error) {
 		return m.RefreshTokenFn(tokenString)
 	}
 	return "", nil
+}
+
+func (m *JWTServiceMock) GenerateGoogleSignupToken(googleID, email, name, picture string, ttl time.Duration) (string, error) {
+	if m.GenerateGoogleSignupTokenFn != nil {
+		return m.GenerateGoogleSignupTokenFn(googleID, email, name, picture, ttl)
+	}
+	return "token-de-registro-google", nil
 }
 
 type EmailSenderMock struct {
@@ -276,4 +287,25 @@ func (l *SilentLogger) WithModule(module string) log.ILogger {
 
 func (l *SilentLogger) WithBusinessID(businessID uint) log.ILogger {
 	return l
+}
+
+func (m *AuthRepositoryMock) GetUserByGoogleID(ctx context.Context, googleID string) (*domain.UserAuthInfo, error) {
+	if m.GetUserByGoogleIDFn != nil {
+		return m.GetUserByGoogleIDFn(ctx, googleID)
+	}
+	return nil, nil
+}
+
+func (m *AuthRepositoryMock) LinkGoogleAccount(ctx context.Context, userID uint, googleID string) error {
+	if m.LinkGoogleAccountFn != nil {
+		return m.LinkGoogleAccountFn(ctx, userID, googleID)
+	}
+	return nil
+}
+
+func (m *AuthRepositoryMock) UpdateAvatarIfEmpty(ctx context.Context, userID uint, avatarURL string) error {
+	if m.UpdateAvatarIfEmptyFn != nil {
+		return m.UpdateAvatarIfEmptyFn(ctx, userID, avatarURL)
+	}
+	return nil
 }

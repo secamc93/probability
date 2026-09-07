@@ -7,26 +7,24 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-// IJWTService define operaciones de JWT sin depender de otros módulos
 type IJWTService interface {
-	// Token unificado que incluye toda la información
 	GenerateToken(userID, businessID, businessTypeID, roleID uint, subscriptionStatus string) (string, error)
 	ValidateToken(tokenString string) (*JWTClaims, error)
 	RefreshToken(tokenString string) (string, error)
 
-	// Tokens para votación pública
 	GeneratePublicVotingToken(votingID, votingGroupID, hpID uint, durationHours int) (string, error)
 	GenerateVotingAuthToken(residentID, propertyUnitID, votingID, votingGroupID, hpID uint) (string, error)
 	ValidatePublicVotingToken(tokenString string) (*PublicVotingClaims, error)
 	ValidateVotingAuthToken(tokenString string) (*VotingAuthClaims, error)
+
+	GenerateGoogleSignupToken(googleID, email, name, picture string, ttl time.Duration) (string, error)
+	ValidateGoogleSignupToken(tokenString string) (*GoogleSignupClaims, error)
 }
 
-// JWTService implementación concreta
 type JWTService struct {
 	secretKey string
 }
 
-// Claims representa los claims internos del token unificado
 type Claims struct {
 	UserID             uint   `json:"user_id"`
 	BusinessID         uint   `json:"business_id"`
@@ -36,7 +34,6 @@ type Claims struct {
 	jwt.RegisteredClaims
 }
 
-// JWTClaims es la estructura pública que exponemos a consumidores
 type JWTClaims struct {
 	UserID             uint
 	BusinessID         uint
@@ -45,14 +42,12 @@ type JWTClaims struct {
 	SubscriptionStatus string
 }
 
-// New crea una nueva instancia del servicio JWT (autocontenida)
 func New(secretKey string) IJWTService {
 	return &JWTService{
 		secretKey: secretKey,
 	}
 }
 
-// GenerateToken genera un nuevo token JWT unificado con toda la información
 func (j *JWTService) GenerateToken(userID, businessID, businessTypeID, roleID uint, subscriptionStatus string) (string, error) {
 	claims := Claims{
 		UserID:             userID,
@@ -61,7 +56,7 @@ func (j *JWTService) GenerateToken(userID, businessID, businessTypeID, roleID ui
 		RoleID:             roleID,
 		SubscriptionStatus: subscriptionStatus,
 		RegisteredClaims: jwt.RegisteredClaims{
-			ExpiresAt: jwt.NewNumericDate(time.Now().Add(168 * time.Hour)), // 7 días para coincidir con el login cookie
+			ExpiresAt: jwt.NewNumericDate(time.Now().Add(168 * time.Hour)),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
 			NotBefore: jwt.NewNumericDate(time.Now()),
 			Issuer:    "central-reserve-api",
@@ -79,9 +74,8 @@ func (j *JWTService) GenerateToken(userID, businessID, businessTypeID, roleID ui
 	return tokenString, nil
 }
 
-// ValidateToken valida y decodifica un token JWT
 func (j *JWTService) ValidateToken(tokenString string) (*JWTClaims, error) {
-	// Usar un parser con margen de gracia (leeway) para manejar drift de reloj en producción
+
 	parser := jwt.NewParser(jwt.WithLeeway(5 * time.Minute))
 
 	token, err := parser.ParseWithClaims(tokenString, &Claims{}, func(token *jwt.Token) (interface{}, error) {
@@ -108,7 +102,6 @@ func (j *JWTService) ValidateToken(tokenString string) (*JWTClaims, error) {
 	return nil, fmt.Errorf("token inválido")
 }
 
-// RefreshToken refresca un token JWT
 func (j *JWTService) RefreshToken(tokenString string) (string, error) {
 	claims, err := j.ValidateToken(tokenString)
 	if err != nil {

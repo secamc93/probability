@@ -12,11 +12,19 @@ type IDemoRepository interface {
 	UpdateUserPhone(ctx context.Context, userID uint, phone string) error
 	BusinessCodeExists(ctx context.Context, code string) (bool, error)
 	GetDemoRoleID(ctx context.Context) (uint, error)
-	CreateDemoAccount(ctx context.Context, params CreateDemoAccountParams) (uint, error)
+	CreateDemoAccount(ctx context.Context, params CreateDemoAccountParams) (*DemoAccountCreated, error)
 	GetValidEmailVerificationToken(ctx context.Context, tokenHash string) (*EmailVerificationTokenInfo, error)
 	ActivateUserAndConsumeToken(ctx context.Context, tokenID, userID uint) error
 	GetBusinessIDByUserID(ctx context.Context, userID uint) (uint, error)
 	ProvisionDemoIntegrations(ctx context.Context, businessID, userID uint) error
+}
+
+type IGoogleSignupTokenValidator interface {
+	ValidateGoogleSignupToken(tokenString string) (*GoogleSignupClaims, error)
+}
+
+type ISessionTokenIssuer interface {
+	GenerateToken(userID, businessID, businessTypeID, roleID uint, subscriptionStatus string) (string, error)
 }
 
 type IEmailSender interface {

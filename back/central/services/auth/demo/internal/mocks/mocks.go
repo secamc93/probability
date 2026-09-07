@@ -17,7 +17,7 @@ type RepositoryMock struct {
 	UpdateUserPhoneFn                func(ctx context.Context, userID uint, phone string) error
 	BusinessCodeExistsFn             func(ctx context.Context, code string) (bool, error)
 	GetDemoRoleIDFn                  func(ctx context.Context) (uint, error)
-	CreateDemoAccountFn              func(ctx context.Context, params domain.CreateDemoAccountParams) (uint, error)
+	CreateDemoAccountFn              func(ctx context.Context, params domain.CreateDemoAccountParams) (*domain.DemoAccountCreated, error)
 	GetValidEmailVerificationTokenFn func(ctx context.Context, tokenHash string) (*domain.EmailVerificationTokenInfo, error)
 	ActivateUserAndConsumeTokenFn    func(ctx context.Context, tokenID, userID uint) error
 	GetBusinessIDByUserIDFn          func(ctx context.Context, userID uint) (uint, error)
@@ -101,12 +101,13 @@ func (m *RepositoryMock) GetDemoRoleID(ctx context.Context) (uint, error) {
 	return 9, nil
 }
 
-func (m *RepositoryMock) CreateDemoAccount(ctx context.Context, params domain.CreateDemoAccountParams) (uint, error) {
+func (m *RepositoryMock) CreateDemoAccount(ctx context.Context, params domain.CreateDemoAccountParams) (*domain.DemoAccountCreated, error) {
 	m.CuentasCreadas = append(m.CuentasCreadas, params)
 	if m.CreateDemoAccountFn != nil {
 		return m.CreateDemoAccountFn(ctx, params)
 	}
-	return uint(len(m.CuentasCreadas)), nil
+	n := uint(len(m.CuentasCreadas))
+	return &domain.DemoAccountCreated{BusinessID: n, UserID: n, RoleID: params.RoleID}, nil
 }
 
 func (m *RepositoryMock) GetValidEmailVerificationToken(ctx context.Context, tokenHash string) (*domain.EmailVerificationTokenInfo, error) {
@@ -242,4 +243,34 @@ func (l *SilentLogger) WithModule(module string) log.ILogger {
 
 func (l *SilentLogger) WithBusinessID(businessID uint) log.ILogger {
 	return l
+}
+
+type GoogleSignupTokenValidatorMock struct {
+	ValidateFn func(tokenString string) (*domain.GoogleSignupClaims, error)
+	Recibidos  []string
+}
+
+func (m *GoogleSignupTokenValidatorMock) ValidateGoogleSignupToken(tokenString string) (*domain.GoogleSignupClaims, error) {
+	m.Recibidos = append(m.Recibidos, tokenString)
+	if m.ValidateFn != nil {
+		return m.ValidateFn(tokenString)
+	}
+	return &domain.GoogleSignupClaims{
+		GoogleID: "sub-de-prueba",
+		Email:    "nuevo@ejemplo.com",
+		Name:     "Nuevo Usuario",
+	}, nil
+}
+
+type SessionTokenIssuerMock struct {
+	GenerateFn func(userID, businessID, businessTypeID, roleID uint, subscriptionStatus string) (string, error)
+	Emitidos   [][]uint
+}
+
+func (m *SessionTokenIssuerMock) GenerateToken(userID, businessID, businessTypeID, roleID uint, subscriptionStatus string) (string, error) {
+	m.Emitidos = append(m.Emitidos, []uint{userID, businessID, businessTypeID, roleID})
+	if m.GenerateFn != nil {
+		return m.GenerateFn(userID, businessID, businessTypeID, roleID, subscriptionStatus)
+	}
+	return "token-de-sesion", nil
 }

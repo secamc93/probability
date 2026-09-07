@@ -120,8 +120,10 @@ func (r *Repository) GetDemoRoleID(ctx context.Context) (uint, error) {
 	return id, nil
 }
 
-func (r *Repository) CreateDemoAccount(ctx context.Context, p domain.CreateDemoAccountParams) (uint, error) {
+func (r *Repository) CreateDemoAccount(ctx context.Context, p domain.CreateDemoAccountParams) (*domain.DemoAccountCreated, error) {
 	var businessID uint
+	var createdUserID uint
+	var createdRoleID uint
 	err := r.database.Conn(ctx).Transaction(func(tx *gorm.DB) error {
 		business := &models.Business{
 			Name:               p.BusinessName,
@@ -139,17 +141,22 @@ func (r *Repository) CreateDemoAccount(ctx context.Context, p domain.CreateDemoA
 
 		scopeBusiness := uint(2)
 		user := &models.User{
-			Name:     p.FullName,
-			Email:    p.Email,
-			Phone:    p.Phone,
-			Password: p.PasswordHash,
-			IsActive: false,
-			ScopeID:  &scopeBusiness,
+			Name:      p.FullName,
+			Email:     p.Email,
+			Phone:     p.Phone,
+			Password:  p.PasswordHash,
+			AvatarURL: p.AvatarURL,
+			IsActive:  p.Active,
+			ScopeID:   &scopeBusiness,
+		}
+		if p.GoogleID != "" {
+			googleID := p.GoogleID
+			user.GoogleID = &googleID
 		}
 		if err := tx.Create(user).Error; err != nil {
 			return err
 		}
-		if err := tx.Model(&models.User{}).Where("id = ?", user.ID).Update("is_active", false).Error; err != nil {
+		if err := tx.Model(&models.User{}).Where("id = ?", user.ID).Update("is_active", p.Active).Error; err != nil {
 			return err
 		}
 
@@ -169,22 +176,27 @@ func (r *Repository) CreateDemoAccount(ctx context.Context, p domain.CreateDemoA
 			return err
 		}
 
-		token := &models.EmailVerificationToken{
-			UserID:    user.ID,
-			TokenHash: p.TokenHash,
-			ExpiresAt: p.ExpiresAt,
+		if p.TokenHash != "" {
+			token := &models.EmailVerificationToken{
+				UserID:    user.ID,
+				TokenHash: p.TokenHash,
+				ExpiresAt: p.ExpiresAt,
+			}
+			if err := tx.Create(token).Error; err != nil {
+				return err
+			}
 		}
-		if err := tx.Create(token).Error; err != nil {
-			return err
-		}
+
+		createdUserID = user.ID
+		createdRoleID = p.RoleID
 
 		return nil
 	})
 	if err != nil {
 		r.logger.Error().Err(err).Str("email", p.Email).Msg("Error creando cuenta demo")
-		return 0, err
+		return nil, err
 	}
-	return businessID, nil
+	return &domain.DemoAccountCreated{BusinessID: businessID, UserID: createdUserID, RoleID: createdRoleID}, nil
 }
 
 func (r *Repository) GetValidEmailVerificationToken(ctx context.Context, tokenHash string) (*domain.EmailVerificationTokenInfo, error) {

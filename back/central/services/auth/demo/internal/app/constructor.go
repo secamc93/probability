@@ -13,6 +13,7 @@ type IUseCase interface {
 	VerifyEmail(ctx context.Context, request domain.VerifyEmailRequest) (*domain.VerifyEmailResponse, error)
 	DemoVerifyOTP(ctx context.Context, request domain.DemoVerifyOTPRequest) (*domain.DemoVerifyOTPResponse, error)
 	DemoResend(ctx context.Context, request domain.DemoResendRequest) (*domain.DemoResendResponse, error)
+	DemoRegisterWithGoogle(ctx context.Context, request domain.GoogleDemoRegisterRequest) (*domain.GoogleDemoRegisterResponse, error)
 	SetOnBusinessCreated(hook func(ctx context.Context, businessID uint))
 }
 
@@ -20,18 +21,22 @@ type UseCase struct {
 	repository        domain.IDemoRepository
 	emailSender       domain.IEmailSender
 	otpPublisher      domain.IDemoOTPPublisher
+	signupTokens      domain.IGoogleSignupTokenValidator
+	sessionTokens     domain.ISessionTokenIssuer
 	log               log.ILogger
 	env               env.IConfig
 	onBusinessCreated func(ctx context.Context, businessID uint)
 }
 
-func New(repository domain.IDemoRepository, emailSender domain.IEmailSender, otpPublisher domain.IDemoOTPPublisher, log log.ILogger, env env.IConfig) IUseCase {
+func New(repository domain.IDemoRepository, emailSender domain.IEmailSender, otpPublisher domain.IDemoOTPPublisher, signupTokens domain.IGoogleSignupTokenValidator, sessionTokens domain.ISessionTokenIssuer, log log.ILogger, env env.IConfig) IUseCase {
 	return &UseCase{
-		repository:   repository,
-		emailSender:  emailSender,
-		otpPublisher: otpPublisher,
-		log:          log,
-		env:          env,
+		repository:    repository,
+		emailSender:   emailSender,
+		otpPublisher:  otpPublisher,
+		signupTokens:  signupTokens,
+		sessionTokens: sessionTokens,
+		log:           log,
+		env:           env,
 	}
 }
 

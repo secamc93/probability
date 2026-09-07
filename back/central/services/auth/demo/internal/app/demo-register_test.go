@@ -16,11 +16,13 @@ import (
 )
 
 type entorno struct {
-	repo  *mocks.RepositoryMock
-	email *mocks.EmailSenderMock
-	otp   *mocks.OTPPublisherMock
-	cfg   *mocks.ConfigMock
-	uc    IUseCase
+	repo   *mocks.RepositoryMock
+	email  *mocks.EmailSenderMock
+	otp    *mocks.OTPPublisherMock
+	cfg    *mocks.ConfigMock
+	signup *mocks.GoogleSignupTokenValidatorMock
+	sesion *mocks.SessionTokenIssuerMock
+	uc     IUseCase
 }
 
 func nuevoEntorno(t *testing.T) *entorno {
@@ -31,7 +33,9 @@ func nuevoEntorno(t *testing.T) *entorno {
 		otp:   &mocks.OTPPublisherMock{},
 		cfg:   &mocks.ConfigMock{Values: map[string]string{}},
 	}
-	e.uc = New(e.repo, e.email, e.otp, mocks.NewSilentLogger(), e.cfg)
+	e.signup = &mocks.GoogleSignupTokenValidatorMock{}
+	e.sesion = &mocks.SessionTokenIssuerMock{}
+	e.uc = New(e.repo, e.email, e.otp, e.signup, e.sesion, mocks.NewSilentLogger(), e.cfg)
 	return e
 }
 
@@ -427,8 +431,8 @@ func TestDemoRegister_UnCanalDesconocidoCaeAlFlujoDeCorreo(t *testing.T) {
 
 func TestDemoRegister_SiFallaElInsertNoSeNotificaANadie(t *testing.T) {
 	e := nuevoEntorno(t)
-	e.repo.CreateDemoAccountFn = func(ctx context.Context, params domain.CreateDemoAccountParams) (uint, error) {
-		return 0, errors.New("unique violation")
+	e.repo.CreateDemoAccountFn = func(ctx context.Context, params domain.CreateDemoAccountParams) (*domain.DemoAccountCreated, error) {
+		return nil, errors.New("unique violation")
 	}
 
 	_, err := e.uc.DemoRegister(context.Background(), registroValido())

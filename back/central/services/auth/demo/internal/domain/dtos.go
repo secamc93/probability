@@ -16,6 +16,30 @@ type DemoRegisterResponse struct {
 	Message string
 }
 
+type GoogleSignupClaims struct {
+	GoogleID string
+	Email    string
+	Name     string
+	Picture  string
+}
+
+type GoogleDemoRegisterRequest struct {
+	SignupToken  string
+	BusinessName string
+}
+
+type GoogleDemoRegisterResponse struct {
+	Success      bool
+	Message      string
+	Token        string
+	UserID       uint
+	BusinessID   uint
+	FullName     string
+	Email        string
+	BusinessName string
+	AvatarURL    string
+}
+
 type VerifyEmailRequest struct {
 	Token string
 }
@@ -55,7 +79,16 @@ type PendingDemoUser struct {
 	LastTokenCreatedAt *time.Time
 }
 
+type DemoAccountCreated struct {
+	BusinessID uint
+	UserID     uint
+	RoleID     uint
+}
+
 type CreateDemoAccountParams struct {
+	GoogleID     string
+	Active       bool
+	AvatarURL    string
 	FullName     string
 	BusinessName string
 	BusinessCode string

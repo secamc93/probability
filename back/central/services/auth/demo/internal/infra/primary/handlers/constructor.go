@@ -10,6 +10,7 @@ type IHandler interface {
 	DemoRegisterHandler(c *gin.Context)
 	VerifyEmailHandler(c *gin.Context)
 	DemoVerifyOTPHandler(c *gin.Context)
+	DemoRegisterWithGoogleHandler(c *gin.Context)
 	RegisterRoutes(v1Group *gin.RouterGroup)
 }
 

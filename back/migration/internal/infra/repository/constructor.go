@@ -23,7 +23,10 @@ func (r *Repository) Migrate(ctx context.Context) error {
 	if err := r.migrateWhatsappInboundConversationType(ctx); err != nil {
 		return err
 	}
-	return r.migrateWhatsappPhoneNumberUnique(ctx)
+	if err := r.migrateWhatsappPhoneNumberUnique(ctx); err != nil {
+		return err
+	}
+	return r.migrateUserGoogleID(ctx)
 }
 
 func (r *Repository) migrateHistorico(ctx context.Context) error {

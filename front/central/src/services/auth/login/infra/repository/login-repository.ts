@@ -58,7 +58,6 @@ export class LoginRepository implements ILoginRepository {
         }
     }
 
-    // Nueva función que retorna Response completo (para leer headers)
     private async fetchWithResponse<T>(url: string, options: RequestInit = {}): Promise<{ data: T; response: Response }> {
         console.log(`[API Request] ${options.method || 'GET'} ${url}`, {
             headers: options.headers,
@@ -90,10 +89,6 @@ export class LoginRepository implements ILoginRepository {
         }
     }
 
-    /**
-     * Autentica un usuario
-     * POST /auth/login
-     */
     async login(credentials: LoginRequest): Promise<LoginSuccessResponse> {
         const payload = mapLoginRequest(credentials);
         const data = await this.fetch<any>(`${this.baseUrl}/auth/login`, {
@@ -104,10 +99,17 @@ export class LoginRepository implements ILoginRepository {
         return mapLoginResponse(data);
     }
 
-    /**
-     * Cambia la contraseña del usuario
-     * POST /auth/change-password
-     */
+    async getSession(token: string): Promise<LoginSuccessResponse> {
+        const data = await this.fetch<any>(`${this.baseUrl}/auth/session`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+            cache: 'no-store',
+        });
+        return mapLoginResponse(data);
+    }
+
     async changePassword(data: ChangePasswordRequest, token: string): Promise<ChangePasswordResponse> {
         const payload = mapChangePasswordRequest(data);
         const resData = await this.fetch<any>(`${this.baseUrl}/auth/change-password`, {
@@ -120,10 +122,6 @@ export class LoginRepository implements ILoginRepository {
         return mapChangePasswordResponse(resData);
     }
 
-    /**
-     * Genera una nueva contraseña (admin o propio usuario)
-     * POST /auth/generate-password
-     */
     async generatePassword(data: GeneratePasswordRequest, token: string): Promise<GeneratePasswordResponse> {
         const payload = mapGeneratePasswordRequest(data);
         const resData = await this.fetch<any>(`${this.baseUrl}/auth/generate-password`, {
@@ -136,10 +134,6 @@ export class LoginRepository implements ILoginRepository {
         return mapGeneratePasswordResponse(resData);
     }
 
-    /**
-     * Obtiene roles y permisos del usuario
-     * GET /auth/roles-permissions
-     */
     async getRolesPermissions(token: string): Promise<UserRolesPermissionsSuccessResponse> {
         const data = await this.fetch<any>(`${this.baseUrl}/auth/roles-permissions`, {
             method: 'GET',
