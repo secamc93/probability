@@ -121,6 +121,8 @@ const ProductFamilyList = forwardRef<ProductFamilyListHandle, ProductFamilyListP
             await fetchModalVariants(family.id);
         };
 
+        const familyAxes: { key: string; label: string }[] = modalFamily?.variant_axes ?? [];
+
         const Field = ({ label, value, children }: { label: string; value?: string | null; children?: ReactNode }) => (
             <div className="min-w-0">
                 <p className="text-[10.5px] font-semibold uppercase tracking-wide text-gray-400 mb-0.5">{label}</p>
@@ -447,7 +449,13 @@ const ProductFamilyList = forwardRef<ProductFamilyListHandle, ProductFamilyListP
                                                         <th className="!bg-gray-100 dark:!bg-gray-700 w-8"></th>
                                                         <th className="!bg-gray-100 dark:!bg-gray-700 !text-gray-600 dark:!text-gray-300 text-left">SKU</th>
                                                         <th className="!bg-gray-100 dark:!bg-gray-700 !text-gray-600 dark:!text-gray-300 text-left">Nombre</th>
-                                                        <th className="!bg-gray-100 dark:!bg-gray-700 !text-gray-600 dark:!text-gray-300 text-left hidden sm:table-cell">Variante</th>
+                                                        {familyAxes.length > 0 ? (
+                                                            familyAxes.map(ax => (
+                                                                <th key={ax.key} className="!bg-gray-100 dark:!bg-gray-700 !text-gray-600 dark:!text-gray-300 text-left hidden sm:table-cell">{ax.label}</th>
+                                                            ))
+                                                        ) : (
+                                                            <th className="!bg-gray-100 dark:!bg-gray-700 !text-gray-600 dark:!text-gray-300 text-left hidden sm:table-cell">Variante</th>
+                                                        )}
                                                         <th className="!bg-gray-100 dark:!bg-gray-700 !text-gray-600 dark:!text-gray-300 text-left hidden sm:table-cell">Barcode</th>
                                                         <th className="!bg-gray-100 dark:!bg-gray-700 !text-gray-600 dark:!text-gray-300 text-right">Precio</th>
                                                         <th className="!bg-gray-100 dark:!bg-gray-700 !text-gray-600 dark:!text-gray-300 text-center">Stock</th>
@@ -474,13 +482,28 @@ const ProductFamilyList = forwardRef<ProductFamilyListHandle, ProductFamilyListP
                                                                     </td>
                                                                     <td className="font-mono text-xs text-gray-600 dark:text-gray-300">{variant.sku}</td>
                                                                     <td className="text-sm text-gray-900 dark:text-white">{variant.name}</td>
-                                                                    <td className="hidden sm:table-cell">
-                                                                        {variant.variant_label ? (
-                                                                            <span className="px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-700">{variant.variant_label}</span>
-                                                                        ) : (
-                                                                            <span className="text-gray-400 text-xs">&mdash;</span>
-                                                                        )}
-                                                                    </td>
+                                                                    {familyAxes.length > 0 ? (
+                                                                        familyAxes.map(ax => {
+                                                                            const value = variant.variant_attributes?.[ax.key];
+                                                                            return (
+                                                                                <td key={ax.key} className="hidden sm:table-cell">
+                                                                                    {value ? (
+                                                                                        <span className="px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-700">{value}</span>
+                                                                                    ) : (
+                                                                                        <span className="text-gray-400 text-xs">&mdash;</span>
+                                                                                    )}
+                                                                                </td>
+                                                                            );
+                                                                        })
+                                                                    ) : (
+                                                                        <td className="hidden sm:table-cell">
+                                                                            {variant.variant_label ? (
+                                                                                <span className="px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-700">{variant.variant_label}</span>
+                                                                            ) : (
+                                                                                <span className="text-gray-400 text-xs">&mdash;</span>
+                                                                            )}
+                                                                        </td>
+                                                                    )}
                                                                     <td className="hidden sm:table-cell font-mono text-xs text-gray-500 dark:text-gray-400">{variant.barcode || '-'}</td>
                                                                     <td className="text-right text-sm font-semibold text-gray-900 dark:text-white">
                                                                         {new Intl.NumberFormat('es-CO', { style: 'currency', currency: variant.currency || 'COP', maximumFractionDigits: 0 }).format(variant.price)}
@@ -489,7 +512,7 @@ const ProductFamilyList = forwardRef<ProductFamilyListHandle, ProductFamilyListP
                                                                 </tr>
                                                                 {isExpanded && (
                                                                     <tr className="bg-gray-50 dark:bg-gray-900/30">
-                                                                        <td colSpan={7} className="px-5 py-4">
+                                                                        <td colSpan={6 + Math.max(familyAxes.length, 1)} className="px-5 py-4">
                                                                             <div className="flex flex-col sm:flex-row gap-5">
                                                                                 {variant.image_url && (
                                                                                     <img src={variant.image_url} alt={variant.name} className="w-24 h-24 rounded-lg object-cover flex-shrink-0 border border-gray-200 dark:border-gray-700" />
