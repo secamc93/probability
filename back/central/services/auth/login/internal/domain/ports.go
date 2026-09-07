@@ -25,11 +25,21 @@ type IAuthRepository interface {
 	GetBusinessConfiguredResourcesIDs(ctx context.Context, businessID uint) ([]uint, error)
 	GetBusinessByID(ctx context.Context, businessID uint) (*BusinessInfo, error)
 	GetRoleByID(ctx context.Context, id uint) (*Role, error)
+	GetUserByGoogleID(ctx context.Context, googleID string) (*UserAuthInfo, error)
+	LinkGoogleAccount(ctx context.Context, userID uint, googleID string) error
+	UpdateAvatarIfEmpty(ctx context.Context, userID uint, avatarURL string) error
+}
+
+type IGoogleOAuthProvider interface {
+	AuthCodeURL(state string) (string, error)
+	ExchangeCode(ctx context.Context, code string) (*GoogleProfile, error)
+	IsConfigured() bool
 }
 type IJWTService interface {
 	GenerateToken(userID, businessID, businessTypeID, roleID uint, subscriptionStatus string) (string, error)
 	ValidateToken(tokenString string) (*JWTClaims, error)
 	RefreshToken(tokenString string) (string, error)
+	GenerateGoogleSignupToken(googleID, email, name, picture string, ttl time.Duration) (string, error)
 }
 
 type IEmailSender interface {

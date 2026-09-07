@@ -8,6 +8,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { EnvelopeIcon, LockClosedIcon, EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 import { getActionError } from '@/shared/utils/action-result';
 import { DemoRegisterModal } from './DemoRegisterModal';
+import { GoogleLogo, googleLoginUrl } from './GoogleButton';
 
 const MEDIA_BASE =
     process.env.NEXT_PUBLIC_S3_BASE_URL ||
@@ -28,6 +29,7 @@ export const LoginForm = () => {
     const [isPending, startTransition] = useTransition();
     const [error, setError] = useState<string | null>(null);
     const [showDemoModal, setShowDemoModal] = useState(false);
+    const errorGoogle = searchParams.get('google_error');
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -121,7 +123,6 @@ export const LoginForm = () => {
 
     return (
         <div className={`w-full max-w-sm ${formClass}`}>
-            {/* Logo */}
             <div className="login-logo-light">
                 <div className="login-logo-mark">
                     <img
@@ -134,16 +135,13 @@ export const LoginForm = () => {
                 </div>
             </div>
 
-            {/* Header */}
             <div className="login-header-light">
                 <h1 className="login-title-light">
                     {'¡Bienvenido!'}
                 </h1>
             </div>
 
-            {/* Form */}
             <form onSubmit={handleSubmit} className="w-full">
-                {/* Email Field */}
                 <div className="login-form-group-light">
                     <label className="login-label-light">
                         Correo
@@ -160,7 +158,6 @@ export const LoginForm = () => {
                     </div>
                 </div>
 
-                {/* Password Field */}
                 <div className="login-form-group-light">
                     <div className="login-label-row-light">
                         <label className="login-label-light">Contraseña</label>
@@ -189,14 +186,18 @@ export const LoginForm = () => {
                     </div>
                 </div>
 
-                {/* Error */}
+                {!error && errorGoogle && (
+                    <div className="p-3 rounded-lg text-sm mb-5 bg-red-50 text-red-600 border border-red-200">
+                        {errorGoogle}
+                    </div>
+                )}
+
                 {error && (
                     <div className="p-3 rounded-lg text-sm mb-5 bg-red-50 text-red-600 border border-red-200">
                         {error}
                     </div>
                 )}
 
-                {/* Submit Button */}
                 <button
                     type="submit"
                     disabled={isPending}
@@ -204,6 +205,20 @@ export const LoginForm = () => {
                 >
                     {isPending ? 'Iniciando Sesión...' : 'Iniciar Sesión'}
                 </button>
+
+                <div className="my-5 flex items-center gap-3">
+                    <span className="h-px flex-1 bg-gray-200" />
+                    <span className="text-xs font-medium uppercase tracking-wide text-gray-400">o</span>
+                    <span className="h-px flex-1 bg-gray-200" />
+                </div>
+
+                <a
+                    href={googleLoginUrl()}
+                    className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition-colors hover:bg-gray-50"
+                >
+                    <GoogleLogo />
+                    {'Continuar con Google'}
+                </a>
 
                 <div className="mt-4 text-center text-sm font-medium text-gray-800">
                     ¿No tienes cuenta?{' '}

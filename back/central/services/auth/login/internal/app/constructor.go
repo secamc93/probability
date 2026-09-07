@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"time"
 
 	"github.com/secamc93/probability/back/central/services/auth/login/internal/domain"
 	"github.com/secamc93/probability/back/central/shared/env"
@@ -17,6 +18,10 @@ type Iapp interface {
 	ForgotPassword(ctx context.Context, request domain.ForgotPasswordRequest) (*domain.ForgotPasswordResponse, error)
 	VerifyOTP(ctx context.Context, request domain.VerifyOTPRequest) (*domain.VerifyOTPResponse, error)
 	ResetPassword(ctx context.Context, request domain.ResetPasswordRequest) (*domain.ResetPasswordResponse, error)
+	GoogleAuthURL(ctx context.Context) (*domain.GoogleAuthURLResponse, error)
+	LoginWithGoogle(ctx context.Context, request domain.GoogleCallbackRequest) (*domain.GoogleLoginResult, error)
+	CurrentSession(ctx context.Context, userID uint) (*domain.LoginResponse, error)
+	GoogleSignupToken(ctx context.Context, profile *domain.GoogleProfile, ttl time.Duration) (string, error)
 }
 
 type IAuthUseCase interface {
@@ -28,16 +33,18 @@ type AuthUseCase struct {
 	jwtService   domain.IJWTService
 	emailSender  domain.IEmailSender
 	otpPublisher domain.IOTPEventPublisher
+	googleOAuth  domain.IGoogleOAuthProvider
 	log          log.ILogger
 	env          env.IConfig
 }
 
-func New(repository domain.IAuthRepository, jwtService domain.IJWTService, emailSender domain.IEmailSender, otpPublisher domain.IOTPEventPublisher, log log.ILogger, env env.IConfig) Iapp {
+func New(repository domain.IAuthRepository, jwtService domain.IJWTService, emailSender domain.IEmailSender, otpPublisher domain.IOTPEventPublisher, googleOAuth domain.IGoogleOAuthProvider, log log.ILogger, env env.IConfig) Iapp {
 	return &AuthUseCase{
 		repository:   repository,
 		jwtService:   jwtService,
 		emailSender:  emailSender,
 		otpPublisher: otpPublisher,
+		googleOAuth:  googleOAuth,
 		log:          log,
 		env:          env,
 	}

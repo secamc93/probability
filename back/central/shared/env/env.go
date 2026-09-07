@@ -20,22 +20,21 @@ type config struct {
 }
 
 func loadDotEnv(logger log.ILogger) {
-	// Intentar cargar .env desde el directorio actual
+
 	_ = godotenv.Load(".env")
 
-	// Si aún faltan claves, buscar hacia arriba hasta 6 niveles
 	cwd, _ := os.Getwd()
 	maxLevels := 6
 	for i := 0; i < maxLevels; i++ {
 		candidate := filepath.Join(cwd, ".env")
 		if _, err := os.Stat(candidate); err == nil {
 			_ = godotenv.Overload(candidate)
-			// quitado: log de archivo .env cargado para evitar ruido en consola
+
 			return
 		}
 		cwd = filepath.Dir(cwd)
 	}
-	// Si no se encontró, intentar rutas relativas comunes
+
 	_ = godotenv.Overload("../.env", "../../.env", "../../../.env", "../../../../.env")
 }
 
@@ -74,14 +73,13 @@ func New(logger log.ILogger) IConfig {
 			logger.Fatal(context.Background()).
 				Strs("missing_env_vars", missing).
 				Msg("Faltan variables de entorno obligatorias - la aplicación no puede continuar")
-			// El panic se ejecutará automáticamente después del log fatal
+
 		}
 	}
 
 	return &config{values: values, logger: logger}
 }
 
-// NewWithLogging crea una nueva configuración con logging automático de errores
 func NewWithLogging(logger log.ILogger) IConfig {
 	loadDotEnv(logger)
 
@@ -117,20 +115,16 @@ func NewWithLogging(logger log.ILogger) IConfig {
 			logger.Fatal(context.Background()).
 				Strs("missing_env_vars", missing).
 				Msg("Faltan variables de entorno obligatorias - la aplicación no puede continuar")
-			// El panic se ejecutará automáticamente después del log fatal
+
 		}
 	}
 
 	return &config{values: values, logger: logger}
 }
 
-// Get retorna el valor de una variable de entorno cargada
 func (c *config) Get(key string) string {
 	return c.values[key]
 }
-
-// Config solo se usa internamente para reflexión
-// No debe ser accedido directamente fuera de este paquete
 
 type Config struct {
 	AppEnv    string `env:"APP_ENV,required"`
@@ -138,10 +132,7 @@ type Config struct {
 	GrpcPort  string `env:"GRPC_PORT"`
 	LogLevel  string `env:"LOG_LEVEL,required"`
 	JwtSecret string `env:"JWT_SECRET,required"`
-	// NatsHost   string `env:"NATS_HOST,required"`
-	// NatsPort   string `env:"NATS_PORT,required"`
-	// NatsUser   string `env:"NATS_USER,required"`
-	// NatsPass   string `env:"NATS_PASS,required"`
+
 	DbHost         string `env:"DB_HOST,required"`
 	DbUser         string `env:"DB_USER,required"`
 	DbPass         string `env:"DB_PASS,required"`
@@ -156,13 +147,11 @@ type Config struct {
 	S3SecretKey    string `env:"S3_SECRET,required"`
 	S3Endpoint     string `env:"S3_ENDPOINT"`
 
-	// Redis
 	RedisHost               string `env:"REDIS_HOST"`
 	RedisPort               string `env:"REDIS_PORT"`
 	RedisPassword           string `env:"REDIS_PASSWORD"`
 	RedisOrderEventsChannel string `env:"REDIS_ORDER_EVENTS_CHANNEL,required"`
 
-	// Email (Amazon SES)
 	ResendAPIKey       string `env:"RESEND_API_KEY"`
 	FromEmail          string `env:"FROM_EMAIL"`
 	FrontendBaseURL    string `env:"FRONTEND_BASE_URL"`
@@ -171,7 +160,6 @@ type Config struct {
 	WhatsAppToken      string `env:"WHATSAPP_TOKEN,required"`
 	WhatsAppPhoneNumID string `env:"WHATSAPP_PHONE_NUMBER_ID,required"`
 
-	// DynamoDB
 	DynamoRegion    string `env:"DYNAMO_REGION"`
 	DynamoAccessKey string `env:"DYNAMO_ACCESS_KEY"`
 	DynamoSecretKey string `env:"DYNAMO_SECRET_KEY"`
@@ -185,7 +173,6 @@ type Config struct {
 	RabbitMQVHost       string `env:"RABBITMQ_VHOST,required"`
 	RabbitMQOrdersQueue string `env:"RABBITMQ_ORDERS_CREATE,required"`
 
-	// Shopify OAuth
 	ShopifyClientID     string `env:"SHOPIFY_CLIENT_ID"`
 	ShopifyClientSecret string `env:"SHOPIFY_CLIENT_SECRET"`
 	ShopifyRedirectURI  string `env:"SHOPIFY_REDIRECT_URI"`
@@ -193,34 +180,32 @@ type Config struct {
 	ShopifyShopDomain   string `env:"SHOPIFY_SHOP_DOMAIN"`
 	ShopifyAPIVersion   string `env:"SHOPIFY_API_VERSION"`
 
-	// Webhooks
 	WebhookBaseURL string `env:"WEBHOOK_BASE_URL"`
 
-	// Woo store (EC2 temporal on/off por super admin)
 	WooStoreAWSRegion  string `env:"WOO_STORE_AWS_REGION"`
 	WooStoreAWSKey     string `env:"WOO_STORE_AWS_KEY"`
 	WooStoreAWSSecret  string `env:"WOO_STORE_AWS_SECRET"`
 	WooStoreInstanceID string `env:"WOO_STORE_INSTANCE_ID"`
 	WooStoreURL        string `env:"WOO_STORE_URL"`
 
-	// Softpymes (Facturación Electrónica)
 	SoftpymesAPIURL string `env:"SOFTPYMES_API_URL"`
 
-	// Google Geocoding API
 	GoogleMapsAPIKey string `env:"GOOGLE_MAPS_API_KEY"`
 
-	// Bold.co
 	BoldIdentityKey string `env:"BOLD_IDENTITY_KEY"`
 	BoldSecretKey   string `env:"BOLD_SECRET_KEY"`
 
-	// Amazon Bedrock (AI)
+	GoogleOAuthClientID     string `env:"GOOGLE_OAUTH_CLIENT_ID"`
+	GoogleOAuthClientSecret string `env:"GOOGLE_OAUTH_CLIENT_SECRET"`
+	GoogleOAuthRedirectURI  string `env:"GOOGLE_OAUTH_REDIRECT_URI"`
+
 	BedrockAccessKey string `env:"BEDROCK_ACCESS_KEY"`
 	BedrockSecretKey string `env:"BEDROCK_SECRET_KEY"`
 	BedrockRegion    string `env:"BEDROCK_REGION"`
 }
 
 func splitTag(tag string) []string {
-	// Usamos SplitN para dividir solo en la primera coma
+
 	parts := make([]string, 0, 2)
 	for i, c := range tag {
 		if c == ',' {

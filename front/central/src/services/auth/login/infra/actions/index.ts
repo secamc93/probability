@@ -18,34 +18,21 @@ import {
     GenerateBusinessTokenSuccessResponse
 } from '../repository/mapper/response';
 
-// Instancia del repositorio y caso de uso (Singleton implícito por módulo)
 const repository = new LoginRepository();
 const useCase = new LoginUseCase(repository);
 
-/**
- * Server Action para autenticar usuario
- */
 export const loginAction = async (credentials: LoginRequest): Promise<LoginSuccessResponse> => {
     try {
         const response = await useCase.login(credentials);
 
-        // ✅ NO setear cookie aquí - el backend ya la setea como HttpOnly
-        // El backend Go setea: c.SetCookie("session_token", token, ...)
-        // Next.js recibirá esa cookie automáticamente en el navegador
 
         return response;
     } catch (error: any) {
         console.error('Login Action Error:', error.message);
-        throw new Error(error.message); // Re-throw to be caught by client
+        throw new Error(error.message); 
     }
 };
 
-/**
- * Server Action para cambiar contraseña
- */
-/**
- * Server Action para cambiar contraseña
- */
 export const changePasswordAction = async (data: ChangePasswordRequest, token?: string): Promise<ChangePasswordResponse> => {
     try {
         if (!token) {
@@ -64,9 +51,6 @@ export const changePasswordAction = async (data: ChangePasswordRequest, token?: 
     }
 };
 
-/**
- * Server Action para generar contraseña
- */
 export const generatePasswordAction = async (data: GeneratePasswordRequest, token: string): Promise<GeneratePasswordResponse> => {
     try {
         return await useCase.generatePassword(data, token);
@@ -76,13 +60,8 @@ export const generatePasswordAction = async (data: GeneratePasswordRequest, toke
     }
 };
 
-/**
- * Server Action para obtener roles y permisos
- * Lee el token de la cookie HttpOnly automáticamente
- */
 export const getRolesPermissionsAction = async (): Promise<UserRolesPermissionsSuccessResponse> => {
     try {
-        // Leer token de cookie HttpOnly (seteada por el backend)
         const cookieStore = await cookies();
         const token = cookieStore.get('session_token')?.value;
 
@@ -97,14 +76,87 @@ export const getRolesPermissionsAction = async (): Promise<UserRolesPermissionsS
     }
 };
 
-/**
- * Server Action para login en desarrollo local.
- *
- * En producción, el login se hace con fetch directo desde el cliente para
- * que el navegador reciba la cookie Partitioned directamente (necesario para Shopify iframe).
- *
- * En desarrollo local, este Server Action se usa para evitar problemas de proxy con cookies.
- */
+const SIGNUP_COOKIE = 'g_signup_token';
+
+function leerClaimsSignup(token: string): { email: string; name: string } | null {
+    try {
+        const payload = token.split('.')[1];
+        if (!payload) return null;
+        const json = Buffer.from(payload.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8');
+        const claims = JSON.parse(json);
+        if (!claims.email) return null;
+        return { email: claims.email, name: claims.name || '' };
+    } catch {
+        return null;
+    }
+}
+
+export const getGoogleSignupInfoAction = async (): Promise<{ email: string; name: string } | null> => {
+    const cookieStore = await cookies();
+    const token = cookieStore.get(SIGNUP_COOKIE)?.value;
+    if (!token) return null;
+    return leerClaimsSignup(token);
+};
+
+export const demoRegisterWithGoogleAction = async (businessName: string) => {
+    try {
+        const cookieStore = await cookies();
+        const googleToken = cookieStore.get(SIGNUP_COOKIE)?.value;
+        if (!googleToken) {
+            return { success: false, error: 'La solicitud de registro con Google expiró, intenta de nuevo' };
+        }
+
+        const baseUrl = env.API_BASE_URL;
+        const res = await fetch(`${baseUrl}/auth/demo-register-google`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ google_token: googleToken, business_name: businessName }),
+            cache: 'no-store',
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+            return { success: false, error: data.error || 'No se pudo crear la demo' };
+        }
+
+        const cookieHeader = res.headers.get('set-cookie');
+        if (cookieHeader) {
+            const token = cookieHeader.split(';')[0].split('=').slice(1).join('=');
+            if (token) {
+                cookieStore.set('session_token', token, {
+                    httpOnly: true,
+                    path: '/',
+                    maxAge: 7 * 24 * 60 * 60,
+                    sameSite: 'lax',
+                });
+            }
+        }
+
+        cookieStore.delete(SIGNUP_COOKIE);
+
+        return { success: true, data: data.data };
+    } catch (error: any) {
+        console.error('Demo Register With Google Action Error:', error.message);
+        return { success: false, error: 'Error al conectar con el servidor' };
+    }
+};
+
+export const getSessionAction = async (): Promise<LoginSuccessResponse> => {
+    try {
+        const cookieStore = await cookies();
+        const token = cookieStore.get('session_token')?.value;
+
+        if (!token) {
+            throw new Error('No session token found');
+        }
+
+        return await useCase.getSession(token);
+    } catch (error: any) {
+        console.error('Get Session Action Error:', error.message);
+        throw new Error(error.message);
+    }
+};
+
 export async function loginServerAction(email: string, password: string) {
     try {
         const response = await fetch('http://localhost:3050/api/v1/auth/login', {
@@ -121,24 +173,21 @@ export async function loginServerAction(email: string, password: string) {
             };
         }
 
-        // Extraer Set-Cookie header del backend
         const setCookieHeader = response.headers.get('set-cookie');
 
         if (setCookieHeader) {
-            // Parsear el cookie manualmente
             const tokenMatch = setCookieHeader.match(/session_token=([^;]+)/);
             const maxAgeMatch = setCookieHeader.match(/Max-Age=(\d+)/);
 
             if (tokenMatch && tokenMatch[1]) {
                 const cookieStore = await cookies();
 
-                // Setear cookie usando Next.js cookies API
                 cookieStore.set('session_token', tokenMatch[1], {
-                    maxAge: maxAgeMatch ? parseInt(maxAgeMatch[1]) : 7 * 24 * 60 * 60, // 7 días por defecto
+                    maxAge: maxAgeMatch ? parseInt(maxAgeMatch[1]) : 7 * 24 * 60 * 60, 
                     path: '/',
                     httpOnly: true,
-                    secure: false, // En local dev no usamos HTTPS
-                    sameSite: 'lax', // En local dev no necesitamos 'none'
+                    secure: false, 
+                    sameSite: 'lax', 
                 });
             }
         }

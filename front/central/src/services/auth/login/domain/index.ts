@@ -14,6 +14,7 @@ import {
 
 export interface ILoginRepository {
     login(credentials: LoginRequest): Promise<LoginSuccessResponse>;
+    getSession(token: string): Promise<LoginSuccessResponse>;
     changePassword(data: ChangePasswordRequest, token: string): Promise<ChangePasswordResponse>;
     generatePassword(data: GeneratePasswordRequest, token: string): Promise<GeneratePasswordResponse>;
     getRolesPermissions(token: string): Promise<UserRolesPermissionsSuccessResponse>;

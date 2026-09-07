@@ -9,5 +9,6 @@ func (h *Handler) RegisterRoutes(v1Group *gin.RouterGroup) {
 		demoGroup.POST("/verify-email", h.VerifyEmailHandler)
 		demoGroup.POST("/demo-verify-otp", h.DemoVerifyOTPHandler)
 		demoGroup.POST("/demo-resend", h.DemoResendHandler)
+		demoGroup.POST("/demo-register-google", h.DemoRegisterWithGoogleHandler)
 	}
 }

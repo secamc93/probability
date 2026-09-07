@@ -96,6 +96,10 @@ x-back-central: &back-central
     GRAFANA_WEBHOOK_SECRET: "${GRAFANA_WEBHOOK_SECRET}"
     # Google Geocoding API
     GOOGLE_MAPS_API_KEY: "${GOOGLE_MAPS_API_KEY}"
+    # Google OAuth (login con Google)
+    GOOGLE_OAUTH_CLIENT_ID:     "${GOOGLE_OAUTH_CLIENT_ID}"
+    GOOGLE_OAUTH_CLIENT_SECRET: "${GOOGLE_OAUTH_CLIENT_SECRET}"
+    GOOGLE_OAUTH_REDIRECT_URI:  "${GOOGLE_OAUTH_REDIRECT_URI:-https://www.probabilityia.com.co/api/v1/auth/google/callback}"
     # Amazon Bedrock (AI)
     BEDROCK_ACCESS_KEY: "${BEDROCK_ACCESS_KEY}"
     BEDROCK_SECRET_KEY: "${BEDROCK_SECRET_KEY}"
