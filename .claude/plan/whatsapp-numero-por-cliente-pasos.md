@@ -39,6 +39,12 @@ Hay dos formas de dar de alta el numero, y la segunda depende de Meta:
       Meta lo marca como faltante para poder enviar la solicitud.
 - [ ] **A4. Elegir la categoria de la app** en Configuracion basica. Tambien
       esta marcada como faltante.
+- [ ] **A4.1. Probar que `comercial@probabilityapp.com` recibe.** Es el correo
+      que declaran la politica de privacidad, los terminos y la pagina de
+      eliminacion de datos, y es donde escribe el revisor de Meta y donde llegan
+      las solicitudes de datos de la Ley 1581. El dominio tiene MX
+      (mx01/mx03.mi.com.co) y `gerencia@probabilityapp.com` esta en uso, pero de
+      `comercial@` no hay rastro. Si rebota, hay que corregir los tres textos.
 - [ ] **A5. Verificar el correo de contacto** (`probabilitysas@gmail.com`
       figura como no verificado).
 - [ ] **A6. Crear la configuracion de registro insertado** en el panel
