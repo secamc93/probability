@@ -65,9 +65,23 @@ export default function WhatsAppConnectionForm({ config, businessId, onSaved }: 
 
     return (
         <div className="space-y-3">
-            <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
-                {'Si el bot\u00f3n de arriba no te sirve, comparte tu cuenta con Probability desde tu Business Manager y pega aqu\u00ed los identificadores. T\u00fa pagas las conversaciones a Meta y tus plantillas se crean en tu cuenta.'}
-            </p>
+            <div className="rounded-lg bg-white dark:bg-gray-800 px-3 py-2.5 space-y-2" style={{ border: '1px solid #e9e9f0' }}>
+                <p className="text-[11px] text-gray-600 dark:text-gray-300 leading-relaxed">
+                    {'Solo si no puedes usar el bot\u00f3n de arriba. Aqu\u00ed nos entregas t\u00fa los identificadores de tu cuenta, y de eso depende que la conexi\u00f3n siga viva.'}
+                </p>
+                <p className="text-[11px] font-semibold text-gray-700 dark:text-gray-200">{'Necesitas:'}</p>
+                <ul className="space-y-1 text-[11px] text-gray-600 dark:text-gray-300">
+                    <li>{'\u2022 Ser administrador de la cuenta de WhatsApp Business (WABA) en tu Business Manager.'}</li>
+                    <li>{'\u2022 Un token con los permisos whatsapp_business_messaging y whatsapp_business_management sobre esa cuenta.'}</li>
+                    <li>{'\u2022 Que el token sea de un System User: los tokens de usuario caducan en d\u00edas o semanas y el d\u00eda que expiren dejamos de enviar tus mensajes sin aviso.'}</li>
+                </ul>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
+                    {'Alternativa sin token: comparte tu cuenta con Probability desde tu Business Manager (Cuentas de WhatsApp \u2192 Socios) y deja el token vac\u00edo; enviamos con nuestras credenciales.'}
+                </p>
+                <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
+                    {'En este camino t\u00fa pagas las conversaciones a Meta y tus plantillas se crean y se aprueban en tu cuenta.'}
+                </p>
+            </div>
 
             <div className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2">
                 <div>
@@ -99,7 +113,7 @@ export default function WhatsAppConnectionForm({ config, businessId, onSaved }: 
                 </div>
 
                 <div className="sm:col-span-2">
-                    <label className={fieldLabel}>{'Token de acceso (opcional)'}</label>
+                    <label className={fieldLabel}>{'Token de System User (opcional)'}</label>
                     <SecretInput
                         value={accessToken}
                         onChange={(e) => setAccessToken(e.target.value)}
@@ -107,7 +121,7 @@ export default function WhatsAppConnectionForm({ config, businessId, onSaved }: 
                         className="font-mono"
                     />
                     <p className={fieldHint}>
-                        {'D\u00e9jalo vac\u00edo si compartiste tu cuenta con Probability: en ese caso enviamos con nuestras credenciales.'}
+                        {'D\u00e9jalo vac\u00edo si compartiste tu cuenta con Probability. Si lo llenas, que sea un token de System User: uno de usuario caduca y hay que volver a pegarlo.'}
                     </p>
                 </div>
             </div>

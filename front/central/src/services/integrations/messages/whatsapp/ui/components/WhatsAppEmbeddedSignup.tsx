@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert } from '@/shared/ui';
 import { BoltIcon } from '@heroicons/react/24/outline';
-import { ACCENT, ActionButton, Card } from './ui-kit';
+import { ACCENT, ActionButton, Card, Pill } from './ui-kit';
 import {
     completeWhatsAppEmbeddedSignupAction,
     getWhatsAppEmbeddedSignupConfigAction,
@@ -153,10 +153,18 @@ export default function WhatsAppEmbeddedSignup({ businessId, onConnected }: What
     return (
         <Card
             icon={<BoltIcon style={{ color: ACCENT, width: 16, height: 16 }} />}
-            title="Conectar con Meta"
-            description={'La forma m\u00e1s r\u00e1pida: inicias sesi\u00f3n con tu cuenta de Facebook, eliges o creas tu cuenta de WhatsApp Business y tu n\u00famero queda conectado. Probability no ve tu contrase\u00f1a.'}
+            title={'Conectar con Meta (recomendado)'}
+            description={'Inicias sesi\u00f3n con tu cuenta de Facebook en una ventana de Meta, eliges o creas tu cuenta de WhatsApp Business y tu n\u00famero queda conectado.'}
+            action={<Pill tone="ok">Recomendado</Pill>}
         >
             <div className="space-y-3">
+                <ul className="space-y-1 text-[11px] text-gray-600 dark:text-gray-300">
+                    <li>{'\u2713 No nos das tu contrase\u00f1a ni copias identificadores a mano.'}</li>
+                    <li>{'\u2713 Meta nos entrega un acceso propio de la aplicaci\u00f3n, que no caduca a los pocos d\u00edas.'}</li>
+                    <li>{'\u2713 Dejamos configurado el webhook y el registro del n\u00famero en un solo paso.'}</li>
+                    <li>{'\u2713 Puedes revocarnos el acceso cuando quieras desde tu Business Manager.'}</li>
+                </ul>
+
                 <ActionButton onClick={conectar} disabled={busy} loading={busy}>
                     {'Conectar cuenta de WhatsApp'}
                 </ActionButton>

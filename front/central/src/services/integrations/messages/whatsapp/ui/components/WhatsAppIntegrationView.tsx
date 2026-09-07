@@ -309,11 +309,27 @@ export default function WhatsAppIntegrationView({
                                                 businessId={integration.business_id || undefined}
                                                 onConnected={onRefresh}
                                             />
-                                            <WhatsAppConnectionForm
-                                                config={integration.config || {}}
-                                                businessId={integration.business_id || undefined}
-                                                onSaved={onRefresh}
-                                            />
+
+                                            <details
+                                                className="rounded-xl p-4 dark:bg-gray-800/60"
+                                                style={{ backgroundColor: '#fafafd', border: '1px solid #eceaf3' }}
+                                            >
+                                                <summary className="cursor-pointer">
+                                                    <span className="text-sm font-bold text-gray-900 dark:text-white">
+                                                        {'Conexi\u00f3n avanzada con credenciales de Meta'}
+                                                    </span>
+                                                    <span className="block text-[11px] text-gray-500 dark:text-gray-400 mt-1">
+                                                        {'Para equipos t\u00e9cnicos, cuando el bot\u00f3n de arriba no est\u00e1 disponible.'}
+                                                    </span>
+                                                </summary>
+                                                <div className="mt-3">
+                                                    <WhatsAppConnectionForm
+                                                        config={integration.config || {}}
+                                                        businessId={integration.business_id || undefined}
+                                                        onSaved={onRefresh}
+                                                    />
+                                                </div>
+                                            </details>
                                         </div>
                                     )}
                                 </div>
