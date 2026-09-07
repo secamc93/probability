@@ -5,11 +5,13 @@ import { XMarkIcon } from '@heroicons/react/24/outline';
 import { AnnouncementInfo } from '../../domain/types';
 import { getActiveAnnouncementsAction, registerViewAction } from '../../infra/actions';
 import { TokenStorage } from '@/shared/config';
+import { useSelectedBusiness } from '@/shared/contexts/selected-business-context';
 
 export default function AnnouncementTicker() {
     const [announcements, setAnnouncements] = useState<AnnouncementInfo[]>([]);
     const [dismissed, setDismissed] = useState(false);
     const viewedRef = useRef<Set<number>>(new Set());
+    const { selectedBusinessId } = useSelectedBusiness();
 
     useEffect(() => {
         const fetchTicker = async () => {
@@ -18,9 +20,9 @@ export default function AnnouncementTicker() {
                 if (!userData) return;
 
                 const businessesData = TokenStorage.getBusinessesData();
-                const businessId = businessesData?.[0]?.id;
+                const businessId = selectedBusinessId ?? businessesData?.[0]?.id;
 
-                const all = await getActiveAnnouncementsAction(businessId);
+                const all = await getActiveAnnouncementsAction(businessId ?? undefined);
                 const tickers = (all || []).filter(a => a.display_type === 'ticker');
                 setAnnouncements(tickers);
 
@@ -34,7 +36,7 @@ export default function AnnouncementTicker() {
             }
         };
         fetchTicker();
-    }, []);
+    }, [selectedBusinessId]);
 
     if (dismissed || announcements.length === 0) return null;
 

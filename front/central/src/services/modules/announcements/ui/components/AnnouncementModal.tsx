@@ -5,12 +5,14 @@ import { XMarkIcon, ChevronLeftIcon, ChevronRightIcon, CheckIcon } from '@heroic
 import { AnnouncementInfo } from '../../domain/types';
 import { getActiveAnnouncementsAction, registerViewAction } from '../../infra/actions';
 import { TokenStorage } from '@/shared/config';
+import { useSelectedBusiness } from '@/shared/contexts/selected-business-context';
 
 export default function AnnouncementModal() {
     const [announcements, setAnnouncements] = useState<AnnouncementInfo[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [visible, setVisible] = useState(false);
     const [imageIndex, setImageIndex] = useState(0);
+    const { selectedBusinessId } = useSelectedBusiness();
 
     useEffect(() => {
         const fetchActive = async () => {
@@ -19,9 +21,9 @@ export default function AnnouncementModal() {
                 if (!userData) return;
 
                 const businessesData = TokenStorage.getBusinessesData();
-                const businessId = businessesData?.[0]?.id;
+                const businessId = selectedBusinessId ?? businessesData?.[0]?.id;
 
-                const all = await getActiveAnnouncementsAction(businessId);
+                const all = await getActiveAnnouncementsAction(businessId ?? undefined);
                 const modals = (all || []).filter(
                     a => a.display_type === 'modal_image' || a.display_type === 'modal_text'
                 );
@@ -34,7 +36,7 @@ export default function AnnouncementModal() {
             }
         };
         fetchActive();
-    }, []);
+    }, [selectedBusinessId]);
 
     const current = announcements[currentIndex];
 

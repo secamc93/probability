@@ -80,6 +80,7 @@ function LayoutContent({ user, children }: LayoutContentProps) {
         <SelectedBusinessProvider>
           <TourProvider>
                       <AnnouncementTicker />
+                      <AnnouncementModal />
                       <OrdersSubNavbar />
                       <TicketsSubNavbar />
                       <InventorySubNavbar />
@@ -111,7 +112,6 @@ function LayoutContent({ user, children }: LayoutContentProps) {
         `}</style>
       </main>
 
-      <AnnouncementModal />
       <LegalAcceptanceGate />
     </div>
   );

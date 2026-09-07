@@ -35,6 +35,8 @@ func (r *Repository) GetActiveAnnouncements(ctx context.Context, params dtos.Act
 						Where("business_id = ?", params.BusinessID),
 				),
 		)
+	} else {
+		query = query.Where("is_global = ?", true)
 	}
 
 	query = query.Order("force_redisplay DESC, created_at DESC")

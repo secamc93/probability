@@ -51,7 +51,7 @@ func (b *Bundle) CreateBusinessAlert(ctx context.Context, businessID uint, title
 		CategoryID:    categoryID,
 		Title:         title,
 		Message:       message,
-		DisplayType:   entities.DisplayTypeModalText,
+		DisplayType:   entities.DisplayTypeTicker,
 		FrequencyType: frequency,
 		IsGlobal:      false,
 		TargetIDs:     []uint{businessID},
