@@ -11,4 +11,5 @@ var (
 	ErrWebhookInvalidSignature = errors.New("la firma del webhook de WooCommerce no es valida")
 	ErrWebhookMissingSecret    = errors.New("falta el secret del webhook de WooCommerce")
 	ErrNoOrdersFound           = errors.New("no se encontraron ordenes en WooCommerce")
+	ErrProductNotFoundInStore  = errors.New("producto no encontrado en la tienda")
 )

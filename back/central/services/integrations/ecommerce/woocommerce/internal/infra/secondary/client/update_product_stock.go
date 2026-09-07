@@ -50,7 +50,7 @@ func (c *WooCommerceClient) UpdateProductStock(ctx context.Context, storeURL, co
 	}
 
 	if resp.StatusCode == http.StatusNotFound {
-		return fmt.Errorf("woocommerce client: producto %s no encontrado en la tienda", productExternalID)
+		return fmt.Errorf("woocommerce client: producto %s: %w", productExternalID, domain.ErrProductNotFoundInStore)
 	}
 
 	if resp.StatusCode != http.StatusOK {

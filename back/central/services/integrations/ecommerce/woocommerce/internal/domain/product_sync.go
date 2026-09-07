@@ -134,4 +134,7 @@ type IProductRepository interface {
 	LoadCompareSnapshot(ctx context.Context, businessID, integrationID uint, opts inventorycompare.LoadOptions) (*inventorycompare.Page, error)
 	GetShippingQuoteRate(ctx context.Context, quoteID uint, rateIndex int) (*ShippingQuoteRate, error)
 	GetIntegrationCodIncludesShipping(ctx context.Context, integrationID uint) (bool, error)
+	GetProductSKUByID(ctx context.Context, productID string, businessID uint) (string, error)
+	GetProductIDByExternalRef(ctx context.Context, integrationID uint, externalProductID, externalVariantID string) (string, error)
+	GetExternalRefs(ctx context.Context, productID string, integrationID uint) (string, string, error)
 }

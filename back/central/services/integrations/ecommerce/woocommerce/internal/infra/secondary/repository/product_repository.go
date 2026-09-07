@@ -154,6 +154,58 @@ func (r *ProductRepository) GetExternalProductID(ctx context.Context, productID 
 	return result.ExternalProductID, true, nil
 }
 
+func (r *ProductRepository) GetProductIDByExternalRef(ctx context.Context, integrationID uint, externalProductID, externalVariantID string) (string, error) {
+	q := r.db.Conn(ctx).
+		Table("product_business_integrations").
+		Select("product_id").
+		Where("integration_id = ? AND external_product_id = ? AND deleted_at IS NULL", integrationID, externalProductID)
+	if externalVariantID == "" {
+		q = q.Where("external_variant_id IS NULL")
+	} else {
+		q = q.Where("external_variant_id = ?", externalVariantID)
+	}
+	var productID string
+	if err := q.Limit(1).Scan(&productID).Error; err != nil {
+		return "", err
+	}
+	return productID, nil
+}
+
+func (r *ProductRepository) GetExternalRefs(ctx context.Context, productID string, integrationID uint) (string, string, error) {
+	var row struct {
+		ExternalProductID string
+		ExternalVariantID *string
+	}
+	err := r.db.Conn(ctx).
+		Table("product_business_integrations").
+		Select("external_product_id, external_variant_id").
+		Where("product_id = ? AND integration_id = ? AND deleted_at IS NULL", productID, integrationID).
+		Limit(1).
+		Scan(&row).Error
+	if err != nil {
+		return "", "", err
+	}
+	variant := ""
+	if row.ExternalVariantID != nil {
+		variant = *row.ExternalVariantID
+	}
+	return row.ExternalProductID, variant, nil
+}
+
+func (r *ProductRepository) GetProductSKUByID(ctx context.Context, productID string, businessID uint) (string, error) {
+	var sku string
+	err := r.db.Conn(ctx).
+		Table("products").
+		Select("sku").
+		Where("id = ? AND business_id = ? AND deleted_at IS NULL", productID, businessID).
+		Limit(1).
+		Scan(&sku).Error
+	if err != nil {
+		return "", err
+	}
+	return sku, nil
+}
+
 func optionalRef(value string) *string {
 	if value == "" {
 		return nil
