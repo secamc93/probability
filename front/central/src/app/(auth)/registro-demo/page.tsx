@@ -1,28 +1,32 @@
 'use client';
 
-import { Suspense, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { CheckCircleIcon } from '@heroicons/react/24/outline';
-import { demoRegisterWithGoogleAction } from '@/services/auth/login/infra/actions';
+import { GoogleLogo } from '@/services/auth/login/ui/components/GoogleButton';
+import { demoRegisterWithGoogleAction, getGoogleSignupInfoAction } from '@/services/auth/login/infra/actions';
 
 const VENTAJAS = ['Datos de ejemplo cargados', 'Sin tarjeta', 'Listo en un minuto'];
 
 function RegistroDemoContent() {
     const router = useRouter();
-    const searchParams = useSearchParams();
-    const googleToken = searchParams.get('google_token');
+    const [cuenta, setCuenta] = useState<{ email: string; name: string } | null>(null);
+    const [cargando, setCargando] = useState(true);
     const [businessName, setBusinessName] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+
+    useEffect(() => {
+        getGoogleSignupInfoAction()
+            .then(setCuenta)
+            .catch(() => setCuenta(null))
+            .finally(() => setCargando(false));
+    }, []);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
 
-        if (!googleToken) {
-            setError('La solicitud expiró. Vuelve a intentarlo desde el login.');
-            return;
-        }
         if (businessName.trim().length < 2) {
             setError('Escribe el nombre de tu negocio');
             return;
@@ -30,7 +34,7 @@ function RegistroDemoContent() {
 
         setLoading(true);
         try {
-            const resultado = await demoRegisterWithGoogleAction(googleToken, businessName.trim());
+            const resultado = await demoRegisterWithGoogleAction(businessName.trim());
             if (!resultado.success) {
                 setError(resultado.error || 'No se pudo crear la demo');
                 return;
@@ -43,7 +47,15 @@ function RegistroDemoContent() {
         }
     };
 
-    if (!googleToken) {
+    if (cargando) {
+        return (
+            <div className="flex min-h-screen items-center justify-center bg-[#140c2d]">
+                <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-white" />
+            </div>
+        );
+    }
+
+    if (!cuenta) {
         return (
             <div className="flex min-h-screen items-center justify-center bg-[#140c2d] p-4">
                 <div className="w-full max-w-[440px] rounded-3xl bg-white p-7 text-center shadow-2xl">
@@ -72,6 +84,11 @@ function RegistroDemoContent() {
                 <p className="mt-1.5 text-sm text-gray-500">
                     {'Es lo último que necesitamos para armar tu demo.'}
                 </p>
+
+                <div className="mt-4 flex items-center gap-2 rounded-xl bg-gray-50 px-3.5 py-2.5">
+                    <GoogleLogo />
+                    <span className="truncate text-sm text-gray-600">{cuenta.email}</span>
+                </div>
 
                 <ul className="mt-3.5 flex flex-wrap gap-x-4 gap-y-1.5">
                     {VENTAJAS.map((v) => (
@@ -116,15 +133,5 @@ function RegistroDemoContent() {
 }
 
 export default function RegistroDemoPage() {
-    return (
-        <Suspense
-            fallback={
-                <div className="flex min-h-screen items-center justify-center bg-[#140c2d]">
-                    <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-white" />
-                </div>
-            }
-        >
-            <RegistroDemoContent />
-        </Suspense>
-    );
+    return <RegistroDemoContent />;
 }

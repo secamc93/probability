@@ -18,6 +18,7 @@ import (
 const (
 	googleStateCookie  = "g_oauth_state"
 	googleIntentCookie = "g_oauth_intent"
+	googleSignupCookie = "g_signup_token"
 	intentDemo         = "demo"
 	signupTokenTTL     = 15 * time.Minute
 )
@@ -113,8 +114,11 @@ func (h *AuthHandler) redirigirARegistroDemo(c *gin.Context, ctx context.Context
 		return
 	}
 
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie(googleSignupCookie, token, int(signupTokenTTL.Seconds()), "/", "", isSecureRequest(c), true)
+
 	h.logger.Info(ctx).Str("email", profile.Email).Msg("Cuenta de Google sin usuario: se ofrece crear demo")
-	c.Redirect(http.StatusFound, frontendBaseURL()+"/registro-demo?google_token="+url.QueryEscape(token))
+	c.Redirect(http.StatusFound, frontendBaseURL()+"/registro-demo")
 }
 
 func cuentaInexistente(email string) error {

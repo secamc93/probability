@@ -76,8 +76,36 @@ export const getRolesPermissionsAction = async (): Promise<UserRolesPermissionsS
     }
 };
 
-export const demoRegisterWithGoogleAction = async (googleToken: string, businessName: string) => {
+const SIGNUP_COOKIE = 'g_signup_token';
+
+function leerClaimsSignup(token: string): { email: string; name: string } | null {
     try {
+        const payload = token.split('.')[1];
+        if (!payload) return null;
+        const json = Buffer.from(payload.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8');
+        const claims = JSON.parse(json);
+        if (!claims.email) return null;
+        return { email: claims.email, name: claims.name || '' };
+    } catch {
+        return null;
+    }
+}
+
+export const getGoogleSignupInfoAction = async (): Promise<{ email: string; name: string } | null> => {
+    const cookieStore = await cookies();
+    const token = cookieStore.get(SIGNUP_COOKIE)?.value;
+    if (!token) return null;
+    return leerClaimsSignup(token);
+};
+
+export const demoRegisterWithGoogleAction = async (businessName: string) => {
+    try {
+        const cookieStore = await cookies();
+        const googleToken = cookieStore.get(SIGNUP_COOKIE)?.value;
+        if (!googleToken) {
+            return { success: false, error: 'La solicitud de registro con Google expiró, intenta de nuevo' };
+        }
+
         const baseUrl = env.API_BASE_URL;
         const res = await fetch(`${baseUrl}/auth/demo-register-google`, {
             method: 'POST',
@@ -95,7 +123,6 @@ export const demoRegisterWithGoogleAction = async (googleToken: string, business
         if (cookieHeader) {
             const token = cookieHeader.split(';')[0].split('=').slice(1).join('=');
             if (token) {
-                const cookieStore = await cookies();
                 cookieStore.set('session_token', token, {
                     httpOnly: true,
                     path: '/',
@@ -104,6 +131,8 @@ export const demoRegisterWithGoogleAction = async (googleToken: string, business
                 });
             }
         }
+
+        cookieStore.delete(SIGNUP_COOKIE);
 
         return { success: true, data: data.data };
     } catch (error: any) {
