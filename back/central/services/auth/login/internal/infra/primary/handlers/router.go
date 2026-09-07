@@ -20,5 +20,6 @@ func (h *AuthHandler) RegisterRoutes(v1Group *gin.RouterGroup, handler IAuthHand
 		authGroup.POST("/reset-password", handler.ResetPasswordHandler)
 		authGroup.GET("/google", handler.GoogleAuthHandler)
 		authGroup.GET("/google/callback", handler.GoogleCallbackHandler)
+		authGroup.GET("/session", middleware.JWT(), handler.SessionHandler)
 	}
 }

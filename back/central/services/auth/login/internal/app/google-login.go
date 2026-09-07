@@ -64,7 +64,7 @@ func (uc *AuthUseCase) LoginWithGoogle(ctx context.Context, request domain.Googl
 		}
 		if userAuth == nil {
 			uc.log.Warn().Str("email", normalizedEmail).Msg("Login con Google de un correo sin cuenta")
-			return nil, domain.ErrGoogleUserNotFound
+			return nil, fmt.Errorf("%w %s. Pide a un administrador que te cree el usuario", domain.ErrGoogleUserNotFound, normalizedEmail)
 		}
 		if err := uc.repository.LinkGoogleAccount(ctx, userAuth.ID, profile.Sub); err != nil {
 			return nil, domain.ErrGoogleAccountLinkedElsewhere

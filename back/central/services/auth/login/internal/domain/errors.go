@@ -29,6 +29,6 @@ var (
 	ErrGoogleInvalidState           = errors.New("la solicitud de Google no es válida o expiró")
 	ErrGoogleExchangeFailed         = errors.New("no se pudo validar la cuenta de Google")
 	ErrGoogleEmailNotVerified       = errors.New("la cuenta de Google no tiene el correo verificado")
-	ErrGoogleUserNotFound           = errors.New("no existe una cuenta con ese correo, contacta al administrador")
+	ErrGoogleUserNotFound           = errors.New("no hay ninguna cuenta de Probability con el correo")
 	ErrGoogleAccountLinkedElsewhere = errors.New("esa cuenta de Google ya está vinculada a otro usuario")
 )

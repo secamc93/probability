@@ -19,6 +19,7 @@ type IAuthHandler interface {
 	ResetPasswordHandler(c *gin.Context)
 	GoogleAuthHandler(c *gin.Context)
 	GoogleCallbackHandler(c *gin.Context)
+	SessionHandler(c *gin.Context)
 	RegisterRoutes(v1Group *gin.RouterGroup, handler IAuthHandler, logger log.ILogger)
 }
 

@@ -20,6 +20,10 @@ export class LoginUseCase {
         return this.repository.login(credentials);
     }
 
+    async getSession(token: string): Promise<LoginSuccessResponse> {
+        return this.repository.getSession(token);
+    }
+
     async changePassword(data: ChangePasswordRequest, token: string): Promise<ChangePasswordResponse> {
         return this.repository.changePassword(data, token);
     }

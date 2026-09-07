@@ -19,6 +19,7 @@ type Iapp interface {
 	ResetPassword(ctx context.Context, request domain.ResetPasswordRequest) (*domain.ResetPasswordResponse, error)
 	GoogleAuthURL(ctx context.Context) (*domain.GoogleAuthURLResponse, error)
 	LoginWithGoogle(ctx context.Context, request domain.GoogleCallbackRequest) (*domain.LoginResponse, error)
+	CurrentSession(ctx context.Context, userID uint) (*domain.LoginResponse, error)
 }
 
 type IAuthUseCase interface {
