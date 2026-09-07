@@ -184,7 +184,9 @@ const ProductFamilyList = forwardRef<ProductFamilyListHandle, ProductFamilyListP
         const pagedGroups = variantGroups.slice((modalPage - 1) * MODAL_PAGE_SIZE, modalPage * MODAL_PAGE_SIZE);
         const groupTotalPages = Math.ceil(variantGroups.length / MODAL_PAGE_SIZE);
 
-        const renderVariantRow = (variant: Product, axesForRow: { key: string; label: string }[], showLabelFallback: boolean) => {
+        const familyDescription = modalVariants.find(v => v.description)?.description;
+
+        const renderVariantRow = (variant: Product, axesForRow: { key: string; label: string }[], showLabelFallback: boolean, showMedia: boolean = true) => {
             const isExpanded = expandedVariantId === variant.id;
             const colCount = 6 + (axesForRow.length > 0 ? axesForRow.length : (showLabelFallback ? 1 : 0));
             return (
@@ -237,7 +239,7 @@ const ProductFamilyList = forwardRef<ProductFamilyListHandle, ProductFamilyListP
                         <tr className="bg-gray-50 dark:bg-gray-900/30">
                             <td colSpan={colCount} className="px-5 py-4">
                                 <div className="flex flex-col sm:flex-row gap-5">
-                                    {variant.image_url && (
+                                    {showMedia && variant.image_url && (
                                         <img src={variant.image_url} alt={variant.name} className="w-24 h-24 rounded-lg object-cover flex-shrink-0 border border-gray-200 dark:border-gray-700" />
                                     )}
                                     <div className="flex-1 min-w-0">
@@ -258,7 +260,7 @@ const ProductFamilyList = forwardRef<ProductFamilyListHandle, ProductFamilyListP
                                             <Field label="Integración" value={variant.integration_type} />
                                             <Field label="Creado" value={variant.created_at ? new Date(variant.created_at).toLocaleDateString('es-CO') : undefined} />
                                         </div>
-                                        {variant.description && (
+                                        {showMedia && variant.description && (
                                             <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
                                                 <p className="text-[10.5px] font-semibold uppercase tracking-wide text-gray-400 mb-1">{'Descripción'}</p>
                                                 <p className="text-sm text-gray-700 dark:text-gray-200 leading-relaxed">{variant.description}</p>
@@ -559,6 +561,12 @@ const ProductFamilyList = forwardRef<ProductFamilyListHandle, ProductFamilyListP
                             </div>
 
                             <div className="overflow-auto flex-1 p-5 flex flex-col gap-4">
+                                {!modalLoading && familyDescription && (
+                                    <div className="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/30 p-3">
+                                        <p className="text-[10.5px] font-semibold uppercase tracking-wide text-gray-400 mb-1">{'Descripción'}</p>
+                                        <p className="text-sm text-gray-700 dark:text-gray-200 leading-relaxed">{familyDescription}</p>
+                                    </div>
+                                )}
                                 {modalLoading ? (
                                     <div className="flex justify-center py-12">
                                         <div className="spinner" />
@@ -598,7 +606,14 @@ const ProductFamilyList = forwardRef<ProductFamilyListHandle, ProductFamilyListP
                                                                                 {isGroupExpanded ? <ChevronDownIcon className="w-4 h-4" /> : <ChevronRightIcon className="w-4 h-4" />}
                                                                             </button>
                                                                         </td>
-                                                                        <td className="text-sm font-medium text-gray-900 dark:text-white">{group.label}</td>
+                                                                        <td className="text-sm font-medium text-gray-900 dark:text-white">
+                                                                            <div className="flex items-center gap-2">
+                                                                                {group.variants[0]?.image_url && (
+                                                                                    <img src={group.variants[0].image_url} alt={group.label} className="w-8 h-8 rounded object-cover flex-shrink-0 border border-gray-200 dark:border-gray-700" />
+                                                                                )}
+                                                                                {group.label}
+                                                                            </div>
+                                                                        </td>
                                                                         <td className="text-center text-sm text-gray-600 dark:text-gray-300">{group.variants.length}</td>
                                                                         <td className="text-center">{stockBadge(totalStock)}</td>
                                                                     </tr>
@@ -621,7 +636,7 @@ const ProductFamilyList = forwardRef<ProductFamilyListHandle, ProductFamilyListP
                                                                                             </tr>
                                                                                         </thead>
                                                                                         <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                                                                                            {group.variants.map(variant => renderVariantRow(variant, restAxes, false))}
+                                                                                            {group.variants.map(variant => renderVariantRow(variant, restAxes, false, false))}
                                                                                         </tbody>
                                                                                     </table>
                                                                                 </div>
