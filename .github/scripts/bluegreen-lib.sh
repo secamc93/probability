@@ -9,6 +9,39 @@
 COMPOSE_DIR=/home/ubuntu/probability/infra/compose-prod
 UPSTREAMS_DIR="$COMPOSE_DIR/nginx-upstreams"
 ACTIVE_FILE="$UPSTREAMS_DIR/active.conf"
+LOCK_DIR="$UPSTREAMS_DIR/.switch.lock"
+
+# El backend y el frontend se despliegan en paralelo cuando un push toca los
+# dos, y ambos reescriben active.conf entero. El 2026-09-07 se pisaron con 0,2 s
+# de diferencia: el frontend escribio backend=blue con el dato que habia leido
+# minutos antes, cuando el backend ya se habia movido a green y apagado blue.
+# nginx quedo apuntando a un contenedor inexistente y todo /api/ devolvio 502.
+#
+# De ahi el candado: el color del otro servicio se lee DENTRO de la seccion
+# critica, justo antes de escribir, nunca al principio del deploy.
+bg_lock() {
+  waited=0
+  while ! mkdir "$LOCK_DIR" 2>/dev/null; do
+    # Candado huerfano de un deploy que murio a mitad de camino
+    if [ -d "$LOCK_DIR" ] && [ -n "$(find "$LOCK_DIR" -maxdepth 0 -mmin +5 2>/dev/null)" ]; then
+      echo "⚠️  Candado de upstreams viejo (>5 min), se descarta"
+      rm -rf "$LOCK_DIR"
+      continue
+    fi
+    if [ "$waited" -ge 180 ]; then
+      echo "❌ Otro deploy lleva 180s con el candado de upstreams tomado"
+      return 1
+    fi
+    [ "$waited" = "0" ] && echo "⏸️  Otro deploy esta cambiando upstreams, esperando..."
+    sleep 3
+    waited=$((waited + 3))
+  done
+  return 0
+}
+
+bg_unlock() {
+  rm -rf "$LOCK_DIR"
+}
 
 # El entrypoint de nginx corre como root y puede crear active.conf; sin este
 # chown el deploy (usuario ubuntu) no puede reescribirlo y aborta a mitad de
@@ -37,7 +70,13 @@ bg_init() {
   fi
   if [ "$fixed" = "1" ]; then
     echo "⚠️  active.conf apuntaba a un color sin contenedor, corrigiendo"
-    bg_write_upstreams "$back" "$front"
+    if bg_lock; then
+      # Releer bajo candado: el otro deploy pudo corregirlo mientras esperabamos
+      back=$(bg_active_color back)
+      front=$(bg_active_color front)
+      bg_write_upstreams "$back" "$front"
+      bg_unlock
+    fi
   fi
 }
 
@@ -83,8 +122,10 @@ bg_other_color() {
 }
 
 # bg_write_upstreams <color_back> <color_front>
+# Escribe por archivo temporal y mv: nginx nunca lee un archivo a medias.
 bg_write_upstreams() {
-  cat > "$ACTIVE_FILE" <<EOF
+  tmp="$ACTIVE_FILE.tmp.$$"
+  cat > "$tmp" <<EOF
 upstream probability_backend {
     server back-central-$1:3050 max_fails=3 fail_timeout=30s;
 }
@@ -93,7 +134,45 @@ upstream probability_frontend {
     server front-central-$2:3000 max_fails=3 fail_timeout=30s;
 }
 EOF
+  mv -f "$tmp" "$ACTIVE_FILE"
   echo "🎨 Upstreams: backend=$1 frontend=$2"
+}
+
+# bg_switch back|front <color_nuevo>
+# Cambia SOLO el upstream de su servicio y recarga nginx, todo bajo candado y
+# releyendo el color del otro servicio dentro de la seccion critica. Si nginx
+# rechaza la configuracion, deja el archivo como estaba y devuelve error.
+bg_switch() {
+  service="$1"
+  color="$2"
+
+  bg_lock || return 1
+
+  previo=$(bg_file_color "$service")
+  otro_servicio=front
+  [ "$service" = "front" ] && otro_servicio=back
+  otro_color=$(bg_active_color "$otro_servicio")
+
+  if [ "$service" = "back" ]; then
+    bg_write_upstreams "$color" "$otro_color"
+  else
+    bg_write_upstreams "$otro_color" "$color"
+  fi
+
+  if ! bg_reload_nginx; then
+    echo "↩️  nginx rechazo la configuracion, se restaura $service=$previo"
+    if [ "$service" = "back" ]; then
+      bg_write_upstreams "$previo" "$otro_color"
+    else
+      bg_write_upstreams "$otro_color" "$previo"
+    fi
+    bg_reload_nginx || true
+    bg_unlock
+    return 1
+  fi
+
+  bg_unlock
+  return 0
 }
 
 # Recrea nginx si todavia no tiene el montaje de upstreams (primer deploy tras

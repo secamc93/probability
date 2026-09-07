@@ -72,7 +72,6 @@ bg_ensure_nginx
 
 ACTIVE=$(bg_active_color back)
 TARGET=$(bg_other_color "$ACTIVE")
-FRONT_ACTIVE=$(bg_active_color front)
 NEW_CONTAINER="central_reserve_prod_$TARGET"
 OLD_CONTAINER="central_reserve_prod_$ACTIVE"
 
@@ -91,11 +90,8 @@ if ! bg_wait_healthy "$NEW_CONTAINER" "http://localhost:3050/health" 150; then
   exit 1
 fi
 
-bg_write_upstreams "$TARGET" "$FRONT_ACTIVE"
-if ! bg_reload_nginx; then
-  echo "❌ nginx rechazo la configuracion. Volviendo a $ACTIVE."
-  bg_write_upstreams "$ACTIVE" "$FRONT_ACTIVE"
-  bg_reload_nginx || true
+if ! bg_switch back "$TARGET"; then
+  echo "❌ No se pudo mover el trafico a $TARGET. Sigue sirviendo $ACTIVE."
   docker rm -f "$NEW_CONTAINER" >/dev/null 2>&1 || true
   exit 1
 fi
