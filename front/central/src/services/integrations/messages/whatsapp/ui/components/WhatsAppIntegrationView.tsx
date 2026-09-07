@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Alert, Button } from '@/shared/ui';
-import { ChatBubbleLeftRightIcon, CheckCircleIcon, PhoneIcon } from '@heroicons/react/24/outline';
+import { Alert } from '@/shared/ui';
+import { ChatBubbleLeftRightIcon, PhoneIcon } from '@heroicons/react/24/outline';
+import { ACCENT, ACCENT_BORDER, ACCENT_SOFT, ActionButton, Card, Pill, fieldHint, fieldLabel, inputCls } from './ui-kit';
 import WhatsAppConnectionForm from './WhatsAppConnectionForm';
 import WhatsAppEmbeddedSignup from './WhatsAppEmbeddedSignup';
 import WhatsAppNumberWizard from './WhatsAppNumberWizard';
@@ -117,173 +118,170 @@ export default function WhatsAppIntegrationView({
         }
     };
 
+    const numeroPropio = integration.config?.phone_number_id;
+    const estadoNumero = integration.config?.number_status;
+
     return (
-        <div className="space-y-6 max-w-2xl mx-auto py-4">
-
-            <div className="flex flex-col items-center text-center">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4 overflow-hidden">
-                    {imageUrl ? (
-                        <img
-                            src={imageUrl}
-                            alt={integration.name}
-                            className="w-12 h-12 object-contain"
-                            onError={(e) => {
-                                const target = e.target as HTMLImageElement;
-                                target.style.display = 'none';
-                            }}
-                        />
-                    ) : (
-                        <ChatBubbleLeftRightIcon className="w-8 h-8 text-green-600" />
-                    )}
-                </div>
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">{integration.name}</h3>
-                <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-400 font-mono">{integration.code}</p>
-            </div>
-
-            <div className="flex items-center justify-center">
-                {onToggleActive ? (
-                    <button
-                        type="button"
-                        onClick={handleToggle}
-                        disabled={toggling}
-                        className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-colors cursor-pointer ${
-                            isActive
-                                ? 'bg-green-100 text-green-800 hover:bg-red-100 hover:text-red-700'
-                                : 'bg-red-100 text-red-700 hover:bg-green-100 hover:text-green-800'
-                        } ${toggling ? 'opacity-50 cursor-wait' : ''}`}
-                        title={isActive ? 'Clic para desactivar' : 'Clic para activar'}
-                    >
-                        {toggling ? (
-                            <svg className="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                            </svg>
-                        ) : isActive ? (
-                            <CheckCircleIcon className="w-5 h-5" />
-                        ) : (
-                            <span className="w-2.5 h-2.5 bg-red-400 rounded-full" />
-                        )}
-                        {isActive ? 'Activa' : 'Inactiva'}
-                    </button>
-                ) : (
-                    <span className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium ${
-                        isActive
-                            ? 'bg-green-100 text-green-800'
-                            : 'bg-red-100 text-red-700'
-                    }`}>
-                        {isActive ? (
-                            <>
-                                <CheckCircleIcon className="w-5 h-5" />
-                                Activa
-                            </>
-                        ) : (
-                            <>
-                                <span className="w-2.5 h-2.5 bg-red-400 rounded-full" />
-                                Inactiva
-                            </>
-                        )}
-                    </span>
-                )}
-            </div>
-
-            <div className="grid grid-cols-2 gap-4 text-center text-sm">
-                <div>
-                    <p className="text-gray-500 dark:text-gray-400 dark:text-gray-400">Creada</p>
-                    <p className="text-gray-900 dark:text-white font-medium">{new Date(integration.created_at).toLocaleDateString()}</p>
-                </div>
-                <div>
-                    <p className="text-gray-500 dark:text-gray-400 dark:text-gray-400">Actualizada</p>
-                    <p className="text-gray-900 dark:text-white font-medium">{new Date(integration.updated_at).toLocaleDateString()}</p>
-                </div>
-            </div>
-
-            {isActive && (onUpdateConfig || onTestConnection) && (
-                <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-3">
-                    <div className="flex items-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200 dark:text-gray-200">
-                        <PhoneIcon className="w-4 h-4" />
-                        Numero de telefono para pruebas
-                    </div>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 dark:text-gray-400">
-                        Ingresa un numero con codigo de pais (ej: 573001234567) para enviar un mensaje de prueba y verificar que la integracion funciona.
-                    </p>
-                    <div className="flex gap-2">
-                        <input
-                            type="text"
-                            value={testPhone}
-                            onChange={(e) => setTestPhone(e.target.value)}
-                            placeholder="573001234567"
-                            className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500"
-                        />
-                        {onUpdateConfig && (
-                            <Button
-                                type="button"
-                                variant="outline"
-                                onClick={handleSavePhone}
-                                disabled={saving || !testPhone.trim() || !hasUnsavedChanges}
-                                loading={saving}
-                                size="sm"
-                            >
-                                Guardar
-                            </Button>
-                        )}
-                    </div>
-                    {onTestConnection && (
-                        <Button
-                            type="button"
-                            variant="primary"
-                            onClick={handleTestConnection}
-                            disabled={testing || !testPhone.trim()}
-                            loading={testing}
-                            className="w-full"
-                        >
-                            Enviar mensaje de prueba
-                        </Button>
-                    )}
-                </div>
-            )}
-
-            {isActive && (
-                <WhatsAppEmbeddedSignup
-                    businessId={integration.business_id || undefined}
-                    onConnected={onRefresh}
-                />
-            )}
-
-            {isActive && (
-                <WhatsAppNumberWizard
-                    businessId={integration.business_id || undefined}
-                    onChanged={onRefresh}
-                />
-            )}
-
-            {isActive && (
-                <details className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                    <summary className="text-sm font-medium text-gray-700 dark:text-gray-200 cursor-pointer">
-                        {'Ya tengo mi propia cuenta de WhatsApp Business'}
-                    </summary>
-                    <div className="mt-3">
-                        <WhatsAppConnectionForm
-                            config={integration.config || {}}
-                            businessId={integration.business_id || undefined}
-                            onSaved={onRefresh}
-                        />
-                    </div>
-                </details>
-            )}
-
-            {isActive && (
-                <WhatsAppTemplatesPanel
-                    businessId={integration.business_id || undefined}
-                    enabled={usesOwnNumber}
-                />
-            )}
-
+        <div className="space-y-3 w-full">
             {message && (
                 <Alert type={message.type} onClose={() => setMessage(null)}>
                     {message.text}
                 </Alert>
             )}
 
+            <div
+                className="flex flex-col gap-3 rounded-xl p-4 sm:flex-row sm:items-center sm:justify-between dark:bg-gray-800/60"
+                style={{ backgroundColor: ACCENT_SOFT, border: `1px solid ${ACCENT_BORDER}` }}
+            >
+                <div className="flex items-center gap-3">
+                    <span
+                        className="flex h-11 w-11 items-center justify-center rounded-xl overflow-hidden shrink-0 bg-white dark:bg-gray-900"
+                        style={{ border: `1px solid ${ACCENT_BORDER}` }}
+                    >
+                        {imageUrl ? (
+                            <img src={imageUrl} alt={integration.name} className="h-8 w-8 object-contain" />
+                        ) : (
+                            <ChatBubbleLeftRightIcon className="h-6 w-6" style={{ color: ACCENT }} />
+                        )}
+                    </span>
+                    <div className="min-w-0">
+                        <h2 className="text-base font-bold text-gray-900 dark:text-white leading-tight">
+                            {integration.name}
+                        </h2>
+                        <p className="text-xs text-gray-600 dark:text-gray-300 mt-0.5">
+                            {usesOwnNumber
+                                ? 'Los mensajes de tus pedidos salen desde tu propio n\u00famero.'
+                                : 'Los mensajes de tus pedidos salen desde el n\u00famero de Probability.'}
+                        </p>
+                        <p className="text-[11px] text-gray-500 dark:text-gray-400 font-mono mt-0.5">
+                            {integration.code}
+                        </p>
+                    </div>
+                </div>
+
+                <div className="flex items-center gap-2 self-start shrink-0">
+                    <Pill tone={isActive ? 'ok' : 'off'}>{isActive ? 'Activa' : 'Inactiva'}</Pill>
+                    {onToggleActive && (
+                        <button
+                            type="button"
+                            role="switch"
+                            aria-checked={isActive}
+                            onClick={handleToggle}
+                            disabled={toggling}
+                            className="relative inline-flex h-7 w-12 items-center rounded-full transition-colors focus:outline-none disabled:opacity-50"
+                            style={{ backgroundColor: isActive ? ACCENT : '#e5e7eb' }}
+                        >
+                            <span
+                                className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform ${
+                                    isActive ? 'translate-x-6' : 'translate-x-1'
+                                }`}
+                            />
+                        </button>
+                    )}
+                </div>
+            </div>
+
+            {!isActive && (
+                <Card
+                    icon={<ChatBubbleLeftRightIcon style={{ color: ACCENT, width: 16, height: 16 }} />}
+                    title={'Integraci\u00f3n desactivada'}
+                    description={'Act\u00edvala con el interruptor de arriba para configurar el n\u00famero y enviar mensajes.'}
+                />
+            )}
+
+            {isActive && (
+                <>
+                    <WhatsAppEmbeddedSignup
+                        businessId={integration.business_id || undefined}
+                        onConnected={onRefresh}
+                    />
+
+                    <WhatsAppNumberWizard
+                        businessId={integration.business_id || undefined}
+                        onChanged={onRefresh}
+                    />
+
+                    {(onUpdateConfig || onTestConnection) && (
+                        <Card
+                            icon={<PhoneIcon style={{ color: ACCENT, width: 16, height: 16 }} />}
+                            title={'Probar el env\u00edo'}
+                            description={'Mandamos un mensaje de prueba a este n\u00famero para confirmar que la integraci\u00f3n responde. Usa indicativo de pa\u00eds, por ejemplo 573001234567.'}
+                        >
+                            <div className="space-y-3">
+                                <div>
+                                    <label className={fieldLabel}>{'N\u00famero de prueba'}</label>
+                                    <div className="flex flex-col gap-2 sm:flex-row">
+                                        <input
+                                            type="text"
+                                            value={testPhone}
+                                            onChange={(e) => setTestPhone(e.target.value)}
+                                            placeholder="573001234567"
+                                            className={`${inputCls} font-mono flex-1`}
+                                            style={{ borderColor: '#e9e9f0' }}
+                                        />
+                                        {onUpdateConfig && (
+                                            <ActionButton
+                                                variant="ghost"
+                                                onClick={handleSavePhone}
+                                                disabled={!hasUnsavedChanges || !testPhone.trim()}
+                                                loading={saving}
+                                            >
+                                                Guardar
+                                            </ActionButton>
+                                        )}
+                                    </div>
+                                    {hasUnsavedChanges && testPhone.trim() && (
+                                        <p className={fieldHint}>Sin guardar. Al probar se guarda solo.</p>
+                                    )}
+                                </div>
+
+                                {onTestConnection && (
+                                    <ActionButton
+                                        onClick={handleTestConnection}
+                                        disabled={!testPhone.trim()}
+                                        loading={testing}
+                                        className="w-full"
+                                    >
+                                        Enviar mensaje de prueba
+                                    </ActionButton>
+                                )}
+                            </div>
+                        </Card>
+                    )}
+
+                    <WhatsAppTemplatesPanel
+                        businessId={integration.business_id || undefined}
+                        enabled={usesOwnNumber}
+                    />
+
+                    <details
+                        className="rounded-xl p-4 dark:bg-gray-800/60"
+                        style={{ backgroundColor: '#fafafd', border: '1px solid #eceaf3' }}
+                    >
+                        <summary className="text-sm font-bold text-gray-900 dark:text-white cursor-pointer">
+                            {'Ya tengo mi propia cuenta de WhatsApp Business'}
+                        </summary>
+                        <div className="mt-3">
+                            <WhatsAppConnectionForm
+                                config={integration.config || {}}
+                                businessId={integration.business_id || undefined}
+                                onSaved={onRefresh}
+                            />
+                        </div>
+                    </details>
+
+                    <div className="flex flex-wrap items-center justify-between gap-2 px-1 text-[11px] text-gray-400 dark:text-gray-500">
+                        <span>Creada {new Date(integration.created_at).toLocaleDateString()}</span>
+                        {numeroPropio && (
+                            <span className="font-mono">
+                                phone_number_id {numeroPropio}
+                                {estadoNumero ? ` \u00b7 ${estadoNumero}` : ''}
+                            </span>
+                        )}
+                        <span>Actualizada {new Date(integration.updated_at).toLocaleDateString()}</span>
+                    </div>
+                </>
+            )}
         </div>
     );
 }

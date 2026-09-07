@@ -1,7 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Alert, Button, Input, SecretInput } from '@/shared/ui';
+import { Alert, SecretInput } from '@/shared/ui';
+import { ACCENT, ActionButton, fieldHint, fieldLabel, inputCls } from './ui-kit';
 import { saveWhatsAppConnectionAction } from '../../infra/actions';
 import { WhatsAppConnectionValues } from '../../domain/types';
 
@@ -80,15 +81,10 @@ export default function WhatsAppConnectionForm({ config, businessId, onSaved }: 
     };
 
     return (
-        <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4">
-            <div>
-                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-200">Número de WhatsApp</h4>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Puedes enviar desde el número de Probability o conectar el tuyo. Para usar el tuyo,
-                    comparte tu cuenta de WhatsApp con Probability desde tu Business Manager de Meta y pega
-                    aquí los identificadores.
-                </p>
-            </div>
+        <div className="space-y-3">
+            <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-relaxed">
+                {'Solo si ya tienes tu propia cuenta de WhatsApp Business en Meta. Comp\u00e1rtela con Probability desde tu Business Manager y pega aqu\u00ed los identificadores. En este caso las conversaciones las pagas t\u00fa y tus plantillas se crean en tu cuenta.'}
+            </p>
 
             <div className="flex items-center gap-3">
                 <button
@@ -96,34 +92,31 @@ export default function WhatsAppConnectionForm({ config, businessId, onSaved }: 
                     role="switch"
                     aria-checked={!values.use_platform_token}
                     onClick={() => handleChange('use_platform_token', !values.use_platform_token)}
-                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
-                        !values.use_platform_token ? 'bg-green-500' : 'bg-gray-300 dark:bg-gray-600'
-                    }`}
+                    className="relative inline-flex h-7 w-12 items-center rounded-full transition-colors focus:outline-none shrink-0"
+                    style={{ backgroundColor: !values.use_platform_token ? ACCENT : '#e5e7eb' }}
                 >
                     <span
-                        className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${
+                        className={`inline-block h-5 w-5 transform rounded-full bg-white shadow-md transition-transform ${
                             !values.use_platform_token ? 'translate-x-6' : 'translate-x-1'
                         }`}
                     />
                 </button>
                 <div>
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                        Usar mi propio número
+                    <p className="text-[13px] font-semibold text-gray-800 dark:text-gray-100 leading-tight">
+                        {'Usar mi propio n\u00famero'}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
+                    <p className="text-[11px] text-gray-500 dark:text-gray-400 leading-tight mt-0.5">
                         {'Apagado: los mensajes salen del n\u00famero de Probability, como hasta ahora.'}
                     </p>
                 </div>
             </div>
 
             {!values.use_platform_token && (
-                <div className="space-y-4">
+                <div className="space-y-3">
                     <div className="space-y-2">
-                        <p className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                            {'\u00bfD\u00f3nde vive el n\u00famero?'}
-                        </p>
+                        <p className={fieldLabel}>{'\u00bfD\u00f3nde vive el n\u00famero?'}</p>
 
-                        <label className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-200">
+                        <label className="flex items-start gap-2 text-[13px] text-gray-700 dark:text-gray-200">
                             <input
                                 type="radio"
                                 className="mt-1"
@@ -132,13 +125,13 @@ export default function WhatsAppConnectionForm({ config, businessId, onSaved }: 
                             />
                             <span>
                                 {'En la cuenta de Probability (recomendado)'}
-                                <span className="block text-xs text-gray-500 dark:text-gray-400">
-                                    {'Nosotros pagamos las conversaciones y te las cobramos, y el n\u00famero usa las plantillas ya aprobadas: no hay que esperar a Meta.'}
+                                <span className="block text-[11px] text-gray-500 dark:text-gray-400">
+                                    {'Nosotros pagamos las conversaciones y te las cobramos, y el n\u00famero usa las plantillas ya aprobadas.'}
                                 </span>
                             </span>
                         </label>
 
-                        <label className="flex items-start gap-2 text-sm text-gray-700 dark:text-gray-200">
+                        <label className="flex items-start gap-2 text-[13px] text-gray-700 dark:text-gray-200">
                             <input
                                 type="radio"
                                 className="mt-1"
@@ -147,60 +140,54 @@ export default function WhatsAppConnectionForm({ config, businessId, onSaved }: 
                             />
                             <span>
                                 {'En mi propia cuenta de WhatsApp Business'}
-                                <span className="block text-xs text-gray-500 dark:text-gray-400">
-                                    {'T\u00fa pagas las conversaciones a Meta y tus plantillas se crean en tu cuenta, con su propia aprobaci\u00f3n.'}
+                                <span className="block text-[11px] text-gray-500 dark:text-gray-400">
+                                    {'T\u00fa pagas las conversaciones a Meta y tus plantillas se crean en tu cuenta.'}
                                 </span>
                             </span>
                         </label>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2">
                         {!values.hosted && (
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
-                                    WABA ID *
+                                <label className={fieldLabel}>
+                                    WABA ID <span style={{ color: ACCENT }}>*</span>
                                 </label>
-                                <Input
-                                    type="text"
+                                <input
+                                    className={`${inputCls} font-mono`}
+                                    style={{ borderColor: '#e9e9f0' }}
                                     value={values.waba_id}
                                     onChange={(e) => handleChange('waba_id', e.target.value)}
                                     placeholder="123456789012345"
-                                    className="font-mono"
                                 />
-                                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                                    {'ID de tu cuenta de WhatsApp Business en Meta'}
-                                </p>
+                                <p className={fieldHint}>{'ID de tu cuenta de WhatsApp Business en Meta'}</p>
                             </div>
                         )}
 
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
-                                Phone Number ID *
+                            <label className={fieldLabel}>
+                                Phone Number ID <span style={{ color: ACCENT }}>*</span>
                             </label>
-                            <Input
-                                type="text"
+                            <input
+                                className={`${inputCls} font-mono`}
+                                style={{ borderColor: '#e9e9f0' }}
                                 value={values.phone_number_id}
                                 onChange={(e) => handleChange('phone_number_id', e.target.value)}
                                 placeholder="123456789012345"
-                                className="font-mono"
                             />
-                            <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                                {'ID del n\u00famero desde el que se env\u00edan los mensajes'}
-                            </p>
+                            <p className={fieldHint}>{'ID del n\u00famero desde el que se env\u00edan los mensajes'}</p>
                         </div>
 
                         {!values.hosted && (
-                            <div className="md:col-span-2">
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
-                                    {'Token de acceso (opcional)'}
-                                </label>
+                            <div className="sm:col-span-2">
+                                <label className={fieldLabel}>{'Token de acceso (opcional)'}</label>
                                 <SecretInput
                                     value={values.access_token}
                                     onChange={(e) => handleChange('access_token', e.target.value)}
                                     placeholder={hasStoredToken ? 'Gu\u00e1rdalo vac\u00edo para no cambiarlo' : 'EAAxxxxxxxxx...'}
                                     className="font-mono"
                                 />
-                                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                <p className={fieldHint}>
                                     {'D\u00e9jalo vac\u00edo si compartiste tu cuenta con Probability desde tu Business Manager: en ese caso enviamos con nuestras credenciales.'}
                                 </p>
                             </div>
@@ -209,9 +196,9 @@ export default function WhatsAppConnectionForm({ config, businessId, onSaved }: 
                 </div>
             )}
 
-            <Button type="button" variant="primary" onClick={handleSubmit} disabled={saving} loading={saving}>
-                Guardar conexión
-            </Button>
+            <ActionButton onClick={handleSubmit} disabled={saving} loading={saving}>
+                {'Guardar conexi\u00f3n'}
+            </ActionButton>
 
             {message && (
                 <Alert type={message.type} onClose={() => setMessage(null)}>

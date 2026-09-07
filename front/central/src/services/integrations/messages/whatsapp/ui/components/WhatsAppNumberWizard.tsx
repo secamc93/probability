@@ -1,7 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import { Alert, Button, Input } from '@/shared/ui';
+import { Alert } from '@/shared/ui';
+import { DevicePhoneMobileIcon } from '@heroicons/react/24/outline';
+import { ACCENT, ActionButton, Card, Pill, Steps, fieldHint, fieldLabel, inputCls } from './ui-kit';
 import {
     addWhatsAppNumberAction,
     getWhatsAppNumberStateAction,
@@ -77,65 +79,72 @@ export default function WhatsAppNumberWizard({ businessId, onChanged }: WhatsApp
     const pasoActual = indiceDePaso(status);
 
     return (
-        <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-4">
-            <div>
-                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                    {'Conectar tu propio número'}
-                </h4>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {'Tu número queda dentro de la cuenta de WhatsApp de Probability: usa las plantillas ya aprobadas y nosotros gestionamos el consumo. El número no puede estar activo en WhatsApp normal.'}
-                </p>
-            </div>
-
-            <ol className="flex flex-wrap gap-2 text-xs">
-                {PASOS.map((paso, idx) => (
-                    <li
-                        key={paso.key}
-                        className={`px-2 py-1 rounded-full ${
-                            idx < pasoActual
-                                ? 'bg-green-100 text-green-800'
-                                : idx === pasoActual
-                                  ? 'bg-blue-100 text-blue-800'
-                                  : 'bg-gray-100 text-gray-500'
-                        }`}
-                    >
-                        {idx + 1}. {paso.label}
-                    </li>
-                ))}
-            </ol>
+        <Card
+            icon={<DevicePhoneMobileIcon style={{ color: ACCENT, width: 16, height: 16 }} />}
+            title={'Conectar tu propio n\u00famero'}
+            description={'Tu n\u00famero queda dentro de la cuenta de WhatsApp de Probability: usa las plantillas ya aprobadas y nosotros gestionamos el consumo. El n\u00famero no puede estar activo en WhatsApp normal.'}
+            action={
+                status === 'registrado' ? (
+                    <Pill tone="ok">Conectado</Pill>
+                ) : status === 'nombre_en_revision' ? (
+                    <Pill tone="warn">{'Nombre en revisi\u00f3n'}</Pill>
+                ) : status === 'sin_numero' ? null : (
+                    <Pill tone="warn">En proceso</Pill>
+                )
+            }
+        >
+            <Steps pasos={PASOS} actual={pasoActual} />
 
             {loading ? (
-                <p className="text-sm text-gray-500 dark:text-gray-400">{'Consultando el estado...'}</p>
+                <p className="text-[13px] text-gray-500 dark:text-gray-400">{'Consultando el estado...'}</p>
             ) : (
-                <>
+                <div className="space-y-3">
                     {status === 'sin_numero' && (
-                        <div className="space-y-3">
-                            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                        <>
+                            <div className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-3">
                                 <div>
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
-                                        {'Indicativo'}
+                                    <label className={fieldLabel}>
+                                        Indicativo <span style={{ color: ACCENT }}>*</span>
                                     </label>
-                                    <Input value={countryCode} onChange={(e) => setCountryCode(e.target.value)} placeholder="57" />
+                                    <input
+                                        className={inputCls}
+                                        style={{ borderColor: '#e9e9f0' }}
+                                        value={countryCode}
+                                        onChange={(e) => setCountryCode(e.target.value)}
+                                        placeholder="57"
+                                    />
                                 </div>
-                                <div className="md:col-span-2">
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
-                                        {'Número de teléfono'}
+                                <div className="sm:col-span-2">
+                                    <label className={fieldLabel}>
+                                        {'N\u00famero de tel\u00e9fono'} <span style={{ color: ACCENT }}>*</span>
                                     </label>
-                                    <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="3001234567" />
+                                    <input
+                                        className={`${inputCls} font-mono`}
+                                        style={{ borderColor: '#e9e9f0' }}
+                                        value={phone}
+                                        onChange={(e) => setPhone(e.target.value)}
+                                        placeholder="3001234567"
+                                    />
                                 </div>
                             </div>
+
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
-                                    {'Nombre que verán tus clientes'}
+                                <label className={fieldLabel}>
+                                    {'Nombre que ver\u00e1n tus clientes'} <span style={{ color: ACCENT }}>*</span>
                                 </label>
-                                <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Mi Tienda" />
-                                <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                                <input
+                                    className={inputCls}
+                                    style={{ borderColor: '#e9e9f0' }}
+                                    value={name}
+                                    onChange={(e) => setName(e.target.value)}
+                                    placeholder="Mi Tienda"
+                                />
+                                <p className={fieldHint}>
                                     {'Meta revisa este nombre. Debe corresponder a tu negocio real.'}
                                 </p>
                             </div>
-                            <Button
-                                type="button"
-                                variant="primary"
+
+                            <ActionButton
                                 disabled={busy}
                                 loading={busy}
                                 onClick={() =>
@@ -145,85 +154,91 @@ export default function WhatsAppNumberWizard({ businessId, onChanged }: WhatsApp
                                                 { country_code: countryCode, phone_number: phone, verified_name: name },
                                                 businessId
                                             ),
-                                        'Número agregado. Pide el código para verificarlo.'
+                                        'N\u00famero agregado. Pide el c\u00f3digo para verificarlo.'
                                     )
                                 }
                             >
-                                {'Agregar número'}
-                            </Button>
-                        </div>
+                                {'Agregar n\u00famero'}
+                            </ActionButton>
+                        </>
                     )}
 
                     {status === 'esperando_codigo' && (
-                        <div className="space-y-3">
-                            <p className="text-sm text-gray-700 dark:text-gray-200">
-                                {'Te enviaremos un código de 6 dígitos al teléfono para confirmar que es tuyo.'}
+                        <>
+                            <p className="text-[13px] text-gray-600 dark:text-gray-300">
+                                {'Te enviaremos un c\u00f3digo de 6 d\u00edgitos al tel\u00e9fono para confirmar que es tuyo.'}
                             </p>
                             <div className="flex flex-wrap gap-2">
-                                <Button
-                                    type="button"
-                                    variant="outline"
+                                <ActionButton
+                                    variant="ghost"
                                     disabled={busy}
-                                    onClick={() => correr(() => requestWhatsAppNumberCodeAction('SMS', businessId), 'Código enviado por SMS')}
+                                    onClick={() =>
+                                        correr(() => requestWhatsAppNumberCodeAction('SMS', businessId), 'C\u00f3digo enviado por SMS')
+                                    }
                                 >
                                     {'Enviar por SMS'}
-                                </Button>
-                                <Button
-                                    type="button"
-                                    variant="outline"
+                                </ActionButton>
+                                <ActionButton
+                                    variant="ghost"
                                     disabled={busy}
-                                    onClick={() => correr(() => requestWhatsAppNumberCodeAction('VOICE', businessId), 'Te llamaremos con el código')}
+                                    onClick={() =>
+                                        correr(() => requestWhatsAppNumberCodeAction('VOICE', businessId), 'Te llamaremos con el c\u00f3digo')
+                                    }
                                 >
                                     {'Recibir llamada'}
-                                </Button>
+                                </ActionButton>
                             </div>
-                            <div className="flex items-end gap-2">
+                            <div className="flex flex-col gap-2 sm:flex-row sm:items-end">
                                 <div className="flex-1">
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
-                                        {'Código recibido'}
-                                    </label>
-                                    <Input value={code} onChange={(e) => setCode(e.target.value)} placeholder="123456" className="font-mono" />
+                                    <label className={fieldLabel}>{'C\u00f3digo recibido'}</label>
+                                    <input
+                                        className={`${inputCls} font-mono`}
+                                        style={{ borderColor: '#e9e9f0' }}
+                                        value={code}
+                                        onChange={(e) => setCode(e.target.value)}
+                                        placeholder="123456"
+                                    />
                                 </div>
-                                <Button
-                                    type="button"
-                                    variant="primary"
-                                    disabled={busy}
+                                <ActionButton
+                                    disabled={busy || !code.trim()}
                                     loading={busy}
-                                    onClick={() => correr(() => verifyWhatsAppNumberCodeAction(code, businessId), 'Número verificado')}
+                                    onClick={() =>
+                                        correr(() => verifyWhatsAppNumberCodeAction(code, businessId), 'N\u00famero verificado')
+                                    }
                                 >
-                                    {'Verificar'}
-                                </Button>
+                                    Verificar
+                                </ActionButton>
                             </div>
-                        </div>
+                        </>
                     )}
 
                     {status === 'verificado' && (
-                        <div className="space-y-3">
-                            <p className="text-sm text-gray-700 dark:text-gray-200">
-                                {'El número es tuyo. Falta activarlo para enviar y recibir mensajes.'}
+                        <>
+                            <p className="text-[13px] text-gray-600 dark:text-gray-300">
+                                {'El n\u00famero es tuyo. Falta activarlo para enviar y recibir mensajes.'}
                             </p>
-                            <Button
-                                type="button"
-                                variant="primary"
+                            <ActionButton
                                 disabled={busy}
                                 loading={busy}
-                                onClick={() => correr(() => registerWhatsAppNumberAction(businessId), 'Número activado')}
+                                onClick={() => correr(() => registerWhatsAppNumberAction(businessId), 'N\u00famero activado')}
                             >
-                                {'Activar número'}
-                            </Button>
-                        </div>
+                                {'Activar n\u00famero'}
+                            </ActionButton>
+                        </>
                     )}
 
                     {(status === 'registrado' || status === 'nombre_en_revision') && (
-                        <div className="space-y-2 text-sm text-gray-700 dark:text-gray-200">
-                            <p>
+                        <div className="rounded-lg bg-white dark:bg-gray-800 px-3 py-2.5" style={{ border: '1px solid #e9e9f0' }}>
+                            <p className="text-[13px] text-gray-800 dark:text-gray-100">
                                 {'Tus mensajes salen desde '}
-                                <span className="font-mono">{state?.display_phone_number || state?.phone_number_id}</span>
-                                {state?.quality_rating ? ` (calidad ${state.quality_rating})` : ''}
+                                <span className="font-mono font-semibold">
+                                    {state?.display_phone_number || state?.phone_number_id}
+                                </span>
+                                {state?.quality_rating ? ` \u00b7 calidad ${state.quality_rating}` : ''}
                             </p>
                             {status === 'nombre_en_revision' && (
-                                <p className="text-xs text-yellow-700 dark:text-yellow-500">
-                                    {'Meta todavía está revisando el nombre que verán tus clientes.'}
+                                <p className={fieldHint}>
+                                    {'Meta todav\u00eda est\u00e1 revisando el nombre que ver\u00e1n tus clientes.'}
                                 </p>
                             )}
                         </div>
@@ -235,14 +250,14 @@ export default function WhatsAppNumberWizard({ businessId, onChanged }: WhatsApp
                             <span className="font-mono font-semibold">{pin}</span>
                         </Alert>
                     )}
-                </>
-            )}
 
-            {message && (
-                <Alert type={message.type} onClose={() => setMessage(null)}>
-                    {message.text}
-                </Alert>
+                    {message && (
+                        <Alert type={message.type} onClose={() => setMessage(null)}>
+                            {message.text}
+                        </Alert>
+                    )}
+                </div>
             )}
-        </div>
+        </Card>
     );
 }

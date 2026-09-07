@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import { ArrowPathIcon } from '@heroicons/react/24/outline';
-import { Alert, Button } from '@/shared/ui';
+import { Alert } from '@/shared/ui';
+import { ACCENT, ActionButton, Card, Pill } from './ui-kit';
 import {
     getWhatsAppTemplatesStatusAction,
     provisionWhatsAppTemplatesAction,
@@ -96,104 +97,109 @@ export default function WhatsAppTemplatesPanel({ businessId, enabled }: WhatsApp
 
     if (enabled && hosted) {
         return (
-            <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-200">Plantillas</h4>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {'Tu n\u00famero vive en la cuenta de WhatsApp de Probability, as\u00ed que usa las plantillas que ya est\u00e1n aprobadas. No hay nada que crear ni que esperar.'}
-                </p>
-            </div>
+            <Card
+                icon={<ArrowPathIcon style={{ color: ACCENT, width: 16, height: 16 }} />}
+                title="Plantillas"
+                description={'Tu n\u00famero vive en la cuenta de WhatsApp de Probability, as\u00ed que usa las plantillas que ya est\u00e1n aprobadas. No hay nada que crear ni que esperar.'}
+                action={<Pill tone="ok">Aprobadas</Pill>}
+            />
         );
     }
 
     if (!enabled) {
         return (
-            <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
-                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-200">Plantillas</h4>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {'Est\u00e1s usando el n\u00famero de Probability, que ya tiene todas las plantillas aprobadas. Conecta tu propio n\u00famero para gestionar las tuyas.'}
-                </p>
-            </div>
+            <Card
+                icon={<ArrowPathIcon style={{ color: ACCENT, width: 16, height: 16 }} />}
+                title="Plantillas"
+                description={'Est\u00e1s usando el n\u00famero de Probability, que ya tiene todas las plantillas aprobadas. Conecta tu propio n\u00famero para gestionar las tuyas.'}
+                action={<Pill tone="ok">Aprobadas</Pill>}
+            />
         );
     }
 
     const pending = templates.filter((t) => t.status !== 'APPROVED').length;
 
     return (
-        <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-3">
-            <div className="flex items-start justify-between gap-3">
-                <div>
-                    <h4 className="text-sm font-medium text-gray-700 dark:text-gray-200">Plantillas</h4>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        {wabaId ? `Cuenta de WhatsApp ${wabaId}. ` : ''}
-                        Meta puede tardar horas en aprobarlas. Mientras una plantilla no esté aprobada, los
-                        mensajes que la usan no se pueden enviar.
-                    </p>
-                </div>
+        <Card
+            icon={<ArrowPathIcon style={{ color: ACCENT, width: 16, height: 16 }} />}
+            title="Plantillas"
+            description={
+                <>
+                    {wabaId ? `Cuenta de WhatsApp ${wabaId}. ` : ''}
+                    {'Meta puede tardar horas en aprobarlas. Mientras una plantilla no est\u00e9 aprobada, los mensajes que la usan no se pueden enviar.'}
+                </>
+            }
+            action={
                 <button
                     type="button"
                     onClick={() => load(true)}
                     disabled={loading}
-                    className="p-2 rounded-md border border-gray-300 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 shrink-0"
+                    className="p-2 rounded-lg bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
+                    style={{ border: '1px solid #e9e9f0' }}
                     title="Actualizar estado"
                 >
-                    <ArrowPathIcon className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                    <ArrowPathIcon className={`w-4 h-4 text-gray-500 ${loading ? 'animate-spin' : ''}`} />
                 </button>
-            </div>
-
-            {templates.length === 0 ? (
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                    {loading ? 'Consultando plantillas...' : 'Todavía no hay plantillas en tu cuenta.'}
-                </p>
-            ) : (
-                <>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                        {templates.length} plantillas, {pending} pendientes de aprobación.
+            }
+        >
+            <div className="space-y-3">
+                {templates.length === 0 ? (
+                    <p className="text-[13px] text-gray-500 dark:text-gray-400">
+                        {loading ? 'Consultando plantillas...' : 'Todav\u00eda no hay plantillas en tu cuenta.'}
                     </p>
-                    <div className="max-h-72 overflow-y-auto divide-y divide-gray-100 dark:divide-gray-700">
-                        {templates.map((template) => (
-                            <div
-                                key={`${template.name}-${template.language}`}
-                                className="py-2 flex items-center justify-between gap-3"
-                            >
-                                <div className="min-w-0">
-                                    <p className="text-sm text-gray-900 dark:text-white font-mono truncate">
-                                        {template.name}
-                                    </p>
-                                    {template.reason && (
-                                        <p className="text-xs text-red-600 dark:text-red-400 truncate">
-                                            {template.reason}
-                                        </p>
-                                    )}
-                                </div>
-                                <span
-                                    className={`px-2 py-1 rounded-full text-xs font-medium shrink-0 ${
-                                        STATUS_STYLES[template.status] || 'bg-gray-100 text-gray-700'
-                                    }`}
+                ) : (
+                    <>
+                        <p className="text-[11px] text-gray-500 dark:text-gray-400">
+                            {templates.length} plantillas, {pending} pendientes de {'aprobaci\u00f3n'}.
+                        </p>
+                        <div
+                            className="max-h-72 overflow-y-auto rounded-lg bg-white dark:bg-gray-800 divide-y divide-gray-100 dark:divide-gray-700"
+                            style={{ border: '1px solid #e9e9f0' }}
+                        >
+                            {templates.map((template) => (
+                                <div
+                                    key={`${template.name}-${template.language}`}
+                                    className="px-3 py-2.5 flex items-center justify-between gap-3"
                                 >
-                                    {STATUS_LABELS[template.status] || template.status}
-                                </span>
-                            </div>
-                        ))}
-                    </div>
-                </>
-            )}
+                                    <div className="min-w-0">
+                                        <p className="text-[13px] text-gray-900 dark:text-white font-mono truncate">
+                                            {template.name}
+                                        </p>
+                                        {template.reason && (
+                                            <p className="text-[11px] text-red-600 dark:text-red-400 truncate">
+                                                {template.reason}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <span
+                                        className={`px-2 py-1 rounded-full text-[11px] font-semibold shrink-0 ${
+                                            STATUS_STYLES[template.status] || 'bg-gray-100 text-gray-700'
+                                        }`}
+                                    >
+                                        {STATUS_LABELS[template.status] || template.status}
+                                    </span>
+                                </div>
+                            ))}
+                        </div>
+                    </>
+                )}
 
-            <Button
-                type="button"
-                variant="outline"
-                onClick={handleProvision}
-                disabled={provisioning}
-                loading={provisioning}
-                className="w-full"
-            >
-                Crear las plantillas que faltan
-            </Button>
+                <ActionButton
+                    variant="ghost"
+                    onClick={handleProvision}
+                    disabled={provisioning}
+                    loading={provisioning}
+                    className="w-full"
+                >
+                    {'Crear las plantillas que faltan'}
+                </ActionButton>
 
-            {message && (
-                <Alert type={message.type === 'info' ? 'success' : message.type} onClose={() => setMessage(null)}>
-                    {message.text}
-                </Alert>
-            )}
-        </div>
+                {message && (
+                    <Alert type={message.type === 'info' ? 'success' : message.type} onClose={() => setMessage(null)}>
+                        {message.text}
+                    </Alert>
+                )}
+            </div>
+        </Card>
     );
 }

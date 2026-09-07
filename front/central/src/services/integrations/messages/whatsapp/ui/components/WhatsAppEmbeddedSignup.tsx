@@ -1,7 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Alert, Button } from '@/shared/ui';
+import { Alert } from '@/shared/ui';
+import { BoltIcon } from '@heroicons/react/24/outline';
+import { ACCENT, ActionButton, Card } from './ui-kit';
 import {
     completeWhatsAppEmbeddedSignupAction,
     getWhatsAppEmbeddedSignupConfigAction,
@@ -149,32 +151,29 @@ export default function WhatsAppEmbeddedSignup({ businessId, onConnected }: What
     if (!config?.enabled) return null;
 
     return (
-        <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4 space-y-3">
-            <div>
-                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-200">
-                    {'Conectar con Meta'}
-                </h4>
-                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    {'Inicias sesión con tu cuenta de Facebook, eliges o creas tu cuenta de WhatsApp Business y tu número queda conectado. Probability no ve tu contraseña.'}
-                </p>
+        <Card
+            icon={<BoltIcon style={{ color: ACCENT, width: 16, height: 16 }} />}
+            title="Conectar con Meta"
+            description={'La forma m\u00e1s r\u00e1pida: inicias sesi\u00f3n con tu cuenta de Facebook, eliges o creas tu cuenta de WhatsApp Business y tu n\u00famero queda conectado. Probability no ve tu contrase\u00f1a.'}
+        >
+            <div className="space-y-3">
+                <ActionButton onClick={conectar} disabled={busy} loading={busy}>
+                    {'Conectar cuenta de WhatsApp'}
+                </ActionButton>
+
+                {pin && (
+                    <Alert type="success">
+                        {'Guarda este PIN de dos pasos, no se vuelve a mostrar: '}
+                        <span className="font-mono font-semibold">{pin}</span>
+                    </Alert>
+                )}
+
+                {message && (
+                    <Alert type={message.type} onClose={() => setMessage(null)}>
+                        {message.text}
+                    </Alert>
+                )}
             </div>
-
-            <Button type="button" variant="primary" onClick={conectar} disabled={busy} loading={busy}>
-                {'Conectar cuenta de WhatsApp'}
-            </Button>
-
-            {pin && (
-                <Alert type="success">
-                    {'Guarda este PIN de dos pasos, no se vuelve a mostrar: '}
-                    <span className="font-mono font-semibold">{pin}</span>
-                </Alert>
-            )}
-
-            {message && (
-                <Alert type={message.type} onClose={() => setMessage(null)}>
-                    {message.text}
-                </Alert>
-            )}
-        </div>
+        </Card>
     );
 }

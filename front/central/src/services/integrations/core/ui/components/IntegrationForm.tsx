@@ -28,6 +28,7 @@ import { ExitoConfigForm, ExitoEditForm } from '@/services/integrations/ecommerc
 import { TikTokConfigForm, TikTokEditForm } from '@/services/integrations/ecommerce/tiktok/ui';
 import { JumpsellerConfigForm } from '@/services/integrations/ecommerce/jumpseller/ui';
 import { BoldConfigForm, BoldEditForm } from '@/services/integrations/pay/bold/ui/components';
+import { ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline';
 import { getActionError } from '@/shared/utils/action-result';
 
 const INTEGRATION_TYPE_IDS = {
@@ -824,46 +825,94 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
                     )}
 
                     {selectedType.id === INTEGRATION_TYPE_IDS.WHATSAPP && (
-                        <div className="space-y-4 max-w-md mx-auto py-4">
-                            <div className="flex flex-col items-center text-center mb-4">
-                                {selectedType.image_url ? (
-                                    <img src={selectedType.image_url} alt="WhatsApp" className="w-14 h-14 object-contain rounded-lg shadow-md mb-3" />
-                                ) : (
-                                    <img src="/integrations/whatsapp.png" alt="WhatsApp" className="w-14 h-14 object-contain rounded-lg shadow-md mb-3" />
-                                )}
-                                <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-400">
-                                    Crea una integración de WhatsApp para este negocio. Las notificaciones se configuran desde el módulo de Notificaciones.
-                                </p>
+                        <div className="space-y-3 w-full">
+                            <div
+                                className="flex flex-col gap-3 rounded-xl p-4 sm:flex-row sm:items-center dark:bg-gray-800/60"
+                                style={{
+                                    backgroundColor: 'color-mix(in srgb, var(--color-primary) 10%, white)',
+                                    border: '1px solid color-mix(in srgb, var(--color-primary) 25%, white)',
+                                }}
+                            >
+                                <span
+                                    className="flex h-11 w-11 items-center justify-center rounded-xl overflow-hidden shrink-0 bg-white dark:bg-gray-900"
+                                    style={{ border: '1px solid color-mix(in srgb, var(--color-primary) 25%, white)' }}
+                                >
+                                    <img
+                                        src={selectedType.image_url || '/integrations/whatsapp.png'}
+                                        alt="WhatsApp"
+                                        className="h-8 w-8 object-contain"
+                                    />
+                                </span>
+                                <div>
+                                    <h2 className="text-base font-bold text-gray-900 dark:text-white leading-tight">
+                                        Conectar WhatsApp
+                                    </h2>
+                                    <p className="text-xs text-gray-600 dark:text-gray-300 mt-0.5">
+                                        {'Ponle nombre a la integraci\u00f3n y cr\u00e9ala. Despu\u00e9s, al editarla, conectas tu propio n\u00famero.'}
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 dark:text-gray-200 mb-1">
-                                    Nombre de la integración *
+
+                            <div
+                                className="rounded-xl p-4 dark:bg-gray-800/60"
+                                style={{ backgroundColor: '#fafafd', border: '1px solid #eceaf3' }}
+                            >
+                                <div className="flex items-center gap-2 mb-3">
+                                    <span
+                                        className="flex h-7 w-7 items-center justify-center rounded-md"
+                                        style={{ backgroundColor: 'color-mix(in srgb, var(--color-primary) 10%, white)' }}
+                                    >
+                                        <ChatBubbleLeftRightIcon
+                                            style={{ color: 'var(--color-primary)', width: 16, height: 16 }}
+                                        />
+                                    </span>
+                                    <h3 className="text-sm font-bold text-gray-900 dark:text-white">
+                                        Datos de la {'integraci\u00f3n'}
+                                    </h3>
+                                </div>
+
+                                <label className="block text-[13px] font-semibold text-gray-900 dark:text-gray-100 mb-1">
+                                    Nombre de la {'integraci\u00f3n'}{' '}
+                                    <span style={{ color: 'var(--color-primary)' }}>*</span>
                                 </label>
                                 <input
                                     type="text"
                                     value={whatsappName}
                                     onChange={(e) => setWhatsappName(e.target.value)}
                                     placeholder="Ej: WhatsApp - Mi Negocio"
-                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                    className="w-full px-3 py-2 text-sm rounded-lg border bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)]"
+                                    style={{ borderColor: '#e9e9f0' }}
                                     disabled={creatingWhatsapp}
                                 />
+                                <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-1">
+                                    {'Las notificaciones a tus clientes se configuran despu\u00e9s, en el m\u00f3dulo de Notificaciones.'}
+                                </p>
                             </div>
-                            <div className="flex gap-3">
+
+                            <div className="flex items-center justify-end gap-2 pt-1">
                                 {onCancel && (
-                                    <Button type="button" variant="outline" onClick={onCancel} className="flex-1" disabled={creatingWhatsapp}>
+                                    <button
+                                        type="button"
+                                        onClick={onCancel}
+                                        disabled={creatingWhatsapp}
+                                        className="px-5 py-2 text-[13px] font-semibold rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
+                                        style={{ border: '1px solid #e9e9f0' }}
+                                    >
                                         Cancelar
-                                    </Button>
+                                    </button>
                                 )}
-                                <Button
+                                <button
                                     type="button"
-                                    variant="primary"
                                     onClick={handleWhatsAppCreate}
                                     disabled={creatingWhatsapp || !whatsappName.trim()}
-                                    loading={creatingWhatsapp}
-                                    className="flex-1"
+                                    className="px-5 py-2 text-[13px] font-semibold rounded-lg text-white flex items-center justify-center gap-2 transition-colors disabled:opacity-60"
+                                    style={{ backgroundColor: 'var(--color-primary)' }}
                                 >
-                                    Crear integración
-                                </Button>
+                                    {creatingWhatsapp && (
+                                        <span className="h-3.5 w-3.5 rounded-full border-2 border-white/40 border-t-white animate-spin" />
+                                    )}
+                                    Crear {'integraci\u00f3n'}
+                                </button>
                             </div>
                         </div>
                     )}
