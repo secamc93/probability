@@ -2,6 +2,9 @@ import {
     WhatsAppAddNumberValues,
     WhatsAppConnectionResponse,
     WhatsAppConnectionValues,
+    WhatsAppEmbeddedSignupConfigResponse,
+    WhatsAppEmbeddedSignupPayload,
+    WhatsAppEmbeddedSignupResponse,
     WhatsAppNumberResponse,
     WhatsAppProvisionResponse,
     WhatsAppTemplatesResponse,
@@ -16,4 +19,9 @@ export interface IWhatsAppRepository {
     requestNumberCode(method: string, businessId?: number): Promise<WhatsAppNumberResponse>;
     verifyNumberCode(code: string, businessId?: number): Promise<WhatsAppNumberResponse>;
     registerNumber(businessId?: number): Promise<WhatsAppNumberResponse>;
+    getEmbeddedSignupConfig(): Promise<WhatsAppEmbeddedSignupConfigResponse>;
+    completeEmbeddedSignup(
+        payload: WhatsAppEmbeddedSignupPayload,
+        businessId?: number
+    ): Promise<WhatsAppEmbeddedSignupResponse>;
 }

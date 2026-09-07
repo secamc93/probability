@@ -182,3 +182,41 @@ Mientras una plantilla no este `APPROVED`, los mensajes que la usan no se pueden
 enviar: es el estado "cliente conectado pero sin plantillas aprobadas" que la UI
 muestra explicitamente.
 
+## Registro insertado (Embedded Signup) - detras de flag
+
+El cliente pulsa "Conectar cuenta de WhatsApp", inicia sesion con su Facebook en
+la ventana de Meta, elige o crea su WABA y su numero, y vuelve conectado. Es el
+mismo destino que el asistente manual, pero sin que nadie copie IDs.
+
+**Esta apagado por defecto.** Se prende desde las platform credentials del
+integration_type 2 (nunca desde `.env`, ver la regla de credenciales OAuth):
+
+| Campo | Para que |
+|---|---|
+| `embedded_signup_enabled` | el flag; sin el, `GET /whatsapp/embedded-signup/config` responde `enabled: false` y el boton no se pinta |
+| `app_id` | el de la app de Meta (`2812884712240202`) |
+| `app_secret` | necesario para canjear el codigo; **no esta en el repo**, hay que cargarlo |
+| `embedded_signup_config_id` | el id de la configuracion de registro insertado que se crea en el panel de la app |
+
+Flujo:
+
+1. El front carga el SDK de Meta y llama `FB.login` con `config_id`,
+   `response_type: code` y `override_default_response_type`.
+2. Del evento `WA_EMBEDDED_SIGNUP` (postMessage) salen `waba_id` y
+   `phone_number_id`; del callback sale el `code`.
+3. `POST /whatsapp/embedded-signup` con los tres. El backend:
+   - canjea el `code` por el token del negocio (`GET /oauth/access_token`),
+   - comprueba con ese token que el numero esta en ese WABA,
+   - rechaza el numero si ya pertenece a otra integracion,
+   - suscribe el webhook (`POST /{waba_id}/subscribed_apps`),
+   - registra el numero (`POST /{phone_number_id}/register`) con un PIN generado,
+   - guarda el token del negocio y el PIN cifrados, y deja
+     `use_platform_token: false` solo si el registro salio bien.
+4. Si el registro falla, la conexion queda guardada con
+   `number_status: verificado` y el negocio sigue enviando por el numero de
+   Probability hasta que se resuelva. La respuesta trae `warning`.
+
+**Limite que no desaparece:** con la app en `dev_mode` el flujo solo funciona
+para cuentas con rol en la app. Para clientes reales hace falta Advanced Access
+en `whatsapp_business_management` y `whatsapp_business_messaging`, que hoy estan
+en `REJECTED`. El codigo no depende de eso; el permiso si.

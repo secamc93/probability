@@ -8,6 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/secamc93/probability/back/central/services/integrations/core"
 	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/app/usecaseconnection"
+	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/app/usecaseembedded"
 	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/app/usecasemessaging"
 	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/app/usecasenumbers"
 	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/app/usecasetemplates"
@@ -73,6 +74,7 @@ type bundle struct {
 	templatesUseCase usecasetemplates.IUseCase
 	connectionUC     usecaseconnection.IUseCaseMutable
 	numbersUC        usecasenumbers.IUseCaseMutable
+	embeddedUC       usecaseembedded.IUseCaseMutable
 	handler          handlers.IHandler
 	credsCache       cache.ICredentialsCacheMutable
 }
@@ -141,7 +143,16 @@ func New(config env.IConfig, logger log.ILogger, rabbit rabbitmq.IQueue, redisCl
 
 	numbersUseCase := usecasenumbers.New(credsCache, phoneNumbersAPIFactory, logger)
 
-	handler := handlers.New(useCase, templatesUseCase, connectionUseCase, numbersUseCase, logger, config, rabbit)
+	embeddedSignupAPIFactory := func(baseURL string) ports.IEmbeddedSignupAPI {
+		if baseURL == "" {
+			baseURL = whatsappURL
+		}
+		return client.NewEmbeddedSignupClient(baseURL, logger)
+	}
+
+	embeddedUseCase := usecaseembedded.New(credsCache, embeddedSignupAPIFactory, phoneNumbersAPIFactory, logger)
+
+	handler := handlers.New(useCase, templatesUseCase, connectionUseCase, numbersUseCase, embeddedUseCase, logger, config, rabbit)
 
 	if rabbit != nil {
 		webhookConsumer := consumerwebhook.New(rabbit, useCase, templatesUseCase, logger)
@@ -209,6 +220,7 @@ func New(config env.IConfig, logger log.ILogger, rabbit rabbitmq.IQueue, redisCl
 		templatesUseCase: templatesUseCase,
 		connectionUC:     connectionUseCase,
 		numbersUC:        numbersUseCase,
+		embeddedUC:       embeddedUseCase,
 		handler:          handler,
 		credsCache:       credsCache,
 	}
@@ -228,6 +240,9 @@ func (b *bundle) SetPlatformCredsGetter(getter ports.IPlatformCredentialsGetter)
 	}
 	if b.numbersUC != nil {
 		b.numbersUC.SetResolver(getter)
+	}
+	if b.embeddedUC != nil {
+		b.embeddedUC.SetResolver(getter)
 	}
 }
 

@@ -94,3 +94,41 @@ export interface WhatsAppAddNumberValues {
     phone_number: string;
     verified_name: string;
 }
+
+export interface WhatsAppEmbeddedSignupConfig {
+    enabled: boolean;
+    app_id?: string;
+    config_id?: string;
+    graph_version?: string;
+}
+
+export interface WhatsAppEmbeddedSignupConfigResponse {
+    success: boolean;
+    message?: string;
+    data?: WhatsAppEmbeddedSignupConfig;
+}
+
+export interface WhatsAppEmbeddedSignupResult {
+    integration_id: number;
+    business_id: number;
+    waba_id: string;
+    phone_number_id: string;
+    display_phone_number: string;
+    verified_name: string;
+    quality_rating: string;
+    registered: boolean;
+    pin: string;
+    warning: string;
+}
+
+export interface WhatsAppEmbeddedSignupResponse {
+    success: boolean;
+    message?: string;
+    data?: WhatsAppEmbeddedSignupResult;
+}
+
+export interface WhatsAppEmbeddedSignupPayload {
+    code: string;
+    waba_id: string;
+    phone_number_id: string;
+}

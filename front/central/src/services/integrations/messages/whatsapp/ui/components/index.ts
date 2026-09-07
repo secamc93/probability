@@ -4,3 +4,4 @@ export type { WhatsAppPlatformCredentials } from './WhatsAppTypeCredentialsForm'
 export { default as WhatsAppConnectionForm } from './WhatsAppConnectionForm';
 export { default as WhatsAppTemplatesPanel } from './WhatsAppTemplatesPanel';
 export { default as WhatsAppNumberWizard } from './WhatsAppNumberWizard';
+export { default as WhatsAppEmbeddedSignup } from './WhatsAppEmbeddedSignup';

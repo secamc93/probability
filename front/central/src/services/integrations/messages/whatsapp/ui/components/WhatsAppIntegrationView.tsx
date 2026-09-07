@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { Alert, Button } from '@/shared/ui';
 import { ChatBubbleLeftRightIcon, CheckCircleIcon, PhoneIcon } from '@heroicons/react/24/outline';
 import WhatsAppConnectionForm from './WhatsAppConnectionForm';
+import WhatsAppEmbeddedSignup from './WhatsAppEmbeddedSignup';
 import WhatsAppNumberWizard from './WhatsAppNumberWizard';
 import WhatsAppTemplatesPanel from './WhatsAppTemplatesPanel';
 
@@ -239,6 +240,13 @@ export default function WhatsAppIntegrationView({
                         </Button>
                     )}
                 </div>
+            )}
+
+            {isActive && (
+                <WhatsAppEmbeddedSignup
+                    businessId={integration.business_id || undefined}
+                    onConnected={onRefresh}
+                />
             )}
 
             {isActive && (

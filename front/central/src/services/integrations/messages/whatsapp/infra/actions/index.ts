@@ -7,6 +7,9 @@ import {
     WhatsAppAddNumberValues,
     WhatsAppConnectionResponse,
     WhatsAppConnectionValues,
+    WhatsAppEmbeddedSignupConfigResponse,
+    WhatsAppEmbeddedSignupPayload,
+    WhatsAppEmbeddedSignupResponse,
     WhatsAppNumberResponse,
     WhatsAppProvisionResponse,
     WhatsAppTemplatesResponse,
@@ -96,3 +99,27 @@ export const verifyWhatsAppNumberCodeAction = async (
 
 export const registerWhatsAppNumberAction = async (businessId?: number, token?: string | null) =>
     numberAction((useCases) => useCases.registerNumber(businessId), token);
+
+export const getWhatsAppEmbeddedSignupConfigAction = async (
+    token?: string | null
+): Promise<WhatsAppEmbeddedSignupConfigResponse> => {
+    try {
+        const useCases = await getUseCases(token);
+        return await useCases.getEmbeddedSignupConfig();
+    } catch (error: any) {
+        return { success: true, data: { enabled: false }, message: error?.message };
+    }
+};
+
+export const completeWhatsAppEmbeddedSignupAction = async (
+    payload: WhatsAppEmbeddedSignupPayload,
+    businessId?: number,
+    token?: string | null
+): Promise<WhatsAppEmbeddedSignupResponse> => {
+    try {
+        const useCases = await getUseCases(token);
+        return await useCases.completeEmbeddedSignup(payload, businessId);
+    } catch (error: any) {
+        return { success: false, message: error?.message || 'No se pudo completar el registro' };
+    }
+};

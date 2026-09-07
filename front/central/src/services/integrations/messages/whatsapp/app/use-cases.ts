@@ -3,6 +3,9 @@ import {
     WhatsAppAddNumberValues,
     WhatsAppConnectionResponse,
     WhatsAppConnectionValues,
+    WhatsAppEmbeddedSignupConfigResponse,
+    WhatsAppEmbeddedSignupPayload,
+    WhatsAppEmbeddedSignupResponse,
     WhatsAppNumberResponse,
     WhatsAppProvisionResponse,
     WhatsAppTemplatesResponse,
@@ -44,5 +47,16 @@ export class WhatsAppUseCases {
 
     async registerNumber(businessId?: number): Promise<WhatsAppNumberResponse> {
         return this.repository.registerNumber(businessId);
+    }
+
+    async getEmbeddedSignupConfig(): Promise<WhatsAppEmbeddedSignupConfigResponse> {
+        return this.repository.getEmbeddedSignupConfig();
+    }
+
+    async completeEmbeddedSignup(
+        payload: WhatsAppEmbeddedSignupPayload,
+        businessId?: number
+    ): Promise<WhatsAppEmbeddedSignupResponse> {
+        return this.repository.completeEmbeddedSignup(payload, businessId);
     }
 }

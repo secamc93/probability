@@ -4,6 +4,9 @@ import {
     WhatsAppAddNumberValues,
     WhatsAppConnectionResponse,
     WhatsAppConnectionValues,
+    WhatsAppEmbeddedSignupConfigResponse,
+    WhatsAppEmbeddedSignupPayload,
+    WhatsAppEmbeddedSignupResponse,
     WhatsAppNumberResponse,
     WhatsAppProvisionResponse,
     WhatsAppTemplatesResponse,
@@ -107,5 +110,21 @@ export class WhatsAppApiRepository implements IWhatsAppRepository {
         return this.request<WhatsAppNumberResponse>(`/integrations/whatsapp/numbers/register${this.query(businessId)}`, {
             method: 'POST',
         });
+    }
+
+    async getEmbeddedSignupConfig(): Promise<WhatsAppEmbeddedSignupConfigResponse> {
+        return this.request<WhatsAppEmbeddedSignupConfigResponse>(
+            '/integrations/whatsapp/embedded-signup/config'
+        );
+    }
+
+    async completeEmbeddedSignup(
+        payload: WhatsAppEmbeddedSignupPayload,
+        businessId?: number
+    ): Promise<WhatsAppEmbeddedSignupResponse> {
+        return this.request<WhatsAppEmbeddedSignupResponse>(
+            `/integrations/whatsapp/embedded-signup${this.query(businessId)}`,
+            { method: 'POST', body: JSON.stringify(payload) }
+        );
     }
 }

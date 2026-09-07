@@ -122,6 +122,12 @@ type WABAPhoneNumber struct {
 	Status                 string
 }
 
+type IEmbeddedSignupAPI interface {
+	ExchangeCode(ctx context.Context, appID, appSecret, code string) (string, error)
+	SubscribeApp(ctx context.Context, wabaID, accessToken string) error
+	ListPhoneNumbers(ctx context.Context, wabaID, accessToken string) ([]WABAPhoneNumber, error)
+}
+
 type IPhoneNumbersAPI interface {
 	AddPhoneNumber(ctx context.Context, wabaID, accessToken, countryCode, phoneNumber, verifiedName string) (string, error)
 	RequestCode(ctx context.Context, phoneNumberID, accessToken, method, language string) error

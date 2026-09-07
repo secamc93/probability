@@ -3,6 +3,7 @@ package handlers
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/app/usecaseconnection"
+	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/app/usecaseembedded"
 	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/app/usecasemessaging"
 	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/app/usecasenumbers"
 	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/app/usecasetemplates"
@@ -36,6 +37,9 @@ type IHandler interface {
 	VerifyNumberCode(c *gin.Context)
 	RegisterNumber(c *gin.Context)
 
+	GetEmbeddedSignupConfig(c *gin.Context)
+	CompleteEmbeddedSignup(c *gin.Context)
+
 	SetPlatformCredsGetter(getter ports.IPlatformCredentialsGetter)
 }
 
@@ -44,6 +48,7 @@ type handler struct {
 	templatesUseCase    usecasetemplates.IUseCase
 	connectionUseCase   usecaseconnection.IUseCase
 	numbersUseCase      usecasenumbers.IUseCase
+	embeddedUseCase     usecaseembedded.IUseCase
 	log                 log.ILogger
 	config              env.IConfig
 	platformCredsGetter ports.IPlatformCredentialsGetter
@@ -55,6 +60,7 @@ func New(
 	templatesUseCase usecasetemplates.IUseCase,
 	connectionUseCase usecaseconnection.IUseCase,
 	numbersUseCase usecasenumbers.IUseCase,
+	embeddedUseCase usecaseembedded.IUseCase,
 	logger log.ILogger,
 	config env.IConfig,
 	rabbit rabbitmq.IQueue,
@@ -64,6 +70,7 @@ func New(
 		templatesUseCase:  templatesUseCase,
 		connectionUseCase: connectionUseCase,
 		numbersUseCase:    numbersUseCase,
+		embeddedUseCase:   embeddedUseCase,
 		log:               logger,
 		config:            config,
 		rabbit:            rabbit,

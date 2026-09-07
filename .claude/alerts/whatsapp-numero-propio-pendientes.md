@@ -110,6 +110,21 @@ pedir codigo, verificar y activar, sin ver Meta. Pendientes para que funcione:
   pierde, recuperar el numero es un tramite con Meta. Definir si se guarda
   ademas en algun lado operativo.
 
+## Registro insertado listo pero apagado (2026-09-06)
+
+El codigo del Embedded Signup esta completo (SDK + canje del codigo +
+suscripcion del WABA + registro del numero) y **apagado por flag**. Para
+encenderlo hacen falta, en las platform credentials del integration_type 2:
+`embedded_signup_enabled`, `app_id`, `app_secret` (no esta en el repo) y
+`embedded_signup_config_id` (se crea en el panel de la app, WhatsApp ->
+Registro insertado).
+
+Y sigue faltando lo de Meta: la app esta en `dev_mode` y los permisos
+`whatsapp_business_management`, `whatsapp_business_messaging` y
+`business_management` estan en `REJECTED` / `access_level: none`, con una
+solicitud en proceso que impide enviar otra (`can_submit: false`). Mientras
+tanto el flujo solo sirve para cuentas con rol en la app.
+
 ## Corregido el 2026-09-06
 
 - **Un negocio podia quedarse con los mensajes de otro.** El formulario dejaba
