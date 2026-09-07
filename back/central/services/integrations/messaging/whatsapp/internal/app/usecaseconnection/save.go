@@ -28,11 +28,14 @@ func (u *usecase) SaveConnection(ctx context.Context, businessID uint, input Sav
 	phoneNumberID := strings.TrimSpace(input.PhoneNumberID)
 	accessToken := strings.TrimSpace(input.AccessToken)
 
-	if phoneNumberID == "" {
-		return nil, fmt.Errorf("se necesita el phone_number_id del número")
+	if wabaID == "" || phoneNumberID == "" {
+		return nil, fmt.Errorf("se necesitan el waba_id y el phone_number_id de tu cuenta de WhatsApp Business")
 	}
 	if _, err := strconv.ParseUint(phoneNumberID, 10, 64); err != nil {
 		return nil, fmt.Errorf("phone_number_id inválido: %s", phoneNumberID)
+	}
+	if _, err := strconv.ParseUint(wabaID, 10, 64); err != nil {
+		return nil, fmt.Errorf("waba_id inválido: %s", wabaID)
 	}
 
 	platform, err := u.credentialsCache.GetWhatsAppDefaultConfig(ctx)
@@ -40,15 +43,8 @@ func (u *usecase) SaveConnection(ctx context.Context, businessID uint, input Sav
 		return nil, fmt.Errorf("credenciales de plataforma no disponibles: %w", err)
 	}
 
-	hosted := wabaID == ""
-	if hosted {
-		if platform.WABAID == "" {
-			return nil, fmt.Errorf("las credenciales de plataforma no tienen waba_id: no se puede alojar el número en la cuenta de Probability")
-		}
-		wabaID = platform.WABAID
-	}
-	if _, err := strconv.ParseUint(wabaID, 10, 64); err != nil {
-		return nil, fmt.Errorf("waba_id inválido: %s", wabaID)
+	if platform.WABAID != "" && wabaID == platform.WABAID {
+		return nil, fmt.Errorf("ese waba_id es el de Probability: para alojar tu número en nuestra cuenta usa el asistente de alta de número")
 	}
 
 	if platform.PhoneNumberID != 0 && phoneNumberID == strconv.FormatUint(uint64(platform.PhoneNumberID), 10) {
@@ -82,7 +78,7 @@ func (u *usecase) SaveConnection(ctx context.Context, businessID uint, input Sav
 		"use_platform_token": false,
 		"waba_id":            wabaID,
 		"phone_number_id":    phoneNumberID,
-		"hosted_by_platform": hosted,
+		"hosted_by_platform": false,
 	}
 	if err := u.resolver.UpdateIntegrationConfig(ctx, strconv.FormatUint(uint64(integrationID), 10), config); err != nil {
 		return nil, fmt.Errorf("error guardando la configuración de la conexión: %w", err)
@@ -101,7 +97,6 @@ func (u *usecase) SaveConnection(ctx context.Context, businessID uint, input Sav
 		Str("waba_id", wabaID).
 		Str("phone_number_id", phoneNumberID).
 		Bool("token_de_plataforma", platformToken).
-		Bool("alojado_en_probability", hosted).
 		Msg("número propio de WhatsApp conectado y verificado contra Meta")
 
 	return &ConnectionResult{
@@ -114,7 +109,7 @@ func (u *usecase) SaveConnection(ctx context.Context, businessID uint, input Sav
 		VerifiedName:       number.VerifiedName,
 		QualityRating:      number.QualityRating,
 		PlatformToken:      platformToken,
-		HostedByPlatform:   hosted,
+		HostedByPlatform:   false,
 	}, nil
 }
 
