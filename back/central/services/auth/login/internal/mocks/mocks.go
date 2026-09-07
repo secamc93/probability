@@ -170,9 +170,10 @@ func (m *AuthRepositoryMock) GetRoleByID(ctx context.Context, id uint) (*domain.
 }
 
 type JWTServiceMock struct {
-	GenerateTokenFn func(userID, businessID, businessTypeID, roleID uint, subscriptionStatus string) (string, error)
-	ValidateTokenFn func(tokenString string) (*domain.JWTClaims, error)
-	RefreshTokenFn  func(tokenString string) (string, error)
+	GenerateTokenFn             func(userID, businessID, businessTypeID, roleID uint, subscriptionStatus string) (string, error)
+	ValidateTokenFn             func(tokenString string) (*domain.JWTClaims, error)
+	RefreshTokenFn              func(tokenString string) (string, error)
+	GenerateGoogleSignupTokenFn func(googleID, email, name, picture string, ttl time.Duration) (string, error)
 }
 
 var _ domain.IJWTService = (*JWTServiceMock)(nil)
@@ -196,6 +197,13 @@ func (m *JWTServiceMock) RefreshToken(tokenString string) (string, error) {
 		return m.RefreshTokenFn(tokenString)
 	}
 	return "", nil
+}
+
+func (m *JWTServiceMock) GenerateGoogleSignupToken(googleID, email, name, picture string, ttl time.Duration) (string, error) {
+	if m.GenerateGoogleSignupTokenFn != nil {
+		return m.GenerateGoogleSignupTokenFn(googleID, email, name, picture, ttl)
+	}
+	return "token-de-registro-google", nil
 }
 
 type EmailSenderMock struct {

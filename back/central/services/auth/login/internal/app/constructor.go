@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"time"
 
 	"github.com/secamc93/probability/back/central/services/auth/login/internal/domain"
 	"github.com/secamc93/probability/back/central/shared/env"
@@ -18,8 +19,9 @@ type Iapp interface {
 	VerifyOTP(ctx context.Context, request domain.VerifyOTPRequest) (*domain.VerifyOTPResponse, error)
 	ResetPassword(ctx context.Context, request domain.ResetPasswordRequest) (*domain.ResetPasswordResponse, error)
 	GoogleAuthURL(ctx context.Context) (*domain.GoogleAuthURLResponse, error)
-	LoginWithGoogle(ctx context.Context, request domain.GoogleCallbackRequest) (*domain.LoginResponse, error)
+	LoginWithGoogle(ctx context.Context, request domain.GoogleCallbackRequest) (*domain.GoogleLoginResult, error)
 	CurrentSession(ctx context.Context, userID uint) (*domain.LoginResponse, error)
+	GoogleSignupToken(ctx context.Context, profile *domain.GoogleProfile, ttl time.Duration) (string, error)
 }
 
 type IAuthUseCase interface {

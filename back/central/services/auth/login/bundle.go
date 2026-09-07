@@ -4,12 +4,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/secamc93/probability/back/central/services/auth/login/internal/app"
 	authhandler "github.com/secamc93/probability/back/central/services/auth/login/internal/infra/primary/handlers"
-	"github.com/secamc93/probability/back/central/services/auth/login/internal/infra/secondary/googleoauth"
+	googleadapter "github.com/secamc93/probability/back/central/services/auth/login/internal/infra/secondary/google"
 	otpqueue "github.com/secamc93/probability/back/central/services/auth/login/internal/infra/secondary/queue"
 	"github.com/secamc93/probability/back/central/services/auth/login/internal/infra/secondary/repository"
 	"github.com/secamc93/probability/back/central/shared/db"
 	"github.com/secamc93/probability/back/central/shared/email"
 	"github.com/secamc93/probability/back/central/shared/env"
+	"github.com/secamc93/probability/back/central/shared/googleoauth"
 	"github.com/secamc93/probability/back/central/shared/jwt"
 	"github.com/secamc93/probability/back/central/shared/log"
 	"github.com/secamc93/probability/back/central/shared/rabbitmq"
@@ -30,7 +31,7 @@ func New(
 
 	otpPublisher := otpqueue.New(queue, logger)
 
-	googleProvider := googleoauth.New(cfg, logger)
+	googleProvider := googleadapter.New(googleoauth.New(cfg, logger))
 
 	authUC := app.New(repo, jwtService, emailService, otpPublisher, googleProvider, logger, cfg)
 

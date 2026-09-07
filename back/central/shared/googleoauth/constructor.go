@@ -1,10 +1,10 @@
 package googleoauth
 
 import (
+	"context"
 	"net/http"
 	"time"
 
-	"github.com/secamc93/probability/back/central/services/auth/login/internal/domain"
 	"github.com/secamc93/probability/back/central/shared/env"
 	"github.com/secamc93/probability/back/central/shared/log"
 )
@@ -15,7 +15,21 @@ const (
 	scopes        = "openid email profile"
 )
 
-type Provider struct {
+type Profile struct {
+	Sub           string
+	Email         string
+	EmailVerified bool
+	Name          string
+	Picture       string
+}
+
+type IClient interface {
+	AuthCodeURL(state string) (string, error)
+	ExchangeCode(ctx context.Context, code string) (*Profile, error)
+	IsConfigured() bool
+}
+
+type client struct {
 	clientID     string
 	clientSecret string
 	redirectURI  string
@@ -23,8 +37,8 @@ type Provider struct {
 	logger       log.ILogger
 }
 
-func New(cfg env.IConfig, logger log.ILogger) domain.IGoogleOAuthProvider {
-	return &Provider{
+func New(cfg env.IConfig, logger log.ILogger) IClient {
+	return &client{
 		clientID:     cfg.Get("GOOGLE_OAUTH_CLIENT_ID"),
 		clientSecret: cfg.Get("GOOGLE_OAUTH_CLIENT_SECRET"),
 		redirectURI:  cfg.Get("GOOGLE_OAUTH_REDIRECT_URI"),
@@ -33,6 +47,6 @@ func New(cfg env.IConfig, logger log.ILogger) domain.IGoogleOAuthProvider {
 	}
 }
 
-func (p *Provider) IsConfigured() bool {
-	return p.clientID != "" && p.clientSecret != "" && p.redirectURI != ""
+func (c *client) IsConfigured() bool {
+	return c.clientID != "" && c.clientSecret != "" && c.redirectURI != ""
 }

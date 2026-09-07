@@ -6,6 +6,7 @@ import (
 	"encoding/base64"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/secamc93/probability/back/central/services/auth/login/internal/domain"
 )
@@ -30,7 +31,7 @@ func (uc *AuthUseCase) GoogleAuthURL(ctx context.Context) (*domain.GoogleAuthURL
 	return &domain.GoogleAuthURLResponse{AuthURL: authURL, State: state}, nil
 }
 
-func (uc *AuthUseCase) LoginWithGoogle(ctx context.Context, request domain.GoogleCallbackRequest) (*domain.LoginResponse, error) {
+func (uc *AuthUseCase) LoginWithGoogle(ctx context.Context, request domain.GoogleCallbackRequest) (*domain.GoogleLoginResult, error) {
 	if uc.googleOAuth == nil || !uc.googleOAuth.IsConfigured() {
 		uc.log.Error().Msg("Google OAuth no esta configurado")
 		return nil, domain.ErrGoogleNotConfigured
@@ -64,7 +65,7 @@ func (uc *AuthUseCase) LoginWithGoogle(ctx context.Context, request domain.Googl
 		}
 		if userAuth == nil {
 			uc.log.Warn().Str("email", normalizedEmail).Msg("Login con Google de un correo sin cuenta")
-			return nil, fmt.Errorf("%w %s. Pide a un administrador que te cree el usuario", domain.ErrGoogleUserNotFound, normalizedEmail)
+			return &domain.GoogleLoginResult{Profile: profile, NeedsSignup: true}, nil
 		}
 		if err := uc.repository.LinkGoogleAccount(ctx, userAuth.ID, profile.Sub); err != nil {
 			return nil, domain.ErrGoogleAccountLinkedElsewhere
@@ -97,5 +98,17 @@ func (uc *AuthUseCase) LoginWithGoogle(ctx context.Context, request domain.Googl
 		Str("email", normalizedEmail).
 		Msg("Login con Google validado")
 
-	return uc.buildSession(ctx, userAuth)
+	session, err := uc.buildSession(ctx, userAuth)
+	if err != nil {
+		return nil, err
+	}
+
+	return &domain.GoogleLoginResult{Session: session, Profile: profile}, nil
+}
+
+func (uc *AuthUseCase) GoogleSignupToken(ctx context.Context, profile *domain.GoogleProfile, ttl time.Duration) (string, error) {
+	if profile == nil {
+		return "", domain.ErrGoogleExchangeFailed
+	}
+	return uc.jwtService.GenerateGoogleSignupToken(profile.Sub, profile.Email, profile.Name, profile.Picture, ttl)
 }

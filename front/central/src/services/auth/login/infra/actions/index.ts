@@ -76,6 +76,42 @@ export const getRolesPermissionsAction = async (): Promise<UserRolesPermissionsS
     }
 };
 
+export const demoRegisterWithGoogleAction = async (googleToken: string, businessName: string) => {
+    try {
+        const baseUrl = env.API_BASE_URL;
+        const res = await fetch(`${baseUrl}/auth/demo-register-google`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ google_token: googleToken, business_name: businessName }),
+            cache: 'no-store',
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+            return { success: false, error: data.error || 'No se pudo crear la demo' };
+        }
+
+        const cookieHeader = res.headers.get('set-cookie');
+        if (cookieHeader) {
+            const token = cookieHeader.split(';')[0].split('=').slice(1).join('=');
+            if (token) {
+                const cookieStore = await cookies();
+                cookieStore.set('session_token', token, {
+                    httpOnly: true,
+                    path: '/',
+                    maxAge: 7 * 24 * 60 * 60,
+                    sameSite: 'lax',
+                });
+            }
+        }
+
+        return { success: true, data: data.data };
+    } catch (error: any) {
+        console.error('Demo Register With Google Action Error:', error.message);
+        return { success: false, error: 'Error al conectar con el servidor' };
+    }
+};
+
 export const getSessionAction = async (): Promise<LoginSuccessResponse> => {
     try {
         const cookieStore = await cookies();

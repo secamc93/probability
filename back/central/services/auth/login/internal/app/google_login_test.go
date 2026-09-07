@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"testing"
+	"time"
 
 	"github.com/secamc93/probability/back/central/services/auth/login/internal/domain"
 	"github.com/secamc93/probability/back/central/services/auth/login/internal/mocks"
@@ -113,9 +114,12 @@ func TestLoginWithGoogle_UsuarioInexistenteNoSeCrea(t *testing.T) {
 	}
 	uc := buildGoogleUseCase(repo, provider)
 
-	_, err := uc.LoginWithGoogle(context.Background(), domain.GoogleCallbackRequest{Code: "abc"})
+	resultado, err := uc.LoginWithGoogle(context.Background(), domain.GoogleCallbackRequest{Code: "abc"})
 
-	assert.ErrorIs(t, err, domain.ErrGoogleUserNotFound)
+	require.NoError(t, err)
+	assert.True(t, resultado.NeedsSignup)
+	assert.Nil(t, resultado.Session)
+	assert.Equal(t, "nuevo@ejemplo.com", resultado.Profile.Email)
 	assert.Zero(t, vinculaciones)
 }
 
@@ -212,4 +216,35 @@ func TestLoginWithGoogle_ErrorDelProveedorSePropaga(t *testing.T) {
 	_, err := uc.LoginWithGoogle(context.Background(), domain.GoogleCallbackRequest{Code: "abc"})
 
 	assert.True(t, errors.Is(err, domain.ErrGoogleExchangeFailed))
+}
+
+func TestGoogleSignupToken_UsaElPerfilDeGoogle(t *testing.T) {
+	var recibido []string
+	jwtMock := &mocks.JWTServiceMock{
+		GenerateGoogleSignupTokenFn: func(googleID, email, name, picture string, ttl time.Duration) (string, error) {
+			recibido = []string{googleID, email, name, picture}
+			return "token-firmado", nil
+		},
+	}
+	uc := buildGoogleUseCase(&mocks.AuthRepositoryMock{}, &googleProviderStub{configurado: true})
+	uc.jwtService = jwtMock
+
+	token, err := uc.GoogleSignupToken(context.Background(), &domain.GoogleProfile{
+		Sub:     "sub-1",
+		Email:   "nuevo@ejemplo.com",
+		Name:    "Nuevo Usuario",
+		Picture: "https://foto",
+	}, 15*time.Minute)
+
+	require.NoError(t, err)
+	assert.Equal(t, "token-firmado", token)
+	assert.Equal(t, []string{"sub-1", "nuevo@ejemplo.com", "Nuevo Usuario", "https://foto"}, recibido)
+}
+
+func TestGoogleSignupToken_SinPerfilFalla(t *testing.T) {
+	uc := buildGoogleUseCase(&mocks.AuthRepositoryMock{}, &googleProviderStub{configurado: true})
+
+	_, err := uc.GoogleSignupToken(context.Background(), nil, time.Minute)
+
+	assert.ErrorIs(t, err, domain.ErrGoogleExchangeFailed)
 }

@@ -39,6 +39,7 @@ type IJWTService interface {
 	GenerateToken(userID, businessID, businessTypeID, roleID uint, subscriptionStatus string) (string, error)
 	ValidateToken(tokenString string) (*JWTClaims, error)
 	RefreshToken(tokenString string) (string, error)
+	GenerateGoogleSignupToken(googleID, email, name, picture string, ttl time.Duration) (string, error)
 }
 
 type IEmailSender interface {

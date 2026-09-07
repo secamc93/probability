@@ -14,6 +14,12 @@ type GoogleCallbackRequest struct {
 	State string
 }
 
+type GoogleLoginResult struct {
+	Session     *LoginResponse
+	Profile     *GoogleProfile
+	NeedsSignup bool
+}
+
 type GoogleProfile struct {
 	Sub           string
 	Email         string

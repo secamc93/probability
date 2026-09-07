@@ -1,18 +1,26 @@
 package authhandler
 
 import (
+	"context"
 	"errors"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/secamc93/probability/back/central/services/auth/login/internal/domain"
 	"github.com/secamc93/probability/back/central/shared/log"
+	"github.com/secamc93/probability/back/central/shared/session"
 )
 
-const googleStateCookie = "g_oauth_state"
+const (
+	googleStateCookie  = "g_oauth_state"
+	googleIntentCookie = "g_oauth_intent"
+	intentDemo         = "demo"
+	signupTokenTTL     = 15 * time.Minute
+)
 
 func (h *AuthHandler) GoogleAuthHandler(c *gin.Context) {
 	ctx := log.WithFunctionCtx(c.Request.Context(), "GoogleAuthHandler")
@@ -24,8 +32,15 @@ func (h *AuthHandler) GoogleAuthHandler(c *gin.Context) {
 		return
 	}
 
+	seguro := isSecureRequest(c)
 	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie(googleStateCookie, result.State, 600, "/", "", isSecureRequest(c), true)
+	c.SetCookie(googleStateCookie, result.State, 600, "/", "", seguro, true)
+
+	intent := ""
+	if c.Query("intent") == intentDemo {
+		intent = intentDemo
+	}
+	c.SetCookie(googleIntentCookie, intent, 600, "/", "", seguro, true)
 
 	c.Redirect(http.StatusFound, result.AuthURL)
 }
@@ -47,10 +62,14 @@ func (h *AuthHandler) GoogleCallbackHandler(c *gin.Context) {
 		return
 	}
 
-	c.SetSameSite(http.SameSiteLaxMode)
-	c.SetCookie(googleStateCookie, "", -1, "/", "", isSecureRequest(c), true)
+	intent, _ := c.Cookie(googleIntentCookie)
 
-	domainResponse, err := h.usecase.LoginWithGoogle(ctx, domain.GoogleCallbackRequest{
+	seguro := isSecureRequest(c)
+	c.SetSameSite(http.SameSiteLaxMode)
+	c.SetCookie(googleStateCookie, "", -1, "/", "", seguro, true)
+	c.SetCookie(googleIntentCookie, "", -1, "/", "", seguro, true)
+
+	result, err := h.usecase.LoginWithGoogle(ctx, domain.GoogleCallbackRequest{
 		Code:  c.Query("code"),
 		State: state,
 	})
@@ -60,19 +79,46 @@ func (h *AuthHandler) GoogleCallbackHandler(c *gin.Context) {
 		return
 	}
 
-	setSessionCookie(c, domainResponse.Token)
+	if result.NeedsSignup {
+		h.redirigirARegistroDemo(c, ctx, result.Profile, intent)
+		return
+	}
+
+	session.SetCookie(c, result.Session.Token)
 
 	h.logger.Info(ctx).
-		Uint("user_id", domainResponse.User.ID).
-		Str("email", domainResponse.User.Email).
-		Bool("is_super_admin", domainResponse.IsSuperAdmin).
+		Uint("user_id", result.Session.User.ID).
+		Str("email", result.Session.User.Email).
+		Bool("is_super_admin", result.Session.IsSuperAdmin).
 		Msg("Login con Google exitoso")
 
 	target := frontendBaseURL() + "/auth/google/callback?status=ok"
-	if domainResponse.RequirePasswordChange {
+	if result.Session.RequirePasswordChange {
 		target += "&require_password_change=true"
 	}
 	c.Redirect(http.StatusFound, target)
+}
+
+func (h *AuthHandler) redirigirARegistroDemo(c *gin.Context, ctx context.Context, profile *domain.GoogleProfile, intent string) {
+	if intent != intentDemo {
+		h.logger.Warn(ctx).Str("email", profile.Email).Msg("Login con Google sin cuenta y sin intencion de crear demo")
+		c.Redirect(http.StatusFound, frontendRedirect("google_error", cuentaInexistente(profile.Email)))
+		return
+	}
+
+	token, err := h.usecase.GoogleSignupToken(ctx, profile, signupTokenTTL)
+	if err != nil {
+		h.logger.Error(ctx).Err(err).Msg("No se pudo generar el token de registro con Google")
+		c.Redirect(http.StatusFound, frontendRedirect("google_error", domain.ErrGoogleExchangeFailed))
+		return
+	}
+
+	h.logger.Info(ctx).Str("email", profile.Email).Msg("Cuenta de Google sin usuario: se ofrece crear demo")
+	c.Redirect(http.StatusFound, frontendBaseURL()+"/registro-demo?google_token="+url.QueryEscape(token))
+}
+
+func cuentaInexistente(email string) error {
+	return errors.New(domain.ErrGoogleUserNotFound.Error() + " " + email + ". Pide a un administrador que te cree el usuario")
 }
 
 func googleUserFacingError(err error) error {
