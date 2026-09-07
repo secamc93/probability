@@ -22,5 +22,9 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_users_google_id
 		return fmt.Errorf("unique index on user.google_id: %w", err)
 	}
 
+	if err := db.Exec(`DROP INDEX IF EXISTS idx_user_google_id`).Error; err != nil {
+		return fmt.Errorf("drop non partial index on user.google_id: %w", err)
+	}
+
 	return nil
 }

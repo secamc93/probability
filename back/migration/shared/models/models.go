@@ -150,7 +150,7 @@ type User struct {
 	IsActive    bool   `gorm:"default:true"`
 	LastLoginAt *time.Time
 
-	GoogleID *string `gorm:"size:64;uniqueIndex"`
+	GoogleID *string `gorm:"size:64;index"`
 
 	ScopeID *uint  `gorm:"index"`
 	Scope   *Scope `gorm:"foreignKey:ScopeID;constraint:OnUpdate:CASCADE,OnDelete:RESTRICT"`
