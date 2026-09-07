@@ -129,11 +129,12 @@ func mapSnapshotToResponse(snapshot *ports.WABATemplatesSnapshot) gin.H {
 	}
 
 	return gin.H{
-		"integration_id": snapshot.IntegrationID,
-		"business_id":    snapshot.BusinessID,
-		"waba_id":        snapshot.WABAID,
-		"refreshed_at":   snapshot.RefreshedAt,
-		"templates":      mapTemplatesToResponse(snapshot.Templates),
+		"integration_id":     snapshot.IntegrationID,
+		"business_id":        snapshot.BusinessID,
+		"waba_id":            snapshot.WABAID,
+		"hosted_by_platform": snapshot.HostedByPlatform,
+		"refreshed_at":       snapshot.RefreshedAt,
+		"templates":          mapTemplatesToResponse(snapshot.Templates),
 	}
 }
 

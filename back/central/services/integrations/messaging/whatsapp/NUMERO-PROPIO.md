@@ -14,8 +14,25 @@ Probability como administrador de su cuenta. Lo decide su fila de `integrations`
 | `config` | Efecto |
 |---|---|
 | sin `phone_number_id`, o `use_platform_token: true` | sale por el numero de Probability (comportamiento historico) |
-| `phone_number_id` + `waba_id`, sin credencial propia | sale por el numero del negocio **con el token de Probability** (camino corto) |
-| `phone_number_id` + `waba_id` + credencial `access_token` | sale por el numero del negocio con el token del cliente |
+| `phone_number_id` + `hosted_by_platform: true` | numero del negocio **dentro del WABA de Probability**: modo por defecto |
+| `phone_number_id` + `waba_id` del cliente, sin credencial propia | WABA del cliente, con el token de Probability |
+| `phone_number_id` + `waba_id` + credencial `access_token` | WABA del cliente, con el token del cliente |
+
+## Los dos modelos de numero propio
+
+Decidido el 2026-09-06: **por defecto el numero del cliente se agrega al WABA de
+Probability** (`hosted_by_platform: true`, el `waba_id` se resuelve solo).
+
+|  | Numero alojado en nuestro WABA (defecto) | WABA del cliente |
+|---|---|---|
+| Quien paga las conversaciones | Probability, y se le cobra al negocio | el cliente, a Meta |
+| Plantillas | las 26 ya aprobadas, no hay que replicar nada | hay que crearlas y esperar aprobacion |
+| Tramite con Meta | ninguno | compartir el WABA y asignarlo a `cam-adm` |
+| Riesgo | una sancion de politica es a nivel de WABA: cae para todos | aislado por cliente |
+| Si el cliente se va | migrar el numero a otro WABA | se lleva su cuenta |
+
+El segundo queda para el cliente grande que exija ser dueno de su cuenta o que
+ya la tenga con historia.
 
 `credentials_cache.GetWhatsAppConfig` lee esa fila (config + credenciales
 desencriptadas, cacheadas por `integrations/core` en `integration:meta:*` y
@@ -75,7 +92,21 @@ integracion y se invalida al cambiarle el `config`.
 - Si no es de nadie (o es el numero de la plataforma): sigue el camino de
   siempre, el agente AI Sales.
 
-### Onboarding manual (camino corto, sin Embedded Signup)
+### Onboarding del modo por defecto (numero en el WABA de Probability)
+
+1. El cliente aporta el numero (nuevo, o migrado desde WhatsApp Business App).
+2. Se agrega ese numero al WABA de Probability y se verifica con el OTP que
+   recibe el cliente; queda el PIN de 2FA.
+3. En el front, en la integracion de WhatsApp del negocio, se activa "Usar mi
+   propio numero", se deja marcada la opcion "En la cuenta de Probability" y se
+   pega el `Phone Number ID`. No hace falta WABA ID ni token.
+4. No hay paso de plantillas: el numero usa las que ya estan aprobadas.
+
+**Pendiente para este modelo: medir el consumo por numero y cobrarlo.** Hoy
+nadie cuenta cuantos mensajes manda cada negocio, asi que Probability pone la
+plata y no la recupera. El punto unico donde registrarlo es `sendTemplate`.
+
+### Onboarding con WABA del cliente (sin Embedded Signup)
 
 1. El cliente entra a su Business Manager -> Configuracion del negocio ->
    Cuentas de WhatsApp -> Socios -> agrega el Business ID de Probabilityapp con

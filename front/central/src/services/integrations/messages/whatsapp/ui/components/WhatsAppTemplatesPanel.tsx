@@ -34,6 +34,7 @@ const STATUS_LABELS: Record<string, string> = {
 export default function WhatsAppTemplatesPanel({ businessId, enabled }: WhatsAppTemplatesPanelProps) {
     const [templates, setTemplates] = useState<WhatsAppTemplateStatus[]>([]);
     const [wabaId, setWabaId] = useState('');
+    const [hosted, setHosted] = useState(false);
     const [loading, setLoading] = useState(false);
     const [provisioning, setProvisioning] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error' | 'info'; text: string } | null>(null);
@@ -47,6 +48,7 @@ export default function WhatsAppTemplatesPanel({ businessId, enabled }: WhatsApp
                 if (result.success && result.data) {
                     setTemplates(result.data.templates || []);
                     setWabaId(result.data.waba_id || '');
+                    setHosted(Boolean(result.data.hosted_by_platform));
                 } else {
                     setMessage({ type: 'error', text: result.message || 'No se pudo consultar el estado' });
                 }
@@ -76,7 +78,9 @@ export default function WhatsAppTemplatesPanel({ businessId, enabled }: WhatsApp
                 const failed = Object.keys(result.data.failed || {});
                 setMessage({
                     type: failed.length > 0 ? 'error' : 'success',
-                    text: `Creadas: ${result.data.created.length}. Ya existían: ${result.data.already_exists.length}.${
+                    text: `Creadas: ${result.data.created.length}. Ya exist\u00edan: ${
+                        result.data.already_exists.length
+                    }. Omitidas: ${(result.data.skipped || []).length}.${
                         failed.length > 0 ? ` Fallaron: ${failed.join(', ')}` : ''
                     }`,
                 });
@@ -90,13 +94,23 @@ export default function WhatsAppTemplatesPanel({ businessId, enabled }: WhatsApp
         }
     };
 
+    if (enabled && hosted) {
+        return (
+            <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                <h4 className="text-sm font-medium text-gray-700 dark:text-gray-200">Plantillas</h4>
+                <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                    {'Tu n\u00famero vive en la cuenta de WhatsApp de Probability, as\u00ed que usa las plantillas que ya est\u00e1n aprobadas. No hay nada que crear ni que esperar.'}
+                </p>
+            </div>
+        );
+    }
+
     if (!enabled) {
         return (
             <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
                 <h4 className="text-sm font-medium text-gray-700 dark:text-gray-200">Plantillas</h4>
                 <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    Estás usando el número de Probability, que ya tiene todas las plantillas aprobadas.
-                    Conecta tu propio número para gestionar las tuyas.
+                    {'Est\u00e1s usando el n\u00famero de Probability, que ya tiene todas las plantillas aprobadas. Conecta tu propio n\u00famero para gestionar las tuyas.'}
                 </p>
             </div>
         );

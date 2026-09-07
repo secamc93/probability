@@ -98,11 +98,12 @@ type TemplateStatus struct {
 }
 
 type WABATemplatesSnapshot struct {
-	IntegrationID uint
-	BusinessID    uint
-	WABAID        string
-	Templates     []TemplateStatus
-	RefreshedAt   time.Time
+	IntegrationID    uint
+	BusinessID       uint
+	WABAID           string
+	HostedByPlatform bool
+	Templates        []TemplateStatus
+	RefreshedAt      time.Time
 }
 
 type ITemplateAPI interface {

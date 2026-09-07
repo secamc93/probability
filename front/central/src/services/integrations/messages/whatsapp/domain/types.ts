@@ -13,6 +13,7 @@ export interface WhatsAppTemplatesSnapshot {
     integration_id: number;
     business_id: number;
     waba_id: string;
+    hosted_by_platform: boolean;
     refreshed_at: string;
     templates: WhatsAppTemplateStatus[];
 }
@@ -50,6 +51,7 @@ export interface WhatsAppConnectionResult {
     verified_name: string;
     quality_rating: string;
     platform_token: boolean;
+    hosted_by_platform: boolean;
 }
 
 export interface WhatsAppConnectionResponse {
@@ -59,6 +61,7 @@ export interface WhatsAppConnectionResponse {
 }
 
 export interface WhatsAppConnectionValues {
+    hosted: boolean;
     waba_id: string;
     phone_number_id: string;
     access_token: string;

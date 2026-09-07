@@ -30,6 +30,10 @@ func (u *usecase) Provision(ctx context.Context, businessID uint) (*ProvisionRes
 		return nil, fmt.Errorf("las credenciales de plataforma no tienen waba_id: no se puede leer el catálogo de plantillas origen")
 	}
 
+	if target.WABAID == platform.WABAID {
+		return nil, fmt.Errorf("el número del negocio %d vive en la cuenta de WhatsApp de Probability: usa las plantillas ya aprobadas, no hay nada que crear", businessID)
+	}
+
 	sourceAPI := u.apiFactory(pickBaseURL(platform.WhatsAppURL, target.WhatsAppURL))
 	targetAPI := u.apiFactory(pickBaseURL(target.WhatsAppURL, platform.WhatsAppURL))
 

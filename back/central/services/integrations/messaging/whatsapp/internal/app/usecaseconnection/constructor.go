@@ -26,6 +26,7 @@ type ConnectionResult struct {
 	VerifiedName       string
 	QualityRating      string
 	PlatformToken      bool
+	HostedByPlatform   bool
 }
 
 type IUseCase interface {

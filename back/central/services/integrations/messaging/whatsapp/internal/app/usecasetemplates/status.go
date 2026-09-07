@@ -30,6 +30,9 @@ func (u *usecase) GetStatus(ctx context.Context, businessID uint, refresh bool) 
 		}
 	}
 
+	platform, platErr := u.credentialsCache.GetWhatsAppDefaultConfig(ctx)
+	hosted := platErr == nil && platform.WABAID != "" && platform.WABAID == config.WABAID
+
 	api := u.apiFactory(config.WhatsAppURL)
 
 	remote, err := api.ListTemplates(ctx, config.WABAID, config.AccessToken)
@@ -52,11 +55,12 @@ func (u *usecase) GetStatus(ctx context.Context, businessID uint, refresh bool) 
 	}
 
 	snapshot := &ports.WABATemplatesSnapshot{
-		IntegrationID: config.IntegrationID,
-		BusinessID:    businessID,
-		WABAID:        config.WABAID,
-		Templates:     statuses,
-		RefreshedAt:   time.Now(),
+		IntegrationID:    config.IntegrationID,
+		BusinessID:       businessID,
+		WABAID:           config.WABAID,
+		HostedByPlatform: hosted,
+		Templates:        statuses,
+		RefreshedAt:      time.Now(),
 	}
 
 	if err := u.templatesCache.Save(ctx, snapshot); err != nil {

@@ -75,6 +75,23 @@ corrigio en esa pasada esta al final de este archivo.
 Cuando 1, 2 y 3 esten hechos y verificados, y 4 tenga al menos una corrida real
 contra un WABA. Los puntos 5 a 7 se mueven a `ROADMAP.md` si siguen abiertos.
 
+## Decision del 2026-09-06: el numero vive en NUESTRO WABA
+
+El modelo por defecto pasa a ser: el numero del cliente se agrega al WABA de
+Probability. Nosotros pagamos las conversaciones a Meta y se las cobramos al
+negocio, y el numero hereda las plantillas ya aprobadas (no hay replicacion ni
+espera). El WABA propio del cliente sigue soportado, para quien lo exija.
+
+**Urgente que sale de esta decision: el medidor de consumo.** Nadie cuenta los
+mensajes por negocio, asi que hoy Probability paga y no cobra. Hay que contar
+por `phone_number_id` en `sendTemplate` y descontar de la billetera, como con
+los envios. Sin eso, cada cliente nuevo en este modelo es plata que se va.
+
+Riesgo asumido: una sancion de politica de Meta es a nivel de WABA, asi que un
+cliente que mande spam puede tumbar a todos los numeros alojados. Vigilar el
+`quality_rating` por numero (pendiente 5) deja de ser deseable y pasa a ser
+importante.
+
 ## Corregido el 2026-09-06
 
 - **Un negocio podia quedarse con los mensajes de otro.** El formulario dejaba
