@@ -39,6 +39,7 @@ const ProductFamilyList = forwardRef<ProductFamilyListHandle, ProductFamilyListP
         const [showDimensionsModal, setShowDimensionsModal] = useState(false);
         const [showImportVariantsModal, setShowImportVariantsModal] = useState(false);
         const [expandedVariantId, setExpandedVariantId] = useState<string | null>(null);
+        const [expandedGroupKey, setExpandedGroupKey] = useState<string | null>(null);
 
         useImperativeHandle(ref, () => ({ refresh: fetchFamilies }));
 
@@ -118,6 +119,7 @@ const ProductFamilyList = forwardRef<ProductFamilyListHandle, ProductFamilyListP
             setModalPage(1);
             setModalVariants([]);
             setExpandedVariantId(null);
+            setExpandedGroupKey(null);
             await fetchModalVariants(family.id);
         };
 
@@ -158,8 +160,118 @@ const ProductFamilyList = forwardRef<ProductFamilyListHandle, ProductFamilyListP
             return <span className="px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">{qty}</span>;
         };
 
+        const groupAxisKey = familyAxes.find(ax => ax.key.toLowerCase() === 'color')?.key ?? familyAxes[0]?.key;
+        const restAxes = familyAxes.filter(ax => ax.key !== groupAxisKey);
+
+        type VariantGroup = { key: string; label: string; variants: Product[] };
+        const variantGroups: VariantGroup[] = (() => {
+            if (!groupAxisKey) return [];
+            const order: string[] = [];
+            const byKey = new Map<string, VariantGroup>();
+            for (const variant of modalVariants) {
+                const value = variant.variant_attributes?.[groupAxisKey] || variant.variant_label || 'Sin variante';
+                if (!byKey.has(value)) {
+                    byKey.set(value, { key: value, label: value, variants: [] });
+                    order.push(value);
+                }
+                byKey.get(value)!.variants.push(variant);
+            }
+            return order.map(key => byKey.get(key)!);
+        })();
+
         const pagedVariants = modalVariants.slice((modalPage - 1) * MODAL_PAGE_SIZE, modalPage * MODAL_PAGE_SIZE);
         const modalTotalPages = Math.ceil(modalVariants.length / MODAL_PAGE_SIZE);
+        const pagedGroups = variantGroups.slice((modalPage - 1) * MODAL_PAGE_SIZE, modalPage * MODAL_PAGE_SIZE);
+        const groupTotalPages = Math.ceil(variantGroups.length / MODAL_PAGE_SIZE);
+
+        const renderVariantRow = (variant: Product, axesForRow: { key: string; label: string }[], showLabelFallback: boolean) => {
+            const isExpanded = expandedVariantId === variant.id;
+            const colCount = 6 + (axesForRow.length > 0 ? axesForRow.length : (showLabelFallback ? 1 : 0));
+            return (
+                <Fragment key={variant.id}>
+                    <tr
+                        onClick={() => setExpandedVariantId(isExpanded ? null : variant.id)}
+                        className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer"
+                    >
+                        <td>
+                            <button
+                                type="button"
+                                onClick={(e) => { e.stopPropagation(); setExpandedVariantId(isExpanded ? null : variant.id); }}
+                                className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded transition-colors"
+                                title={isExpanded ? 'Ocultar información' : 'Ver información'}
+                            >
+                                {isExpanded ? <ChevronDownIcon className="w-4 h-4" /> : <ChevronRightIcon className="w-4 h-4" />}
+                            </button>
+                        </td>
+                        <td className="font-mono text-xs text-gray-600 dark:text-gray-300">{variant.sku}</td>
+                        <td className="text-sm text-gray-900 dark:text-white">{variant.name}</td>
+                        {axesForRow.length > 0 ? (
+                            axesForRow.map(ax => {
+                                const value = variant.variant_attributes?.[ax.key];
+                                return (
+                                    <td key={ax.key} className="hidden sm:table-cell">
+                                        {value ? (
+                                            <span className="px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-700">{value}</span>
+                                        ) : (
+                                            <span className="text-gray-400 text-xs">&mdash;</span>
+                                        )}
+                                    </td>
+                                );
+                            })
+                        ) : showLabelFallback ? (
+                            <td className="hidden sm:table-cell">
+                                {variant.variant_label ? (
+                                    <span className="px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-700">{variant.variant_label}</span>
+                                ) : (
+                                    <span className="text-gray-400 text-xs">&mdash;</span>
+                                )}
+                            </td>
+                        ) : null}
+                        <td className="hidden sm:table-cell font-mono text-xs text-gray-500 dark:text-gray-400">{variant.barcode || '-'}</td>
+                        <td className="text-right text-sm font-semibold text-gray-900 dark:text-white">
+                            {new Intl.NumberFormat('es-CO', { style: 'currency', currency: variant.currency || 'COP', maximumFractionDigits: 0 }).format(variant.price)}
+                        </td>
+                        <td className="text-center">{stockBadge(variant.stock_quantity ?? variant.stock ?? 0)}</td>
+                    </tr>
+                    {isExpanded && (
+                        <tr className="bg-gray-50 dark:bg-gray-900/30">
+                            <td colSpan={colCount} className="px-5 py-4">
+                                <div className="flex flex-col sm:flex-row gap-5">
+                                    {variant.image_url && (
+                                        <img src={variant.image_url} alt={variant.name} className="w-24 h-24 rounded-lg object-cover flex-shrink-0 border border-gray-200 dark:border-gray-700" />
+                                    )}
+                                    <div className="flex-1 min-w-0">
+                                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-4">
+                                            <Field label="Categoría" value={variant.category} />
+                                            <Field label="Marca" value={variant.brand} />
+                                            <Field label="Estado">{statusBadge(variant.status)}</Field>
+                                            <Field label="Gestiona inventario" value={variant.manage_stock ? 'Si' : 'No'} />
+                                            <Field label="Peso" value={variant.weight != null ? `${variant.weight} kg` : undefined} />
+                                            <Field
+                                                label="Dimensiones (LxAxA)"
+                                                value={
+                                                    variant.length != null && variant.width != null && variant.height != null
+                                                        ? `${variant.length} x ${variant.width} x ${variant.height} cm`
+                                                        : undefined
+                                                }
+                                            />
+                                            <Field label="Integración" value={variant.integration_type} />
+                                            <Field label="Creado" value={variant.created_at ? new Date(variant.created_at).toLocaleDateString('es-CO') : undefined} />
+                                        </div>
+                                        {variant.description && (
+                                            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                                                <p className="text-[10.5px] font-semibold uppercase tracking-wide text-gray-400 mb-1">{'Descripción'}</p>
+                                                <p className="text-sm text-gray-700 dark:text-gray-200 leading-relaxed">{variant.description}</p>
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    )}
+                </Fragment>
+            );
+        };
 
         return (
             <>
@@ -455,120 +567,99 @@ const ProductFamilyList = forwardRef<ProductFamilyListHandle, ProductFamilyListP
                                     <p className="text-center text-sm text-gray-400 py-12">Esta familia no tiene variantes aun.</p>
                                 ) : (
                                     <>
-                                        <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
-                                            <table className="table w-full">
-                                                <thead>
-                                                    <tr>
-                                                        <th className="!bg-gray-100 dark:!bg-gray-700 w-8"></th>
-                                                        <th className="!bg-gray-100 dark:!bg-gray-700 !text-gray-600 dark:!text-gray-300 text-left">SKU</th>
-                                                        <th className="!bg-gray-100 dark:!bg-gray-700 !text-gray-600 dark:!text-gray-300 text-left">Nombre</th>
-                                                        {familyAxes.length > 0 ? (
-                                                            familyAxes.map(ax => (
-                                                                <th key={ax.key} className="!bg-gray-100 dark:!bg-gray-700 !text-gray-600 dark:!text-gray-300 text-left hidden sm:table-cell">{ax.label}</th>
-                                                            ))
-                                                        ) : (
-                                                            <th className="!bg-gray-100 dark:!bg-gray-700 !text-gray-600 dark:!text-gray-300 text-left hidden sm:table-cell">Variante</th>
-                                                        )}
-                                                        <th className="!bg-gray-100 dark:!bg-gray-700 !text-gray-600 dark:!text-gray-300 text-left hidden sm:table-cell">Barcode</th>
-                                                        <th className="!bg-gray-100 dark:!bg-gray-700 !text-gray-600 dark:!text-gray-300 text-right">Precio</th>
-                                                        <th className="!bg-gray-100 dark:!bg-gray-700 !text-gray-600 dark:!text-gray-300 text-center">Stock</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                                                    {pagedVariants.map((variant) => {
-                                                        const isExpanded = expandedVariantId === variant.id;
-                                                        return (
-                                                            <Fragment key={variant.id}>
-                                                                <tr
-                                                                    onClick={() => setExpandedVariantId(isExpanded ? null : variant.id)}
-                                                                    className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer"
-                                                                >
-                                                                    <td>
-                                                                        <button
-                                                                            type="button"
-                                                                            onClick={(e) => { e.stopPropagation(); setExpandedVariantId(isExpanded ? null : variant.id); }}
-                                                                            className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded transition-colors"
-                                                                            title={isExpanded ? 'Ocultar informaci\u00f3n' : 'Ver informaci\u00f3n'}
-                                                                        >
-                                                                            {isExpanded ? <ChevronDownIcon className="w-4 h-4" /> : <ChevronRightIcon className="w-4 h-4" />}
-                                                                        </button>
-                                                                    </td>
-                                                                    <td className="font-mono text-xs text-gray-600 dark:text-gray-300">{variant.sku}</td>
-                                                                    <td className="text-sm text-gray-900 dark:text-white">{variant.name}</td>
-                                                                    {familyAxes.length > 0 ? (
-                                                                        familyAxes.map(ax => {
-                                                                            const value = variant.variant_attributes?.[ax.key];
-                                                                            return (
-                                                                                <td key={ax.key} className="hidden sm:table-cell">
-                                                                                    {value ? (
-                                                                                        <span className="px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-700">{value}</span>
-                                                                                    ) : (
-                                                                                        <span className="text-gray-400 text-xs">&mdash;</span>
-                                                                                    )}
-                                                                                </td>
-                                                                            );
-                                                                        })
-                                                                    ) : (
-                                                                        <td className="hidden sm:table-cell">
-                                                                            {variant.variant_label ? (
-                                                                                <span className="px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-700">{variant.variant_label}</span>
-                                                                            ) : (
-                                                                                <span className="text-gray-400 text-xs">&mdash;</span>
-                                                                            )}
+                                        {groupAxisKey ? (
+                                            <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+                                                <table className="table w-full">
+                                                    <thead>
+                                                        <tr>
+                                                            <th className="!bg-gray-100 dark:!bg-gray-700 w-8"></th>
+                                                            <th className="!bg-gray-100 dark:!bg-gray-700 !text-gray-600 dark:!text-gray-300 text-left">{familyAxes.find(ax => ax.key === groupAxisKey)?.label || 'Variante'}</th>
+                                                            <th className="!bg-gray-100 dark:!bg-gray-700 !text-gray-600 dark:!text-gray-300 text-center">Variantes</th>
+                                                            <th className="!bg-gray-100 dark:!bg-gray-700 !text-gray-600 dark:!text-gray-300 text-center">Stock total</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                                                        {pagedGroups.map((group) => {
+                                                            const isGroupExpanded = expandedGroupKey === group.key;
+                                                            const totalStock = group.variants.reduce((sum, v) => sum + (v.stock_quantity ?? v.stock ?? 0), 0);
+                                                            return (
+                                                                <Fragment key={group.key}>
+                                                                    <tr
+                                                                        onClick={() => setExpandedGroupKey(isGroupExpanded ? null : group.key)}
+                                                                        className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer"
+                                                                    >
+                                                                        <td>
+                                                                            <button
+                                                                                type="button"
+                                                                                onClick={(e) => { e.stopPropagation(); setExpandedGroupKey(isGroupExpanded ? null : group.key); }}
+                                                                                className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 rounded transition-colors"
+                                                                                title={isGroupExpanded ? 'Ocultar variantes' : 'Ver variantes'}
+                                                                            >
+                                                                                {isGroupExpanded ? <ChevronDownIcon className="w-4 h-4" /> : <ChevronRightIcon className="w-4 h-4" />}
+                                                                            </button>
                                                                         </td>
-                                                                    )}
-                                                                    <td className="hidden sm:table-cell font-mono text-xs text-gray-500 dark:text-gray-400">{variant.barcode || '-'}</td>
-                                                                    <td className="text-right text-sm font-semibold text-gray-900 dark:text-white">
-                                                                        {new Intl.NumberFormat('es-CO', { style: 'currency', currency: variant.currency || 'COP', maximumFractionDigits: 0 }).format(variant.price)}
-                                                                    </td>
-                                                                    <td className="text-center">{stockBadge(variant.stock_quantity ?? variant.stock ?? 0)}</td>
-                                                                </tr>
-                                                                {isExpanded && (
-                                                                    <tr className="bg-gray-50 dark:bg-gray-900/30">
-                                                                        <td colSpan={6 + Math.max(familyAxes.length, 1)} className="px-5 py-4">
-                                                                            <div className="flex flex-col sm:flex-row gap-5">
-                                                                                {variant.image_url && (
-                                                                                    <img src={variant.image_url} alt={variant.name} className="w-24 h-24 rounded-lg object-cover flex-shrink-0 border border-gray-200 dark:border-gray-700" />
-                                                                                )}
-                                                                                <div className="flex-1 min-w-0">
-                                                                                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-x-6 gap-y-4">
-                                                                                        <Field label="Categor\u00eda" value={variant.category} />
-                                                                                        <Field label="Marca" value={variant.brand} />
-                                                                                        <Field label="Estado">{statusBadge(variant.status)}</Field>
-                                                                                        <Field label="Gestiona inventario" value={variant.manage_stock ? 'Si' : 'No'} />
-                                                                                        <Field label="Peso" value={variant.weight != null ? `${variant.weight} kg` : undefined} />
-                                                                                        <Field
-                                                                                            label="Dimensiones (LxAxA)"
-                                                                                            value={
-                                                                                                variant.length != null && variant.width != null && variant.height != null
-                                                                                                    ? `${variant.length} x ${variant.width} x ${variant.height} cm`
-                                                                                                    : undefined
-                                                                                            }
-                                                                                        />
-                                                                                        <Field label="Integraci\u00f3n" value={variant.integration_type} />
-                                                                                        <Field label="Creado" value={variant.created_at ? new Date(variant.created_at).toLocaleDateString('es-CO') : undefined} />
-                                                                                    </div>
-                                                                                    {variant.description && (
-                                                                                        <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                                                                                            <p className="text-[10.5px] font-semibold uppercase tracking-wide text-gray-400 mb-1">{'Descripci\u00f3n'}</p>
-                                                                                            <p className="text-sm text-gray-700 dark:text-gray-200 leading-relaxed">{variant.description}</p>
-                                                                                        </div>
-                                                                                    )}
-                                                                                </div>
-                                                                            </div>
-                                                                        </td>
+                                                                        <td className="text-sm font-medium text-gray-900 dark:text-white">{group.label}</td>
+                                                                        <td className="text-center text-sm text-gray-600 dark:text-gray-300">{group.variants.length}</td>
+                                                                        <td className="text-center">{stockBadge(totalStock)}</td>
                                                                     </tr>
-                                                                )}
-                                                            </Fragment>
-                                                        );
-                                                    })}
-                                                </tbody>
-                                            </table>
-                                        </div>
+                                                                    {isGroupExpanded && (
+                                                                        <tr className="bg-gray-50 dark:bg-gray-900/30">
+                                                                            <td colSpan={4} className="p-0">
+                                                                                <div className="overflow-x-auto">
+                                                                                    <table className="table w-full">
+                                                                                        <thead>
+                                                                                            <tr>
+                                                                                                <th className="!bg-gray-50 dark:!bg-gray-800 w-8"></th>
+                                                                                                <th className="!bg-gray-50 dark:!bg-gray-800 !text-gray-500 dark:!text-gray-400 text-left">SKU</th>
+                                                                                                <th className="!bg-gray-50 dark:!bg-gray-800 !text-gray-500 dark:!text-gray-400 text-left">Nombre</th>
+                                                                                                {restAxes.length > 0 && restAxes.map(ax => (
+                                                                                                    <th key={ax.key} className="!bg-gray-50 dark:!bg-gray-800 !text-gray-500 dark:!text-gray-400 text-left hidden sm:table-cell">{ax.label}</th>
+                                                                                                ))}
+                                                                                                <th className="!bg-gray-50 dark:!bg-gray-800 !text-gray-500 dark:!text-gray-400 text-left hidden sm:table-cell">Barcode</th>
+                                                                                                <th className="!bg-gray-50 dark:!bg-gray-800 !text-gray-500 dark:!text-gray-400 text-right">Precio</th>
+                                                                                                <th className="!bg-gray-50 dark:!bg-gray-800 !text-gray-500 dark:!text-gray-400 text-center">Stock</th>
+                                                                                            </tr>
+                                                                                        </thead>
+                                                                                        <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                                                                                            {group.variants.map(variant => renderVariantRow(variant, restAxes, false))}
+                                                                                        </tbody>
+                                                                                    </table>
+                                                                                </div>
+                                                                            </td>
+                                                                        </tr>
+                                                                    )}
+                                                                </Fragment>
+                                                            );
+                                                        })}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        ) : (
+                                            <div className="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+                                                <table className="table w-full">
+                                                    <thead>
+                                                        <tr>
+                                                            <th className="!bg-gray-100 dark:!bg-gray-700 w-8"></th>
+                                                            <th className="!bg-gray-100 dark:!bg-gray-700 !text-gray-600 dark:!text-gray-300 text-left">SKU</th>
+                                                            <th className="!bg-gray-100 dark:!bg-gray-700 !text-gray-600 dark:!text-gray-300 text-left">Nombre</th>
+                                                            <th className="!bg-gray-100 dark:!bg-gray-700 !text-gray-600 dark:!text-gray-300 text-left hidden sm:table-cell">Variante</th>
+                                                            <th className="!bg-gray-100 dark:!bg-gray-700 !text-gray-600 dark:!text-gray-300 text-left hidden sm:table-cell">Barcode</th>
+                                                            <th className="!bg-gray-100 dark:!bg-gray-700 !text-gray-600 dark:!text-gray-300 text-right">Precio</th>
+                                                            <th className="!bg-gray-100 dark:!bg-gray-700 !text-gray-600 dark:!text-gray-300 text-center">Stock</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+                                                        {pagedVariants.map((variant) => renderVariantRow(variant, [], true))}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        )}
 
-                                        {modalTotalPages > 1 && (
+                                        {(groupAxisKey ? groupTotalPages : modalTotalPages) > 1 && (
                                             <div className="flex items-center justify-between px-1">
-                                                <span className="text-xs text-gray-500">{modalVariants.length} variantes totales</span>
+                                                <span className="text-xs text-gray-500">
+                                                    {groupAxisKey ? `${variantGroups.length} ${familyAxes.find(ax => ax.key === groupAxisKey)?.label.toLowerCase() || 'grupos'}` : `${modalVariants.length} variantes totales`}
+                                                </span>
                                                 <div className="flex items-center gap-1">
                                                     <button
                                                         disabled={modalPage <= 1}
@@ -577,9 +668,9 @@ const ProductFamilyList = forwardRef<ProductFamilyListHandle, ProductFamilyListP
                                                     >
                                                         Anterior
                                                     </button>
-                                                    <span className="text-xs text-gray-600 px-2">{modalPage} / {modalTotalPages}</span>
+                                                    <span className="text-xs text-gray-600 px-2">{modalPage} / {groupAxisKey ? groupTotalPages : modalTotalPages}</span>
                                                     <button
-                                                        disabled={modalPage >= modalTotalPages}
+                                                        disabled={modalPage >= (groupAxisKey ? groupTotalPages : modalTotalPages)}
                                                         onClick={() => setModalPage((p) => p + 1)}
                                                         className="px-3 py-1.5 text-xs rounded border border-gray-300 disabled:opacity-40 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                                                     >
