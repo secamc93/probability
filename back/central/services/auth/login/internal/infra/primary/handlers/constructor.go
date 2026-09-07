@@ -7,7 +7,6 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// IAuthHandler define la interfaz del handler de autenticación
 type IAuthHandler interface {
 	LoginHandler(c *gin.Context)
 	VerifyHandler(c *gin.Context)
@@ -18,6 +17,8 @@ type IAuthHandler interface {
 	ForgotPasswordHandler(c *gin.Context)
 	VerifyOTPHandler(c *gin.Context)
 	ResetPasswordHandler(c *gin.Context)
+	GoogleAuthHandler(c *gin.Context)
+	GoogleCallbackHandler(c *gin.Context)
 	RegisterRoutes(v1Group *gin.RouterGroup, handler IAuthHandler, logger log.ILogger)
 }
 
@@ -26,7 +27,6 @@ type AuthHandler struct {
 	logger  log.ILogger
 }
 
-// New crea una nueva instancia del handler de autenticación
 func New(usecase app.Iapp, logger log.ILogger) IAuthHandler {
 	contextualLogger := logger.WithModule("autenticación")
 	return &AuthHandler{

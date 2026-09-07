@@ -22,3 +22,13 @@ var (
 	ErrInvalidCredentials    = errors.New("credenciales inválidas")
 	ErrEmailPasswordRequired = errors.New("email y contraseña son requeridos")
 )
+
+var (
+	ErrGoogleNotConfigured          = errors.New("el inicio de sesión con Google no está configurado")
+	ErrGoogleCodeRequired           = errors.New("falta el código de autorización de Google")
+	ErrGoogleInvalidState           = errors.New("la solicitud de Google no es válida o expiró")
+	ErrGoogleExchangeFailed         = errors.New("no se pudo validar la cuenta de Google")
+	ErrGoogleEmailNotVerified       = errors.New("la cuenta de Google no tiene el correo verificado")
+	ErrGoogleUserNotFound           = errors.New("no existe una cuenta con ese correo, contacta al administrador")
+	ErrGoogleAccountLinkedElsewhere = errors.New("esa cuenta de Google ya está vinculada a otro usuario")
+)

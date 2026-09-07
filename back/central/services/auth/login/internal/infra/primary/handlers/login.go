@@ -76,32 +76,7 @@ func (h *AuthHandler) LoginHandler(c *gin.Context) {
 	isMobileClient := clientType == "mobile" || clientType == "api"
 
 	if !isMobileClient {
-		cookieDomain := os.Getenv("SESSION_COOKIE_DOMAIN")
-		if cookieDomain == "" {
-			cookieDomain = ".probabilityia.com.co"
-		}
-
-		var cookieValue string
-		if cookieDomain == "none" {
-			cookieValue = fmt.Sprintf(
-				"%s=%s; Max-Age=%d; Path=%s; HttpOnly; SameSite=Lax",
-				"session_token",
-				domainResponse.Token,
-				7*24*60*60,
-				"/",
-			)
-		} else {
-			cookieValue = fmt.Sprintf(
-				"%s=%s; Max-Age=%d; Path=%s; Domain=%s; Secure; HttpOnly; SameSite=None; Partitioned",
-				"session_token",
-				domainResponse.Token,
-				7*24*60*60,
-				"/",
-				cookieDomain,
-			)
-		}
-		c.Header("Set-Cookie", cookieValue)
-
+		setSessionCookie(c, domainResponse.Token)
 		loginResponse.Token = ""
 	}
 
@@ -117,4 +92,32 @@ func (h *AuthHandler) LoginHandler(c *gin.Context) {
 		Success: true,
 		Data:    *loginResponse,
 	})
+}
+
+func setSessionCookie(c *gin.Context, token string) {
+	cookieDomain := os.Getenv("SESSION_COOKIE_DOMAIN")
+	if cookieDomain == "" {
+		cookieDomain = ".probabilityia.com.co"
+	}
+
+	var cookieValue string
+	if cookieDomain == "none" {
+		cookieValue = fmt.Sprintf(
+			"%s=%s; Max-Age=%d; Path=%s; HttpOnly; SameSite=Lax",
+			"session_token",
+			token,
+			7*24*60*60,
+			"/",
+		)
+	} else {
+		cookieValue = fmt.Sprintf(
+			"%s=%s; Max-Age=%d; Path=%s; Domain=%s; Secure; HttpOnly; SameSite=None; Partitioned",
+			"session_token",
+			token,
+			7*24*60*60,
+			"/",
+			cookieDomain,
+		)
+	}
+	c.Header("Set-Cookie", cookieValue)
 }
