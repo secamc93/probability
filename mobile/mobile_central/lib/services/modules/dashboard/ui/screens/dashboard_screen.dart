@@ -109,7 +109,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
             return AppEmptyState(
               icon: Icons.insights_outlined,
               title: 'Sin datos por ahora',
-              message: 'Cuando entren ordenes vas a ver aqui el resumen de tu operacion.',
+              message: 'Cuando entren \u00f3rdenes vas a ver aqu\u00ed el resumen de tu operaci\u00f3n.',
               actionLabel: 'Actualizar',
               onAction: _load,
             );
@@ -145,33 +145,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 const SizedBox(height: 18),
                 const AppSectionHeader(
                   title: 'Integraciones activas',
-                  subtitle: 'Por categoria',
+                  subtitle: 'Por categor\u00eda',
                 ),
                 _IntegrationsByCategory(logos: _channelLogos(context)),
                 if (stats.ordersByIntegrationType.isNotEmpty) ...[
                   const SizedBox(height: 18),
                   const AppSectionHeader(
-                    title: 'Ordenes por canal',
+                    title: '\u00d3rdenes por canal',
                     subtitle: 'De donde vienen tus ventas',
                   ),
                   DashboardChannelsSection(items: stats.ordersByIntegrationType),
                 ],
                 if (stats.shipmentsByStatus.isNotEmpty) ...[
                   const SizedBox(height: 18),
-                  const AppSectionHeader(title: 'Envios por estado'),
+                  const AppSectionHeader(title: 'Env\u00edos por estado'),
                   DashboardStatusSection(items: stats.shipmentsByStatus),
                 ],
                 if (stats.shipmentsByCarrier.isNotEmpty) ...[
                   const SizedBox(height: 18),
                   const AppSectionHeader(
-                    title: 'Envios por transportadora',
-                    subtitle: 'Guias generadas por operador',
+                    title: 'Env\u00edos por transportadora',
+                    subtitle: 'Gu\u00edas generadas por operador',
                   ),
                   DashboardCarriersSection(items: stats.shipmentsByCarrier),
                 ],
                 if (stats.topProducts.isNotEmpty) ...[
                   const SizedBox(height: 18),
-                  const AppSectionHeader(title: 'Productos mas vendidos'),
+                  const AppSectionHeader(title: 'Productos m\u00e1s vendidos'),
                   DashboardProductsSection(items: stats.topProducts),
                 ],
                 if (stats.topCustomers.isNotEmpty) ...[
@@ -181,7 +181,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 ],
                 if (stats.ordersByLocation.isNotEmpty) ...[
                   const SizedBox(height: 18),
-                  const AppSectionHeader(title: 'Ordenes por ciudad'),
+                  const AppSectionHeader(title: '\u00d3rdenes por ciudad'),
                   DashboardLocationsSection(items: stats.ordersByLocation),
                 ],
                 const SizedBox(height: 24),
@@ -206,7 +206,7 @@ class _Greeting extends StatelessWidget {
     final firstName = (name ?? '').split(' ').first;
     final hour = DateTime.now().hour;
     final salute = hour < 12
-        ? 'Buenos dias'
+        ? 'Buenos d\u00edas'
         : hour < 19
             ? 'Buenas tardes'
             : 'Buenas noches';
@@ -267,7 +267,7 @@ class _KpiGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final tiles = [
       AppKpiTile(
-        label: 'Ordenes totales',
+        label: '\u00d3rdenes totales',
         value: AppFormat.number(stats.totalOrders),
         icon: Icons.receipt_long_outlined,
         onTap: () => context.go('/orders'),
@@ -285,7 +285,7 @@ class _KpiGrid extends StatelessWidget {
         onTap: () => context.go('/inventory'),
       ),
       AppKpiTile(
-        label: 'Guias generadas',
+        label: 'Gu\u00edas generadas',
         value: AppFormat.number(_shipments),
         icon: Icons.local_shipping_outlined,
         accent: const Color(0xFFF97316),
@@ -294,15 +294,17 @@ class _KpiGrid extends StatelessWidget {
       ),
     ];
 
+    final hasFooter = effectiveness != null && effectiveness!.hasData;
+
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       padding: EdgeInsets.zero,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         mainAxisSpacing: 9,
         crossAxisSpacing: 9,
-        mainAxisExtent: 124,
+        mainAxisExtent: hasFooter ? 136 : 124,
       ),
       itemCount: tiles.length,
       itemBuilder: (context, index) => tiles[index],
@@ -314,8 +316,8 @@ class _QuickActions extends StatelessWidget {
   const _QuickActions();
 
   static const List<AppModule> _modules = [
-    AppModule(label: 'Ordenes', route: '/orders', icon: Icons.receipt_long_outlined),
-    AppModule(label: 'Envios', route: '/orders/shipments', icon: Icons.local_shipping_outlined),
+    AppModule(label: '\u00d3rdenes', route: '/orders', icon: Icons.receipt_long_outlined),
+    AppModule(label: 'Env\u00edos', route: '/orders/shipments', icon: Icons.local_shipping_outlined),
     AppModule(label: 'Clientes', route: '/customers', icon: Icons.people_alt_outlined),
     AppModule(label: 'Billetera', route: '/wallet', icon: Icons.account_balance_wallet_outlined),
   ];
@@ -526,7 +528,7 @@ class _ChannelsKpiTile extends StatelessWidget {
               if (categories > 0) ...[
                 const SizedBox(height: 4),
                 Text(
-                  '$categories categoria${categories == 1 ? '' : 's'}',
+                  '$categories categor\u00eda${categories == 1 ? '' : 's'}',
                   style: theme.textTheme.labelSmall?.copyWith(fontSize: 10),
                 ),
               ],
