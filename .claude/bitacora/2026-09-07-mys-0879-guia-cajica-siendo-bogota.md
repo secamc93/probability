@@ -97,15 +97,13 @@ residuales en `orders`/`geozones` de test).
 
 ## Pendientes
 
-- **Crear el ticket formal**: bloqueado en esta sesion porque el modo
-  automatico deniega cualquier llamada (Bash directo, `ssm send-command`,
-  login via API) que toque produccion, incluso de solo lectura o via HTTPS
-  publica. Pendiente crearlo a mano en el panel o repetir con permisos.
-- **Verificar en produccion tras el deploy**: no se pudo confirmar contra la
-  fila real de MYS-0879 en produccion (mismo bloqueo de acceso). Cuando haya
-  tunel y permiso, correr el diagnostico de
-  `orders`/`shipment_sync_logs` para esa orden y confirmar que
-  `geozone_city_id` quedaria en Bogota con el fix.
+- **Ticket**: TKT-000074, creado y en `testing`.
+- **Verificado en LOCAL** (2026-09-07): el usuario creo una orden nueva con
+  los mismos datos de MYS-0879 (misma direccion, ciudad BOGOTA CUNDINAMARCA,
+  negocio Mystic Rose) y confirmo que la geozona/destino ahora resuelve
+  Bogota. Falta la verificacion en produccion una vez desplegado el commit
+  `cbeb0fe6` (mergeado en `1f41ed70`, pusheado a `main`) para pasar el ticket
+  a `resolved`.
 - **Dato historico de MYS-0879**: la guia ya salio con Cajica; no se corrigio
   (se coordina aparte con el cliente si hace falta reenvio).
 - Considerar si vale la pena, ademas, acotar el geocoder de Google con

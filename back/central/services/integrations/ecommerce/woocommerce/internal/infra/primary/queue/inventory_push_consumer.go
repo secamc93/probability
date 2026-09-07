@@ -3,6 +3,7 @@ package queue
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"strconv"
 
 	"github.com/secamc93/probability/back/central/services/integrations/ecommerce/woocommerce/internal/app/usecases"
@@ -13,6 +14,7 @@ import (
 type ecommerceStockPushMessage struct {
 	ProductID           string `json:"product_id"`
 	ExternalProductID   string `json:"external_product_id"`
+	ExternalVariantID   string `json:"external_variant_id,omitempty"`
 	IntegrationID       uint   `json:"integration_id"`
 	IntegrationTypeCode string `json:"integration_type_code"`
 	BusinessID          uint   `json:"business_id"`
@@ -73,11 +75,15 @@ func (c *InventoryPushConsumer) handle(ctx context.Context, body []byte) {
 	}
 
 	integrationID := strconv.FormatUint(uint64(msg.IntegrationID), 10)
-	if err := c.useCase.UpdateInventory(ctx, integrationID, msg.ExternalProductID, msg.Quantity); err != nil {
+	productExternalID := msg.ExternalProductID
+	if msg.ExternalVariantID != "" {
+		productExternalID = fmt.Sprintf("%s:%s", msg.ExternalProductID, msg.ExternalVariantID)
+	}
+	if err := c.useCase.UpdateInventory(ctx, integrationID, productExternalID, msg.Quantity); err != nil {
 		c.logger.Error(ctx).
 			Err(err).
 			Str("integration_id", integrationID).
-			Str("external_product_id", msg.ExternalProductID).
+			Str("external_product_id", productExternalID).
 			Int("quantity", msg.Quantity).
 			Msg("Error al empujar stock a WooCommerce")
 	}
