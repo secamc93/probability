@@ -2,14 +2,12 @@
 
 import { useState } from 'react';
 import { Alert, Button, Input, SecretInput } from '@/shared/ui';
+import { saveWhatsAppConnectionAction } from '../../infra/actions';
 import { WhatsAppConnectionValues } from '../../domain/types';
 
 interface WhatsAppConnectionFormProps {
     config: Record<string, any>;
-    onSave: (
-        config: Record<string, any>,
-        credentials: Record<string, any>
-    ) => Promise<{ success: boolean; message?: string }>;
+    businessId?: number;
     onSaved?: () => void;
 }
 
@@ -22,7 +20,7 @@ function readConfig(config: Record<string, any>): WhatsAppConnectionValues {
     };
 }
 
-export default function WhatsAppConnectionForm({ config, onSave, onSaved }: WhatsAppConnectionFormProps) {
+export default function WhatsAppConnectionForm({ config, businessId, onSaved }: WhatsAppConnectionFormProps) {
     const [values, setValues] = useState<WhatsAppConnectionValues>(() => readConfig(config));
     const [saving, setSaving] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -44,42 +42,35 @@ export default function WhatsAppConnectionForm({ config, onSave, onSaved }: What
                 });
                 return;
             }
-            if (!values.access_token.trim() && !hasStoredToken) {
-                setMessage({ type: 'error', text: 'Ingresa el token de acceso de tu cuenta de WhatsApp' });
-                return;
-            }
         }
 
         setSaving(true);
         try {
-            const nextConfig: Record<string, any> = {
-                ...config,
-                use_platform_token: values.use_platform_token,
-            };
+            const result = await saveWhatsAppConnectionAction(
+                {
+                    use_platform_token: values.use_platform_token,
+                    waba_id: values.use_platform_token ? '' : values.waba_id.trim(),
+                    phone_number_id: values.use_platform_token ? '' : values.phone_number_id.trim(),
+                    access_token: values.access_token.trim(),
+                },
+                businessId
+            );
 
-            if (values.use_platform_token) {
-                delete nextConfig.waba_id;
-                delete nextConfig.phone_number_id;
-            } else {
-                nextConfig.waba_id = values.waba_id.trim();
-                nextConfig.phone_number_id = values.phone_number_id.trim();
-            }
-
-            const credentials: Record<string, any> = {};
-            if (!values.use_platform_token && values.access_token.trim()) {
-                credentials.access_token = values.access_token.trim();
-            }
-
-            const result = await onSave(nextConfig, credentials);
             if (result.success) {
-                setMessage({ type: 'success', text: 'Conexión de WhatsApp guardada' });
+                const numero = result.data?.display_phone_number;
+                setMessage({
+                    type: 'success',
+                    text: values.use_platform_token
+                        ? 'Los mensajes vuelven a salir del n\u00famero de Probability'
+                        : `N\u00famero verificado con Meta${numero ? `: ${numero}` : ''}`,
+                });
                 setValues((prev) => ({ ...prev, access_token: '' }));
                 onSaved?.();
             } else {
-                setMessage({ type: 'error', text: result.message || 'Error al guardar la conexión' });
+                setMessage({ type: 'error', text: result.message || 'Error al guardar la conexi\u00f3n' });
             }
         } catch (err: any) {
-            setMessage({ type: 'error', text: err?.message || 'Error al guardar la conexión' });
+            setMessage({ type: 'error', text: err?.message || 'Error al guardar la conexi\u00f3n' });
         } finally {
             setSaving(false);
         }
@@ -158,16 +149,18 @@ export default function WhatsAppConnectionForm({ config, onSave, onSaved }: What
 
                     <div className="md:col-span-2">
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
-                            Token de acceso {hasStoredToken ? '' : '*'}
+                            Token de acceso (opcional)
                         </label>
                         <SecretInput
                             value={values.access_token}
                             onChange={(e) => handleChange('access_token', e.target.value)}
-                            placeholder={hasStoredToken ? 'Guárdalo vacío para no cambiarlo' : 'EAAxxxxxxxxx...'}
+                            placeholder={hasStoredToken ? 'Gu\u00e1rdalo vac\u00edo para no cambiarlo' : 'EAAxxxxxxxxx...'}
                             className="font-mono"
                         />
                         <p className="mt-1 text-xs text-gray-500 dark:text-gray-400">
-                            Token permanente con permisos de mensajería sobre tu cuenta de WhatsApp
+                            D\u00e9jalo vac\u00edo si compartiste tu cuenta de WhatsApp con Probability desde tu
+                            Business Manager: en ese caso enviamos con nuestras credenciales. Solo hace falta un
+                            token propio si prefieres administrar tu cuenta por tu cuenta.
                         </p>
                     </div>
                 </div>

@@ -14,14 +14,19 @@ Probability como administrador de su cuenta. Lo decide su fila de `integrations`
 | `config` | Efecto |
 |---|---|
 | sin `phone_number_id`, o `use_platform_token: true` | sale por el numero de Probability (comportamiento historico) |
-| `phone_number_id` + `waba_id` + credencial `access_token` | sale por el numero del negocio |
+| `phone_number_id` + `waba_id`, sin credencial propia | sale por el numero del negocio **con el token de Probability** (camino corto) |
+| `phone_number_id` + `waba_id` + credencial `access_token` | sale por el numero del negocio con el token del cliente |
 
 `credentials_cache.GetWhatsAppConfig` lee esa fila (config + credenciales
 desencriptadas, cacheadas por `integrations/core` en `integration:meta:*` y
 `integration:creds:*`) y solo cae a la plataforma cuando falta configuracion
-propia. Si el negocio declara `phone_number_id` pero le falta el token, el envio
-falla con un error **permanente**: es una configuracion rota, no un fallo
-transitorio.
+propia.
+
+El caso del medio es el del **camino corto**: el cliente comparte su WABA con
+Probability desde su Business Manager y nuestro system user `cam-adm` queda de
+administrador, asi que enviamos con nuestro token sobre SU numero. El cliente no
+tiene que crear una app en Meta ni generar un token permanente. Solo hace falta
+un `access_token` propio si el cliente prefiere administrar su cuenta el mismo.
 
 **Lo que NO migra al numero del negocio** (siempre sale del de Probability):
 
@@ -31,6 +36,24 @@ transitorio.
 - aviso de saldo bajo de billetera y de ventana de pago de suscripcion
   (`consumerwalletalert`, `consumersubscriptionalert`): son mensajes de
   Probability al negocio, por eso usan `SendPlatformTemplate`.
+
+### Quien puede escribir `phone_number_id` y `waba_id`
+
+Son campos **protegidos**: el `PUT /integrations/:id` generico los ignora y
+conserva los guardados (`handlerintegrations/protected_config.go`), igual que
+`use_platform_token`. El unico camino para escribirlos es
+`PUT /whatsapp/connection`, que antes de guardar:
+
+1. rechaza el `phone_number_id` de la plataforma,
+2. rechaza un `phone_number_id` que ya pertenezca a otra integracion,
+3. le pregunta a Meta (`GET /{waba_id}/phone_numbers` con el token que se va a
+   usar) si ese numero de verdad esta en ese WABA y si tenemos acceso.
+
+Ademas hay un indice unico parcial en base
+(`uq_integrations_whatsapp_phone_number_id`) por si alguien escribe por otro
+camino. Sin esto, un negocio podia declarar el `phone_number_id` de otro (o el
+de Probability) y quedarse con los mensajes entrantes de ese numero: el indice
+de ruteo en Redis y la consulta del webhook apuntan al dueno declarado.
 
 ### Ruteo del webhook por numero
 
@@ -57,11 +80,16 @@ integracion y se invalida al cambiarle el `config`.
 1. El cliente entra a su Business Manager -> Configuracion del negocio ->
    Cuentas de WhatsApp -> Socios -> agrega el Business ID de Probabilityapp con
    control total.
-2. Se anota su `waba_id` y su `phone_number_id` y se suscribe la app:
+2. Se le asigna ese WABA al system user `cam-adm` en Business Manager. Sin eso
+   el token no lo ve: `GET /me/assigned_whatsapp_business_accounts` devuelve
+   vacio y el paso 4 falla con permisos.
+3. Se anota su `waba_id` y su `phone_number_id` y se suscribe la app:
    `POST /{waba_id}/subscribed_apps`.
-3. En el front, en la integracion de WhatsApp del negocio, se activa "Usar mi
-   propio numero" y se pegan `waba_id`, `phone_number_id` y el token.
-4. Se pulsa "Crear las plantillas que faltan" y se espera la aprobacion de Meta.
+4. En el front, en la integracion de WhatsApp del negocio, se activa "Usar mi
+   propio numero" y se pegan `waba_id` y `phone_number_id`. **El token se deja
+   vacio**: se usa el de Probability. Al guardar, el backend le pregunta a Meta
+   si ese numero pertenece a ese WABA; si no, no guarda nada.
+5. Se pulsa "Crear las plantillas que faltan" y se espera la aprobacion de Meta.
 
 Si el cliente revoca el acceso desde su Business Manager, Meta responde 190 / 401
 y el clasificador lo trata como error permanente: el mensaje se descarta con
@@ -77,6 +105,14 @@ necesita las suyas, aprobadas por Meta en SU cuenta.
   plataforma (`GET /{waba_id}/message_templates`) y crea en el WABA del cliente
   las que le falten (`POST /{waba_id}/message_templates`). El catalogo origen es
   Meta, no una copia en Go: asi no se desincronizan.
+- **No se copian todas.** Las plantillas que son de Probability hacia el negocio
+  (`alerta_servidor`, `reporte_saldo_billetera`, `reporte_saldo_billetera_v2`,
+  `resumen_pago_suscripcion`, `recuperacion_codigo`) y `hello_world` quedan
+  fuera; salen en `skipped`. La lista vive en `usecasetemplates/catalog.go`.
+- Las plantillas de categoria `AUTHENTICATION` **no se pueden copiar tal cual**:
+  Meta devuelve en el GET el texto ya renderizado, pero en el POST solo acepta
+  `BODY {add_security_recommendation}`, `FOOTER {code_expiration_minutes}` y
+  botones `OTP`. `componentsForCreate` las reconstruye con esa forma.
 - `GET /whatsapp/templates/status` devuelve el estado por plantilla. Se cachea en
   Redis (`whatsapp:templates:{integration_id}`, TTL 6 h) y `?refresh=true` fuerza
   la consulta a Meta.

@@ -15,6 +15,7 @@ type ProvisionResult struct {
 	WABAID        string
 	Created       []string
 	AlreadyExists []string
+	Skipped       []string
 	Failed        map[string]string
 	Templates     []ports.TemplateStatus
 }

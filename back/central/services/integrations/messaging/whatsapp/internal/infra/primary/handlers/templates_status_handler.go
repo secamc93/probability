@@ -116,6 +116,7 @@ func (h *handler) ProvisionTemplates(c *gin.Context) {
 			"waba_id":        result.WABAID,
 			"created":        result.Created,
 			"already_exists": result.AlreadyExists,
+			"skipped":        result.Skipped,
 			"failed":         result.Failed,
 			"templates":      mapTemplatesToResponse(result.Templates),
 		},

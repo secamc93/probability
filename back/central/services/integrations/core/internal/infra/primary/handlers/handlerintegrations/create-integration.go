@@ -73,6 +73,8 @@ func (h *IntegrationHandler) CreateIntegrationHandler(c *gin.Context) {
 
 	businessID := c.GetUint("business_id")
 
+	protectConfigFields(req.IntegrationTypeID, &req.Config, nil)
+
 	dto := mapper.ToCreateIntegrationDTO(req, userID, businessID)
 
 	// Validar que se haya asignado un BusinessID (crítico para la sincronización)

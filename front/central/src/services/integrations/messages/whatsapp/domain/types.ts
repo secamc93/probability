@@ -23,6 +23,7 @@ export interface WhatsAppProvisionResult {
     waba_id: string;
     created: string[];
     already_exists: string[];
+    skipped: string[];
     failed: Record<string, string>;
     templates: WhatsAppTemplateStatus[];
 }
@@ -37,6 +38,24 @@ export interface WhatsAppProvisionResponse {
     success: boolean;
     message?: string;
     data?: WhatsAppProvisionResult;
+}
+
+export interface WhatsAppConnectionResult {
+    integration_id: number;
+    business_id: number;
+    own_number: boolean;
+    waba_id: string;
+    phone_number_id: string;
+    display_phone_number: string;
+    verified_name: string;
+    quality_rating: string;
+    platform_token: boolean;
+}
+
+export interface WhatsAppConnectionResponse {
+    success: boolean;
+    message?: string;
+    data?: WhatsAppConnectionResult;
 }
 
 export interface WhatsAppConnectionValues {

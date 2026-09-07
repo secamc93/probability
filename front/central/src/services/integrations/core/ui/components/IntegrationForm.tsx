@@ -394,14 +394,6 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
                         const result = await updateIntegrationAction(id, { config });
                         return { success: result.success, message: result.message };
                     }}
-                    onUpdateConnection={async (id, config, credentials) => {
-                        const payload: { config: Record<string, any>; credentials?: Record<string, any> } = { config };
-                        if (Object.keys(credentials).length > 0) {
-                            payload.credentials = credentials;
-                        }
-                        const result = await updateIntegrationAction(id, payload);
-                        return { success: result.success, message: result.message };
-                    }}
                     onTestConnection={async (id) => {
                         const result = await testIntegrationAction(id);
                         return { success: result.success, message: result.message };

@@ -21,11 +21,6 @@ interface WhatsAppIntegrationViewProps {
     imageUrl?: string;
     onToggleActive?: (id: number, currentlyActive: boolean) => Promise<boolean>;
     onUpdateConfig?: (id: number, config: Record<string, any>) => Promise<{ success: boolean; message?: string }>;
-    onUpdateConnection?: (
-        id: number,
-        config: Record<string, any>,
-        credentials: Record<string, any>
-    ) => Promise<{ success: boolean; message?: string }>;
     onTestConnection?: (id: number) => Promise<{ success: boolean; message?: string }>;
     onRefresh?: () => void;
 }
@@ -35,7 +30,6 @@ export default function WhatsAppIntegrationView({
     imageUrl,
     onToggleActive,
     onUpdateConfig,
-    onUpdateConnection,
     onTestConnection,
     onRefresh,
 }: WhatsAppIntegrationViewProps) {
@@ -246,10 +240,10 @@ export default function WhatsAppIntegrationView({
                 </div>
             )}
 
-            {isActive && onUpdateConnection && (
+            {isActive && (
                 <WhatsAppConnectionForm
                     config={integration.config || {}}
-                    onSave={(config, credentials) => onUpdateConnection(integration.id, config, credentials)}
+                    businessId={integration.business_id || undefined}
                     onSaved={onRefresh}
                 />
             )}

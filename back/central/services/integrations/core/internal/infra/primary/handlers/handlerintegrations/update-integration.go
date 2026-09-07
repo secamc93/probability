@@ -52,7 +52,16 @@ func (h *IntegrationHandler) UpdateIntegrationHandler(c *gin.Context) {
 		return
 	}
 
-	// Si no es super admin, verificar que la integración pertenece al business del usuario
+	existing, err := h.usecase.GetIntegrationByID(c.Request.Context(), uint(id))
+	if err != nil {
+		c.JSON(http.StatusNotFound, response.IntegrationErrorResponse{
+			Success: false,
+			Message: "La integración especificada no existe",
+			Error:   err.Error(),
+		})
+		return
+	}
+
 	if !middleware.IsSuperAdmin(c) {
 		businessID, hasBusinessID := middleware.GetBusinessID(c)
 		if !hasBusinessID || businessID == 0 {
@@ -60,15 +69,6 @@ func (h *IntegrationHandler) UpdateIntegrationHandler(c *gin.Context) {
 				Success: false,
 				Message: "No tienes permisos para actualizar esta integración",
 				Error:   "permisos insuficientes",
-			})
-			return
-		}
-		existing, err := h.usecase.GetIntegrationByID(c.Request.Context(), uint(id))
-		if err != nil {
-			c.JSON(http.StatusNotFound, response.IntegrationErrorResponse{
-				Success: false,
-				Message: "La integración especificada no existe",
-				Error:   err.Error(),
 			})
 			return
 		}
@@ -98,6 +98,8 @@ func (h *IntegrationHandler) UpdateIntegrationHandler(c *gin.Context) {
 		})
 		return
 	}
+
+	protectConfigFields(existing.IntegrationTypeID, req.Config, existing)
 
 	dto := mapper.ToUpdateIntegrationDTO(req, userID)
 	integration, err := h.usecase.UpdateIntegration(c.Request.Context(), uint(id), dto)

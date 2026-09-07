@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/app/usecaseconnection"
 	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/app/usecasemessaging"
 	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/app/usecasetemplates"
 	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/domain/ports"
@@ -26,12 +27,15 @@ type IHandler interface {
 	GetTemplatesStatus(c *gin.Context)
 	ProvisionTemplates(c *gin.Context)
 
+	SaveConnection(c *gin.Context)
+
 	SetPlatformCredsGetter(getter ports.IPlatformCredentialsGetter)
 }
 
 type handler struct {
 	useCase             usecasemessaging.IUseCase
 	templatesUseCase    usecasetemplates.IUseCase
+	connectionUseCase   usecaseconnection.IUseCase
 	log                 log.ILogger
 	config              env.IConfig
 	platformCredsGetter ports.IPlatformCredentialsGetter
@@ -41,16 +45,18 @@ type handler struct {
 func New(
 	useCase usecasemessaging.IUseCase,
 	templatesUseCase usecasetemplates.IUseCase,
+	connectionUseCase usecaseconnection.IUseCase,
 	logger log.ILogger,
 	config env.IConfig,
 	rabbit rabbitmq.IQueue,
 ) IHandler {
 	return &handler{
-		useCase:          useCase,
-		templatesUseCase: templatesUseCase,
-		log:              logger,
-		config:           config,
-		rabbit:           rabbit,
+		useCase:           useCase,
+		templatesUseCase:  templatesUseCase,
+		connectionUseCase: connectionUseCase,
+		log:               logger,
+		config:            config,
+		rabbit:            rabbit,
 	}
 }
 

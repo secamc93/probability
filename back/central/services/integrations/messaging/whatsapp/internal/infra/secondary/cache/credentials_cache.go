@@ -80,15 +80,24 @@ func (c *credentialsCache) GetWhatsAppConfigByIntegration(ctx context.Context, i
 		return c.platformConfigFor(ctx, integrationID)
 	}
 
+	platform, platErr := c.GetWhatsAppDefaultConfig(ctx)
+
+	platformToken := false
+	if stringValue(merged["access_token"]) == "" {
+		if platErr != nil {
+			return nil, fmt.Errorf("integración WhatsApp %d con número propio sin token, y las credenciales de plataforma no están disponibles: %w", integrationID, platErr)
+		}
+		merged["access_token"] = platform.AccessToken
+		platformToken = true
+	}
+
 	config, err := buildWhatsAppConfig(merged, integrationID, "")
 	if err != nil {
 		return nil, fmt.Errorf("integración WhatsApp %d con número propio mal configurada: %w", integrationID, err)
 	}
 
-	if config.WhatsAppURL == "" {
-		if platform, platErr := c.GetWhatsAppDefaultConfig(ctx); platErr == nil {
-			config.WhatsAppURL = platform.WhatsAppURL
-		}
+	if config.WhatsAppURL == "" && platErr == nil {
+		config.WhatsAppURL = platform.WhatsAppURL
 	}
 
 	config.OwnNumber = true
@@ -97,6 +106,7 @@ func (c *credentialsCache) GetWhatsAppConfigByIntegration(ctx context.Context, i
 		Uint("integration_id", integrationID).
 		Uint("phone_number_id", config.PhoneNumberID).
 		Str("waba_id", config.WABAID).
+		Bool("token_de_plataforma", platformToken).
 		Msg("configuración WhatsApp propia del negocio resuelta")
 
 	return config, nil

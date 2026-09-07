@@ -1,6 +1,11 @@
 import { env } from '@/shared/config/env';
 import { IWhatsAppRepository } from '../../domain/ports';
-import { WhatsAppProvisionResponse, WhatsAppTemplatesResponse } from '../../domain/types';
+import {
+    WhatsAppConnectionResponse,
+    WhatsAppConnectionValues,
+    WhatsAppProvisionResponse,
+    WhatsAppTemplatesResponse,
+} from '../../domain/types';
 
 export class WhatsAppApiRepository implements IWhatsAppRepository {
     private baseUrl: string;
@@ -50,6 +55,24 @@ export class WhatsAppApiRepository implements IWhatsAppRepository {
         return this.request<WhatsAppProvisionResponse>(
             `/integrations/whatsapp/templates/provision${this.query(businessId)}`,
             { method: 'POST' }
+        );
+    }
+
+    async saveConnection(
+        values: WhatsAppConnectionValues,
+        businessId?: number
+    ): Promise<WhatsAppConnectionResponse> {
+        return this.request<WhatsAppConnectionResponse>(
+            `/integrations/whatsapp/connection${this.query(businessId)}`,
+            {
+                method: 'PUT',
+                body: JSON.stringify({
+                    use_platform_token: values.use_platform_token,
+                    waba_id: values.waba_id,
+                    phone_number_id: values.phone_number_id,
+                    access_token: values.access_token,
+                }),
+            }
         );
     }
 }

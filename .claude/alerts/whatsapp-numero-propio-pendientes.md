@@ -9,15 +9,22 @@ El codigo de las fases 1 a 5 esta escrito y compila; `go build ./...` y
 `go test ./...` de `back/central` pasan, y el front typechequea. Lo que sigue NO
 se ejecuto: esta sesion no tiene base de datos, ni Redis, ni token de Meta.
 
+## Revision del 2026-09-06
+
+Se reviso la rama y se verifico contra Meta con el token de `cam-adm`. Lo que se
+corrigio en esa pasada esta al final de este archivo.
+
 ## Urgente (antes de desplegar)
 
-1. **Correr la migracion.** `Migrate()` en
-   `back/migration/internal/infra/repository/constructor.go` quedo apuntando a
-   `migrateWhatsappInboundConversationType`, que extiende el CHECK de
-   `whatsapp_conversations.conversation_type` para aceptar `inbound`.
-   Sin ella, toda conversacion entrante creada por el ruteo por numero falla al
-   persistirse con SQLSTATE 23514. Correrla en local, verificar, dejar
-   `Migrate()` en cero y registrar la corrida en `back/migration/MIGRACIONES.md`.
+1. **Correr las dos migraciones en produccion.** `Migrate()` en
+   `back/migration/internal/infra/repository/constructor.go` encadena
+   `migrateWhatsappInboundConversationType` (CHECK de
+   `whatsapp_conversations.conversation_type` con `inbound`; sin el, toda
+   conversacion entrante falla con SQLSTATE 23514) y
+   `migrateWhatsappPhoneNumberUnique` (indice unico parcial sobre
+   `config->>'phone_number_id'`). **Ya corrieron y se verificaron contra la copia
+   local** (2026-09-06); falta produccion. Al terminar, dejar `Migrate()` en cero
+   y registrar la corrida en `back/migration/MIGRACIONES.md`.
 
 2. **Probar la fase 1 contra la base local con el numero de test.** Un negocio
    sin `phone_number_id` propio debe seguir enviando por el numero de
@@ -34,7 +41,16 @@ se ejecuto: esta sesion no tiene base de datos, ni Redis, ni token de Meta.
 4. **Fase 3 sin verificar contra un WABA real.** El aprovisionamiento de
    plantillas y el consumo de `message_template_status_update` estan escritos
    pero nunca corrieron contra Meta. Necesitan un cliente conectado o un WABA de
-   pruebas compartido con Probabilityapp.
+   pruebas compartido con Probabilityapp. Lo que si esta verificado: el webhook
+   de la app tiene suscrito `message_template_status_update` ademas de
+   `messages`, y el WABA de produccion tiene 26 plantillas (no 13).
+
+4.1 **Asignarle el WABA del cliente al system user `cam-adm`.** Su token tiene
+   solo `whatsapp_business_management` y `whatsapp_business_messaging` (sin
+   `business_management`), y `GET /me/assigned_whatsapp_business_accounts`
+   devuelve vacio: los WABA compartidos no se pueden descubrir por API, hay que
+   asignarlos a mano en Business Manager. Si falta ese paso, guardar la conexion
+   falla con error de permisos de Meta, que es justo lo que se quiere.
 
 5. **Quality rating por numero.** El riesgo que el propio plan senala sigue sin
    cubrir: hoy se vigila un `quality_rating` y con N clientes son N. La UI
@@ -58,3 +74,21 @@ se ejecuto: esta sesion no tiene base de datos, ni Redis, ni token de Meta.
 
 Cuando 1, 2 y 3 esten hechos y verificados, y 4 tenga al menos una corrida real
 contra un WABA. Los puntos 5 a 7 se mueven a `ROADMAP.md` si siguen abiertos.
+
+## Corregido el 2026-09-06
+
+- **Un negocio podia quedarse con los mensajes de otro.** El formulario dejaba
+  escribir cualquier `phone_number_id` y el ruteo del webhook le entregaba al
+  declarante los entrantes de ese numero. Ahora `phone_number_id`, `waba_id` y
+  `use_platform_token` son campos protegidos en el `PUT /integrations/:id`
+  generico, y solo se escriben por `PUT /whatsapp/connection`, que rechaza el
+  numero de la plataforma, rechaza uno ya tomado y verifica contra Meta que el
+  numero pertenezca a ese WABA. Ademas hay indice unico en base.
+- **El camino corto no estaba implementado.** Se exigia un `access_token` propio
+  del cliente, que es justo el tramite con Meta que el plan queria evitar. Ahora,
+  con `phone_number_id` + `waba_id` y sin credencial propia, se envia por el
+  numero del negocio con el token de Probability. El token propio queda opcional.
+- **`recuperacion_codigo` no se podia crear en el WABA del cliente.** Meta no
+  acepta en el POST los `components` que devuelve el GET de una plantilla
+  `AUTHENTICATION`. Se reconstruyen con la forma correcta, y ademas las
+  plantillas que son de Probability hacia el negocio ya no se copian.

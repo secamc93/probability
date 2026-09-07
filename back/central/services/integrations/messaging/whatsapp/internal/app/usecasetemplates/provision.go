@@ -54,12 +54,18 @@ func (u *usecase) Provision(ctx context.Context, businessID uint) (*ProvisionRes
 		WABAID:        target.WABAID,
 		Created:       []string{},
 		AlreadyExists: []string{},
+		Skipped:       []string{},
 		Failed:        map[string]string{},
 	}
 
 	statuses := make([]ports.TemplateStatus, 0, len(sourceTemplates))
 
 	for _, tpl := range sourceTemplates {
+		if isPlatformOnlyTemplate(tpl.Name) {
+			result.Skipped = append(result.Skipped, tpl.Name)
+			continue
+		}
+
 		key := templateKey(tpl.Name, tpl.Language)
 
 		if found, ok := present[key]; ok {
@@ -77,7 +83,10 @@ func (u *usecase) Provision(ctx context.Context, businessID uint) (*ProvisionRes
 			continue
 		}
 
-		metaID, createErr := targetAPI.CreateTemplate(ctx, target.WABAID, target.AccessToken, tpl)
+		payload := tpl
+		payload.Components = componentsForCreate(tpl)
+
+		metaID, createErr := targetAPI.CreateTemplate(ctx, target.WABAID, target.AccessToken, payload)
 		if createErr != nil {
 			u.log.Warn(ctx).Err(createErr).
 				Str("template", tpl.Name).
@@ -127,6 +136,7 @@ func (u *usecase) Provision(ctx context.Context, businessID uint) (*ProvisionRes
 		Int("creadas", len(result.Created)).
 		Int("existentes", len(result.AlreadyExists)).
 		Int("fallidas", len(result.Failed)).
+		Int("omitidas", len(result.Skipped)).
 		Msg("aprovisionamiento de plantillas terminado")
 
 	return result, nil

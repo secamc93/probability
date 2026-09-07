@@ -76,6 +76,8 @@ type IPlatformCredentialsGetter interface {
 	GetIntegrationIDByBusinessAndType(ctx context.Context, businessID, integrationTypeID uint) (uint, error)
 	GetIntegrationConfigAndCredentials(ctx context.Context, integrationID uint) (map[string]any, map[string]any, error)
 	FindIntegrationByConfigValue(ctx context.Context, integrationTypeID uint, field, value string) (uint, uint, error)
+	UpdateIntegrationConfig(ctx context.Context, integrationID string, config map[string]any) error
+	UpdateIntegrationCredentials(ctx context.Context, integrationID string, credentials map[string]any) error
 }
 
 type ISSEEventPublisher interface {
@@ -106,6 +108,14 @@ type WABATemplatesSnapshot struct {
 type ITemplateAPI interface {
 	ListTemplates(ctx context.Context, wabaID, accessToken string) ([]TemplateDefinitionRemote, error)
 	CreateTemplate(ctx context.Context, wabaID, accessToken string, template TemplateDefinitionRemote) (string, error)
+	ListPhoneNumbers(ctx context.Context, wabaID, accessToken string) ([]WABAPhoneNumber, error)
+}
+
+type WABAPhoneNumber struct {
+	ID                 string
+	DisplayPhoneNumber string
+	VerifiedName       string
+	QualityRating      string
 }
 
 type TemplateDefinitionRemote struct {

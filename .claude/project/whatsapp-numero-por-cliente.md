@@ -82,6 +82,11 @@ POST /{waba_id}/subscribed_apps
 
 ### Fase 1 - Credenciales por negocio (1-2 dias) - HECHA
 
+Revision 2026-09-06: faltaba el caso central del camino corto. Con
+`phone_number_id` + `waba_id` y SIN credencial propia se usa el token de
+Probability (que es administrador del WABA del cliente); el token propio quedo
+opcional, para el cliente que prefiera administrar su cuenta el mismo.
+
 - `credentials_cache.go:39-56`: que `GetWhatsAppConfig` lea de verdad el `config`
   y las `credentials` de la fila `Integration` del negocio. Con
   `phone_number_id` propio se usa el del cliente; con `use_platform_token: true`
@@ -106,6 +111,11 @@ seguir funcionando sin tocarles nada.
 - La firma HMAC no cambia: el `webhook_secret` es de la app, igual para todos.
 
 ### Fase 3 - Plantillas en el WABA del cliente (2-3 dias) - HECHA (sin probar contra un WABA real)
+
+Revision 2026-09-06: el WABA de produccion tiene 26 plantillas, no 13. Las que
+son de Probability hacia el negocio ya no se copian, y las de categoria
+`AUTHENTICATION` se reconstruyen: Meta no acepta en el POST los `components` que
+devuelve el GET (confirmado en su documentacion).
 
 Las 13 plantillas viven en nuestro WABA. Cada cliente necesita las suyas.
 
@@ -172,6 +182,11 @@ contra la base local y el numero de test.
 - **`business_id` NULL vs no NULL.** La fila global (id=2) convive con las de
   cada negocio. Una consulta mal filtrada hace que un negocio envie por el numero
   de otro.
+- **Numero ajeno declarado a proposito** (encontrado el 2026-09-06, corregido).
+  Como el webhook rutea por `phone_number_id`, declarar el numero de otro
+  bastaba para recibir sus mensajes. Hoy esos campos solo se escriben por
+  `PUT /whatsapp/connection`, con verificacion contra Meta, chequeo de duplicado
+  e indice unico en base.
 
 ## Lo que tiene que poner el cliente
 

@@ -3,7 +3,12 @@
 import { cookies } from 'next/headers';
 import { WhatsAppApiRepository } from '../repository/api-repository';
 import { WhatsAppUseCases } from '../../app/use-cases';
-import { WhatsAppProvisionResponse, WhatsAppTemplatesResponse } from '../../domain/types';
+import {
+    WhatsAppConnectionResponse,
+    WhatsAppConnectionValues,
+    WhatsAppProvisionResponse,
+    WhatsAppTemplatesResponse,
+} from '../../domain/types';
 
 async function getUseCases(tokenOverride?: string | null) {
     const cookieStore = await cookies();
@@ -38,5 +43,18 @@ export const provisionWhatsAppTemplatesAction = async (
         return await useCases.provisionTemplates(businessId);
     } catch (error: any) {
         return { success: false, message: error?.message || 'Error aprovisionando las plantillas' };
+    }
+};
+
+export const saveWhatsAppConnectionAction = async (
+    values: WhatsAppConnectionValues,
+    businessId?: number,
+    token?: string | null
+): Promise<WhatsAppConnectionResponse> => {
+    try {
+        const useCases = await getUseCases(token);
+        return await useCases.saveConnection(values, businessId);
+    } catch (error: any) {
+        return { success: false, message: error?.message || 'Error guardando la conexión de WhatsApp' };
     }
 };

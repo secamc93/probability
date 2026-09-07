@@ -1,5 +1,10 @@
 import { IWhatsAppRepository } from '../domain/ports';
-import { WhatsAppProvisionResponse, WhatsAppTemplatesResponse } from '../domain/types';
+import {
+    WhatsAppConnectionResponse,
+    WhatsAppConnectionValues,
+    WhatsAppProvisionResponse,
+    WhatsAppTemplatesResponse,
+} from '../domain/types';
 
 export class WhatsAppUseCases {
     constructor(private readonly repository: IWhatsAppRepository) {}
@@ -10,5 +15,12 @@ export class WhatsAppUseCases {
 
     async provisionTemplates(businessId?: number): Promise<WhatsAppProvisionResponse> {
         return this.repository.provisionTemplates(businessId);
+    }
+
+    async saveConnection(
+        values: WhatsAppConnectionValues,
+        businessId?: number
+    ): Promise<WhatsAppConnectionResponse> {
+        return this.repository.saveConnection(values, businessId);
     }
 }

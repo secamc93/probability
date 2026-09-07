@@ -96,6 +96,50 @@ func (c *templatesClient) ListTemplates(ctx context.Context, wabaID, accessToken
 	return templates, nil
 }
 
+type phoneNumbersResponse struct {
+	Data []struct {
+		ID                 string `json:"id"`
+		DisplayPhoneNumber string `json:"display_phone_number"`
+		VerifiedName       string `json:"verified_name"`
+		QualityRating      string `json:"quality_rating"`
+	} `json:"data"`
+}
+
+func (c *templatesClient) ListPhoneNumbers(ctx context.Context, wabaID, accessToken string) ([]ports.WABAPhoneNumber, error) {
+	if wabaID == "" {
+		return nil, fmt.Errorf("waba_id no configurado")
+	}
+
+	var result phoneNumbersResponse
+
+	resp, err := c.httpClient.R().
+		SetContext(ctx).
+		SetHeader("Authorization", "Bearer "+accessToken).
+		SetQueryParam("limit", "100").
+		SetQueryParam("fields", "id,display_phone_number,verified_name,quality_rating").
+		SetResult(&result).
+		Get(fmt.Sprintf("%s/phone_numbers", wabaID))
+	if err != nil {
+		return nil, fmt.Errorf("error consultando los números del WABA %s: %w", wabaID, err)
+	}
+
+	if resp.StatusCode() < 200 || resp.StatusCode() >= 300 {
+		return nil, parseMetaGraphError(resp.String(), resp.StatusCode(), 0)
+	}
+
+	numbers := make([]ports.WABAPhoneNumber, 0, len(result.Data))
+	for _, item := range result.Data {
+		numbers = append(numbers, ports.WABAPhoneNumber{
+			ID:                 item.ID,
+			DisplayPhoneNumber: item.DisplayPhoneNumber,
+			VerifiedName:       item.VerifiedName,
+			QualityRating:      item.QualityRating,
+		})
+	}
+
+	return numbers, nil
+}
+
 func (c *templatesClient) CreateTemplate(ctx context.Context, wabaID, accessToken string, template ports.TemplateDefinitionRemote) (string, error) {
 	if wabaID == "" {
 		return "", fmt.Errorf("waba_id no configurado")

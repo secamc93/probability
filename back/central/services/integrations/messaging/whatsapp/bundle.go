@@ -3,9 +3,11 @@ package whatsApp
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/secamc93/probability/back/central/services/integrations/core"
+	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/app/usecaseconnection"
 	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/app/usecasemessaging"
 	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/app/usecasetemplates"
 	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/app/usecasetestconnection"
@@ -68,6 +70,7 @@ type bundle struct {
 	useCase          usecasemessaging.IUseCase
 	testUsecase      usecasetestconnection.ITestConnectionUseCase
 	templatesUseCase usecasetemplates.IUseCase
+	connectionUC     usecaseconnection.IUseCaseMutable
 	handler          handlers.IHandler
 	credsCache       cache.ICredentialsCacheMutable
 }
@@ -125,8 +128,9 @@ func New(config env.IConfig, logger log.ILogger, rabbit rabbitmq.IQueue, redisCl
 	}
 
 	templatesUseCase := usecasetemplates.New(credsCache, templatesCache, templatesAPIFactory, logger)
+	connectionUseCase := usecaseconnection.New(credsCache, templatesAPIFactory, logger)
 
-	handler := handlers.New(useCase, templatesUseCase, logger, config, rabbit)
+	handler := handlers.New(useCase, templatesUseCase, connectionUseCase, logger, config, rabbit)
 
 	if rabbit != nil {
 		webhookConsumer := consumerwebhook.New(rabbit, useCase, templatesUseCase, logger)
@@ -192,6 +196,7 @@ func New(config env.IConfig, logger log.ILogger, rabbit rabbitmq.IQueue, redisCl
 		useCase:          useCase,
 		testUsecase:      testUsecase,
 		templatesUseCase: templatesUseCase,
+		connectionUC:     connectionUseCase,
 		handler:          handler,
 		credsCache:       credsCache,
 	}
@@ -205,6 +210,9 @@ func (b *bundle) SetPlatformCredsGetter(getter ports.IPlatformCredentialsGetter)
 	b.handler.SetPlatformCredsGetter(getter)
 	if b.credsCache != nil {
 		b.credsCache.SetResolver(getter)
+	}
+	if b.connectionUC != nil {
+		b.connectionUC.SetResolver(getter)
 	}
 }
 
@@ -231,7 +239,42 @@ func (b *bundle) TestConnection(ctx context.Context, config map[string]interface
 		return client.New(baseURL, logger)
 	}
 
+	config, credentials = b.fillWithPlatformCredentials(ctx, config, credentials)
+
 	return b.testUsecase.TestConnection(ctx, config, credentials, clientFactory)
+}
+
+func (b *bundle) fillWithPlatformCredentials(
+	ctx context.Context,
+	config map[string]interface{},
+	credentials map[string]interface{},
+) (map[string]interface{}, map[string]interface{}) {
+	if config == nil {
+		config = map[string]interface{}{}
+	}
+	if credentials == nil {
+		credentials = map[string]interface{}{}
+	}
+
+	token, _ := credentials["access_token"].(string)
+	phoneID, _ := config["phone_number_id"].(string)
+	if token != "" && phoneID != "" {
+		return config, credentials
+	}
+
+	platform, err := b.credsCache.GetWhatsAppDefaultConfig(ctx)
+	if err != nil {
+		return config, credentials
+	}
+
+	if token == "" {
+		credentials["access_token"] = platform.AccessToken
+	}
+	if phoneID == "" && platform.PhoneNumberID != 0 {
+		config["phone_number_id"] = strconv.FormatUint(uint64(platform.PhoneNumberID), 10)
+	}
+
+	return config, credentials
 }
 
 func (b *bundle) GetWebhookURL(ctx context.Context, baseURL string, integrationID uint) (*core.WebhookInfo, error) {
