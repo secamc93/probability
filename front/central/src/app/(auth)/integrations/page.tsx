@@ -26,6 +26,8 @@ import { WooStorePowerWidget } from '@/services/woostore/ui/components/WooStoreP
 
 const ALL_TAB_CATEGORIES = 'platform,ecommerce,invoicing,messaging';
 
+const NARROW_FORM_TYPE_IDS = [1, 2, 3, 4, 8, 16, 33];
+
 const CATEGORY_RESOURCE_MAP: Record<string, string> = {
     'ecommerce': 'Integraciones-E-commerce',
     'invoicing': 'Integraciones-Facturacion-Electronica',
@@ -250,11 +252,11 @@ export default function IntegrationsPage() {
                         Editar Integración
                     </span>
                 )}
-                size={selectedIntegration && [1, 3, 4, 8, 16, 33].includes(Number(selectedIntegration.integration_type_id)) ? '4xl' : '5xl'}
+                size={selectedIntegration && NARROW_FORM_TYPE_IDS.includes(Number(selectedIntegration.integration_type_id)) ? '4xl' : '5xl'}
             >
                 <div
                     style={
-                        selectedIntegration && [1, 3, 4, 8, 16, 33].includes(Number(selectedIntegration.integration_type_id))
+                        selectedIntegration && NARROW_FORM_TYPE_IDS.includes(Number(selectedIntegration.integration_type_id))
                             ? { width: 'min(768px, 92vw)' }
                             : undefined
                     }

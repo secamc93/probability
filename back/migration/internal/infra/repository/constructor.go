@@ -20,7 +20,10 @@ func New(db db.IDatabase, cfg env.IConfig) *Repository {
 }
 
 func (r *Repository) Migrate(ctx context.Context) error {
-	return nil
+	if err := r.migrateWhatsappInboundConversationType(ctx); err != nil {
+		return err
+	}
+	return r.migrateWhatsappPhoneNumberUnique(ctx)
 }
 
 func (r *Repository) migrateHistorico(ctx context.Context) error {

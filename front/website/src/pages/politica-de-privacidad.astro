@@ -1,0 +1,18 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import LegalPage from '../components/LegalPage.astro';
+import privacidad from '../content/legal/privacidad.html?raw';
+
+const title = 'Política de privacidad - ProbabilityIA';
+const description = 'Política de tratamiento de datos personales de Probability: qué datos recolectamos, con qué finalidad, con quién se comparten y cómo ejercer tus derechos.';
+---
+
+<Layout title={title} description={description}>
+    <Header />
+    <main>
+        <LegalPage titulo="Política de privacidad" actualizado="9 de agosto de 2026" html={privacidad} />
+    </main>
+    <Footer />
+</Layout>

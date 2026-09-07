@@ -28,9 +28,9 @@ import { ExitoConfigForm, ExitoEditForm } from '@/services/integrations/ecommerc
 import { TikTokConfigForm, TikTokEditForm } from '@/services/integrations/ecommerce/tiktok/ui';
 import { JumpsellerConfigForm } from '@/services/integrations/ecommerce/jumpseller/ui';
 import { BoldConfigForm, BoldEditForm } from '@/services/integrations/pay/bold/ui/components';
+import { ChatBubbleLeftRightIcon } from '@heroicons/react/24/outline';
 import { getActionError } from '@/shared/utils/action-result';
 
-// IDs constantes de tipos de integración (tabla integration_types)
 const INTEGRATION_TYPE_IDS = {
     SHOPIFY: 1,
     WHATSAPP: 2,
@@ -71,14 +71,12 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
     const [loadingTypes, setLoadingTypes] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
-    // Notify parent when type is selected
     useEffect(() => {
         if (onTypeSelected) {
             onTypeSelected(!!selectedType);
         }
     }, [selectedType, onTypeSelected]);
 
-    // Fetch integration types on mount
     useEffect(() => {
         const fetchIntegrationTypes = async () => {
             console.log('🔍 Fetching integration types...');
@@ -90,12 +88,11 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
                     console.log('✅ Integration types loaded:', response.data);
                     setIntegrationTypes(response.data);
 
-                    // Set selected type ONLY if editing an existing integration
                     if (integration) {
                         const type = response.data.find(t => t.id === integration.integration_type_id);
                         setSelectedType(type || null);
                     }
-                    // Don't auto-select first type when creating new
+
                 } else {
                     console.warn('⚠️ No integration types in response:', response);
                     setError('No se encontraron tipos de integración');
@@ -244,7 +241,7 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
             if (data.code) {
                 updateData.code = data.code;
             }
-            // Solo incluir credenciales si hay valores ingresados
+
             if (data.credentials && Object.keys(data.credentials).some(k => data.credentials[k])) {
                 updateData.credentials = data.credentials;
             }
@@ -272,11 +269,9 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
         );
     }
 
-    // If editing an existing integration
     if (integration) {
         console.log('📋 Integration recibida para editar:', integration);
 
-        // Parse config if it's a string
         let parsedConfig = integration.config || {};
         if (typeof integration.config === 'string') {
             try {
@@ -291,7 +286,6 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
             console.log('✅ Config ya es objeto en IntegrationForm:', parsedConfig);
         }
 
-        // Show edit form for Shopify with webhook support
         if (selectedType && selectedType.id === INTEGRATION_TYPE_IDS.SHOPIFY) {
             console.log('🛒 Editando Shopify - store_id:', integration.store_id);
             console.log('🛒 Editando Shopify - config:', parsedConfig);
@@ -318,7 +312,6 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
             );
         }
 
-        // Show edit form for WooCommerce
         if (selectedType && selectedType.id === INTEGRATION_TYPE_IDS.WOOCOMMERCE) {
             return (
                 <WooCommerceConfigForm
@@ -376,7 +369,6 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
             );
         }
 
-        // Show WhatsApp view (read-only with webhook info)
         console.log('🔍 Verificando tipo de integración:', {
             hasSelectedType: !!selectedType,
             selectedTypeId: selectedType?.id,
@@ -390,6 +382,7 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
                         id: integration.id,
                         name: integration.name,
                         code: integration.code,
+                        business_id: integration.business_id,
                         config: parsedConfig,
                         credentials: integration.credentials || {},
                         is_active: integration.is_active,
@@ -411,7 +404,6 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
             );
         }
 
-        // Show edit form for Softpymes
         if (selectedType && selectedType.id === INTEGRATION_TYPE_IDS.SOFTPYMES) {
             console.log('✅ Usando SoftpymesEditForm');
             return (
@@ -431,7 +423,6 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
             );
         }
 
-        // Show edit form for Factus
         if (selectedType && selectedType.id === INTEGRATION_TYPE_IDS.FACTUS) {
             console.log('✅ Usando FactusEditForm');
             return (
@@ -449,7 +440,6 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
             );
         }
 
-        // Show edit form for Siigo
         if (selectedType && selectedType.id === INTEGRATION_TYPE_IDS.SIIGO) {
             return (
                 <SiigoEditForm
@@ -468,7 +458,6 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
             );
         }
 
-        // Show edit form for Alegra
         if (selectedType && selectedType.id === INTEGRATION_TYPE_IDS.ALEGRA) {
             return (
                 <AlegraEditForm
@@ -485,7 +474,6 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
             );
         }
 
-        // Show edit form for World Office
         if (selectedType && selectedType.id === INTEGRATION_TYPE_IDS.WORLD_OFFICE) {
             return (
                 <WorldOfficeEditForm
@@ -502,7 +490,6 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
             );
         }
 
-        // Show edit form for Helisa
         if (selectedType && selectedType.id === INTEGRATION_TYPE_IDS.HELISA) {
             return (
                 <HelisaEditForm
@@ -556,7 +543,6 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
             );
         }
 
-        // Show edit form for Enviame
         if (selectedType && selectedType.id === INTEGRATION_TYPE_IDS.ENVIAME) {
             return (
                 <EnviameEditForm
@@ -573,7 +559,6 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
             );
         }
 
-        // Show edit form for TU
         if (selectedType && selectedType.id === INTEGRATION_TYPE_IDS.TU) {
             return (
                 <TuEditForm
@@ -590,7 +575,6 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
             );
         }
 
-        // Show edit form for MiPaquete
         if (selectedType && selectedType.id === INTEGRATION_TYPE_IDS.MIPAQUETE) {
             return (
                 <MiPaqueteEditForm
@@ -623,7 +607,6 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
             );
         }
 
-        // Show edit form for VTEX
         if (selectedType && selectedType.id === INTEGRATION_TYPE_IDS.VTEX) {
             return (
                 <VTEXEditForm
@@ -640,7 +623,6 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
             );
         }
 
-        // Show edit form for Tiendanube
         if (selectedType && selectedType.id === INTEGRATION_TYPE_IDS.TIENDANUBE) {
             return (
                 <TiendanubeEditForm
@@ -657,7 +639,6 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
             );
         }
 
-        // Show edit form for Magento
         if (selectedType && selectedType.id === INTEGRATION_TYPE_IDS.MAGENTO) {
             return (
                 <MagentoEditForm
@@ -674,7 +655,6 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
             );
         }
 
-        // Show edit form for Amazon
         if (selectedType && selectedType.id === INTEGRATION_TYPE_IDS.AMAZON) {
             return (
                 <AmazonEditForm
@@ -691,7 +671,6 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
             );
         }
 
-        // Show edit form for Falabella
         if (selectedType && selectedType.id === INTEGRATION_TYPE_IDS.FALABELLA) {
             return (
                 <FalabellaEditForm
@@ -708,7 +687,6 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
             );
         }
 
-        // Show edit form for Exito
         if (selectedType && selectedType.id === INTEGRATION_TYPE_IDS.EXITO) {
             return (
                 <ExitoEditForm
@@ -741,7 +719,6 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
             );
         }
 
-        // For other types that don't have a specific form yet
         return (
             <Alert type="info">
                 <div className="space-y-3">
@@ -758,10 +735,9 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
         );
     }
 
-    // Creating new integration - show type selector first if no type selected
     return (
         <div className="space-y-6 w-full max-w-full overflow-x-hidden">
-            {/* Type Selector - Show when no type is selected */}
+
             {!selectedType && integrationTypes.length > 0 && (
                 <div className="bg-white dark:bg-gray-800 p-4 rounded-lg w-full">
                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 dark:text-gray-200 mb-2">
@@ -775,7 +751,7 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
                                 onClick={() => handleTypeChange(type.id)}
                                 className="p-4 border-2 rounded-lg text-center transition-all hover:border-blue-300 hover:shadow-lg border-gray-200 dark:border-gray-700 w-full h-full flex flex-col justify-center items-center min-h-[140px] shadow-md"
                             >
-                                {/* Logo centrado */}
+
                                 <div className="flex items-center justify-center mb-4">
                                     <div className="flex-shrink-0">
                                         {type.image_url ? (
@@ -784,7 +760,7 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
                                                 alt={type.name}
                                                 className="w-14 h-14 object-contain rounded-lg shadow-md"
                                                 onError={(e) => {
-                                                    // Fallback a imágenes hardcodeadas si la imagen falla
+
                                                     const target = e.target as HTMLImageElement;
                                                     if (type.id === INTEGRATION_TYPE_IDS.SHOPIFY) {
                                                         target.src = '/integrations/shopify.png';
@@ -796,7 +772,7 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
                                                 }}
                                             />
                                         ) : (
-                                            // Fallback a imágenes hardcodeadas si no hay imagen_url
+
                                             <>
                                                 {type.id === INTEGRATION_TYPE_IDS.SHOPIFY && (
                                                     <img
@@ -822,7 +798,6 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
                                     </div>
                                 </div>
 
-                                {/* Contenido de texto - Nombre y código centrados */}
                                 <div className="flex-1 flex flex-col justify-center items-center">
                                     <h4 className="font-semibold text-gray-900 dark:text-white text-base break-words mb-1">{type.name}</h4>
                                     <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-400 break-words">{type.code}</p>
@@ -833,14 +808,12 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
                 </div>
             )}
 
-            {/* Show message if no types available */}
             {!selectedType && integrationTypes.length === 0 && (
                 <div className="text-center py-8">
                     <p className="text-gray-600 dark:text-gray-300 dark:text-gray-300">No hay tipos de integración disponibles.</p>
                 </div>
             )}
 
-            {/* Render specific form based on selected type */}
             {selectedType && (
                 <div>
                     {selectedType.id === INTEGRATION_TYPE_IDS.SHOPIFY && (
@@ -852,46 +825,94 @@ export default function IntegrationForm({ integration, onSuccess, onCancel, onTy
                     )}
 
                     {selectedType.id === INTEGRATION_TYPE_IDS.WHATSAPP && (
-                        <div className="space-y-4 max-w-md mx-auto py-4">
-                            <div className="flex flex-col items-center text-center mb-4">
-                                {selectedType.image_url ? (
-                                    <img src={selectedType.image_url} alt="WhatsApp" className="w-14 h-14 object-contain rounded-lg shadow-md mb-3" />
-                                ) : (
-                                    <img src="/integrations/whatsapp.png" alt="WhatsApp" className="w-14 h-14 object-contain rounded-lg shadow-md mb-3" />
-                                )}
-                                <p className="text-sm text-gray-500 dark:text-gray-400 dark:text-gray-400">
-                                    Crea una integración de WhatsApp para este negocio. Las notificaciones se configuran desde el módulo de Notificaciones.
-                                </p>
+                        <div className="space-y-3 w-full">
+                            <div
+                                className="flex flex-col gap-3 rounded-xl p-4 sm:flex-row sm:items-center dark:bg-gray-800/60"
+                                style={{
+                                    backgroundColor: 'color-mix(in srgb, var(--color-primary) 10%, white)',
+                                    border: '1px solid color-mix(in srgb, var(--color-primary) 25%, white)',
+                                }}
+                            >
+                                <span
+                                    className="flex h-11 w-11 items-center justify-center rounded-xl overflow-hidden shrink-0 bg-white dark:bg-gray-900"
+                                    style={{ border: '1px solid color-mix(in srgb, var(--color-primary) 25%, white)' }}
+                                >
+                                    <img
+                                        src={selectedType.image_url || '/integrations/whatsapp.png'}
+                                        alt="WhatsApp"
+                                        className="h-8 w-8 object-contain"
+                                    />
+                                </span>
+                                <div>
+                                    <h2 className="text-base font-bold text-gray-900 dark:text-white leading-tight">
+                                        Conectar WhatsApp
+                                    </h2>
+                                    <p className="text-xs text-gray-600 dark:text-gray-300 mt-0.5">
+                                        {'Ponle nombre a la integraci\u00f3n y cr\u00e9ala. Despu\u00e9s, al editarla, conectas tu propio n\u00famero.'}
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 dark:text-gray-200 mb-1">
-                                    Nombre de la integración *
+
+                            <div
+                                className="rounded-xl p-4 dark:bg-gray-800/60"
+                                style={{ backgroundColor: '#fafafd', border: '1px solid #eceaf3' }}
+                            >
+                                <div className="flex items-center gap-2 mb-3">
+                                    <span
+                                        className="flex h-7 w-7 items-center justify-center rounded-md"
+                                        style={{ backgroundColor: 'color-mix(in srgb, var(--color-primary) 10%, white)' }}
+                                    >
+                                        <ChatBubbleLeftRightIcon
+                                            style={{ color: 'var(--color-primary)', width: 16, height: 16 }}
+                                        />
+                                    </span>
+                                    <h3 className="text-sm font-bold text-gray-900 dark:text-white">
+                                        Datos de la {'integraci\u00f3n'}
+                                    </h3>
+                                </div>
+
+                                <label className="block text-[13px] font-semibold text-gray-900 dark:text-gray-100 mb-1">
+                                    Nombre de la {'integraci\u00f3n'}{' '}
+                                    <span style={{ color: 'var(--color-primary)' }}>*</span>
                                 </label>
                                 <input
                                     type="text"
                                     value={whatsappName}
                                     onChange={(e) => setWhatsappName(e.target.value)}
                                     placeholder="Ej: WhatsApp - Mi Negocio"
-                                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg text-sm focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                                    className="w-full px-3 py-2 text-sm rounded-lg border bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[var(--color-primary)]/30 focus:border-[var(--color-primary)]"
+                                    style={{ borderColor: '#e9e9f0' }}
                                     disabled={creatingWhatsapp}
                                 />
+                                <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-1">
+                                    {'Las notificaciones a tus clientes se configuran despu\u00e9s, en el m\u00f3dulo de Notificaciones.'}
+                                </p>
                             </div>
-                            <div className="flex gap-3">
+
+                            <div className="flex items-center justify-end gap-2 pt-1">
                                 {onCancel && (
-                                    <Button type="button" variant="outline" onClick={onCancel} className="flex-1" disabled={creatingWhatsapp}>
+                                    <button
+                                        type="button"
+                                        onClick={onCancel}
+                                        disabled={creatingWhatsapp}
+                                        className="px-5 py-2 text-[13px] font-semibold rounded-lg bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700 disabled:opacity-50"
+                                        style={{ border: '1px solid #e9e9f0' }}
+                                    >
                                         Cancelar
-                                    </Button>
+                                    </button>
                                 )}
-                                <Button
+                                <button
                                     type="button"
-                                    variant="primary"
                                     onClick={handleWhatsAppCreate}
                                     disabled={creatingWhatsapp || !whatsappName.trim()}
-                                    loading={creatingWhatsapp}
-                                    className="flex-1"
+                                    className="px-5 py-2 text-[13px] font-semibold rounded-lg text-white flex items-center justify-center gap-2 transition-colors disabled:opacity-60"
+                                    style={{ backgroundColor: 'var(--color-primary)' }}
                                 >
-                                    Crear integración
-                                </Button>
+                                    {creatingWhatsapp && (
+                                        <span className="h-3.5 w-3.5 rounded-full border-2 border-white/40 border-t-white animate-spin" />
+                                    )}
+                                    Crear {'integraci\u00f3n'}
+                                </button>
                             </div>
                         </div>
                     )}
