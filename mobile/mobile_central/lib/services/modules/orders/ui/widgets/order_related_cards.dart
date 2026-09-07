@@ -28,7 +28,7 @@ class OrderShipmentCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      shipment.trackingNumber ?? 'Sin guia',
+                      shipment.trackingNumber ?? 'Sin gu\u00eda',
                       style: theme.textTheme.titleSmall,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -53,14 +53,14 @@ class OrderShipmentCard extends StatelessWidget {
           ),
           AppKeyValueRow(label: 'Margen aplicado', value: AppFormat.money(margin), dense: true),
           AppKeyValueRow(
-            label: 'Total de la guia',
+            label: 'Total de la gu\u00eda',
             value: AppFormat.money(shipment.totalCost),
             dense: true,
             valueStyle: theme.textTheme.titleSmall?.copyWith(color: AppColors.primary),
           ),
           if ((shipment.codCarrierFee ?? 0) > 0)
             AppKeyValueRow(
-              label: 'Comision contra entrega',
+              label: 'Comisi\u00f3n contra entrega',
               value: AppFormat.money(shipment.codCarrierFee),
               dense: true,
             ),

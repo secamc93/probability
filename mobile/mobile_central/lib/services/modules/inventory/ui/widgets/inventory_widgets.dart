@@ -88,7 +88,7 @@ class InventoryLevelCard extends StatelessWidget {
               AppStatusChip(dense: true, label: badge.label, tone: badge.tone),
               const SizedBox(width: 8),
               Text(
-                'Total ${AppFormat.number(level.quantity)}  ·  Reservado ${AppFormat.number(level.reservedQty)}',
+                'Total ${AppFormat.number(level.quantity)}  \u00b7  Reservado ${AppFormat.number(level.reservedQty)}',
                 style: theme.textTheme.labelSmall,
               ),
             ],
@@ -142,7 +142,7 @@ class StockMovementTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${movement.movementTypeName}  ·  ${movement.warehouseName ?? ''}',
+                  '${movement.movementTypeName}  \u00b7  ${movement.warehouseName ?? ''}',
                   style: theme.textTheme.labelSmall,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

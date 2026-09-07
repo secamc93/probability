@@ -44,7 +44,7 @@ class _PublicSiteScreenState extends State<PublicSiteScreen> {
                       child: TextField(
                         controller: _slugCtrl,
                         decoration: const InputDecoration(
-                          labelText: 'Codigo del negocio',
+                          labelText: 'C\u00f3digo del negocio',
                           hintText: 'ej: mi-tienda',
                           border: OutlineInputBorder(),
                           prefixIcon: Icon(Icons.search),
@@ -110,7 +110,7 @@ class _PublicSiteScreenState extends State<PublicSiteScreen> {
                               size: 64, color: Colors.grey.shade400),
                           const SizedBox(height: 16),
                           Text(
-                              'Ingresa el codigo de un negocio para ver su pagina publica',
+                              'Ingresa el c\u00f3digo de un negocio para ver su p\u00e1gina p\u00fablica',
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                   fontSize: 14, color: Colors.grey.shade600)),
@@ -188,7 +188,7 @@ class _BusinessInfo extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('Descripcion',
+                  const Text('Descripci\u00f3n',
                       style:
                           TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
                   const SizedBox(height: 8),
@@ -259,7 +259,7 @@ class _BusinessInfo extends StatelessWidget {
               label: 'Testimonios',
               enabled: business.websiteConfig!.showTestimonials),
           _SectionToggle(
-              label: 'Ubicacion',
+              label: 'Ubicaci\u00f3n',
               enabled: business.websiteConfig!.showLocation),
           _SectionToggle(
               label: 'Contacto',

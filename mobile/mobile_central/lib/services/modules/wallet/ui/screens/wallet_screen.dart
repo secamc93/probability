@@ -9,7 +9,7 @@ import '../providers/wallet_provider.dart';
 import 'wallet_recharge_sheet.dart';
 
 const Map<String, String> walletConceptLabels = {
-  'GUIDE': 'Cobro de guia',
+  'GUIDE': 'Cobro de gu\u00eda',
   'RECHARGE': 'Recarga',
   'SUBSCRIPTION': 'Suscripcion',
   'REFUND': 'Reembolso',
@@ -113,7 +113,7 @@ class _WalletScreenState extends State<WalletScreen> {
                     const SizedBox(width: 11),
                     Expanded(
                       child: AppKpiTile(
-                        label: 'Gastado en guias',
+                        label: 'Gastado en gu\u00edas',
                         value: AppFormat.compact(spentOnGuides),
                         icon: Icons.local_shipping_outlined,
                         accent: const Color(0xFFF97316),
@@ -208,7 +208,7 @@ class _BalanceCard extends StatelessWidget {
                   const Icon(Icons.warning_amber_rounded, size: 14, color: Colors.white),
                   const SizedBox(width: 7),
                   Text(
-                    'Saldo bajo: las guias pueden fallar',
+                    'Saldo bajo: las gu\u00edas pueden fallar',
                     style: theme.textTheme.labelSmall?.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
@@ -253,7 +253,7 @@ class _ConceptFilter extends StatelessWidget {
         children: [
           for (final entry in [
             (value: '', label: 'Todos'),
-            (value: 'GUIDE', label: 'Guias'),
+            (value: 'GUIDE', label: 'Gu\u00edas'),
             (value: 'RECHARGE', label: 'Recargas'),
             (value: 'SUBSCRIPTION', label: 'Suscripcion'),
             (value: 'REFUND', label: 'Reembolsos'),
@@ -322,7 +322,7 @@ class _MovementTile extends StatelessWidget {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${movement.reference ?? ''}  ·  ${AppFormat.relative(AppFormat.parseDate(movement.createdAt))}',
+                  '${movement.reference ?? ''}  \u00b7  ${AppFormat.relative(AppFormat.parseDate(movement.createdAt))}',
                   style: theme.textTheme.labelSmall,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

@@ -64,7 +64,7 @@ class _DraggableBusinessButtonState extends State<DraggableBusinessButton> {
                 .where((b) => b.id == selected)
                 .firstOrNull;
         final raw = business?.name ?? 'Elegir negocio';
-        final label = raw.length > 16 ? '${raw.substring(0, 15)}…' : raw;
+        final label = raw.length > 16 ? '${raw.substring(0, 15)}\u2026' : raw;
 
         return LayoutBuilder(
           builder: (context, constraints) {

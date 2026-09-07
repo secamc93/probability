@@ -15,7 +15,7 @@ class ModulesScreen extends StatelessWidget {
     final login = context.watch<LoginProvider>();
 
     return AppScaffold(
-      title: 'Modulos',
+      title: 'M\u00f3dulos',
       subtitle: 'Todo lo que puedes gestionar',
       actions: [
         IconButton(
@@ -39,7 +39,7 @@ class ModulesScreen extends StatelessWidget {
                 crossAxisCount: 2,
                 mainAxisSpacing: 12,
                 crossAxisSpacing: 12,
-                mainAxisExtent: 116,
+                mainAxisExtent: 128,
               ),
               itemCount: group.modules.length,
               itemBuilder: (context, index) => _ModuleTile(module: group.modules[index]),
@@ -58,7 +58,7 @@ class ModulesScreen extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Cerrar sesion',
+                    'Cerrar sesi\u00f3n',
                     style: Theme.of(context).textTheme.titleSmall?.copyWith(color: AppColors.error),
                   ),
                 ),

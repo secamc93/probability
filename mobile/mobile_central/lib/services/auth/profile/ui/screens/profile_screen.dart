@@ -100,7 +100,7 @@ class ProfileScreen extends StatelessWidget {
               children: [
                 AppKeyValueRow(label: 'Correo', value: user?.email ?? '-'),
                 const Divider(height: 18),
-                AppKeyValueRow(label: 'Telefono', value: user?.phone ?? '-'),
+                AppKeyValueRow(label: 'Tel\u00e9fono', value: user?.phone ?? '-'),
                 const Divider(height: 18),
                 AppKeyValueRow(
                   label: 'Ultimo ingreso',
@@ -123,7 +123,7 @@ class ProfileScreen extends StatelessWidget {
                 const Divider(height: 1),
                 _ActionRow(
                   icon: Icons.logout_rounded,
-                  label: 'Cerrar sesion',
+                  label: 'Cerrar sesi\u00f3n',
                   tone: AppColors.error,
                   onTap: () {
                     context.read<LoginProvider>().logout();

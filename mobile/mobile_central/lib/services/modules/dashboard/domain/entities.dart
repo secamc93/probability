@@ -19,9 +19,9 @@ extension DashboardPeriodX on DashboardPeriod {
       case DashboardPeriod.today:
         return 'Hoy';
       case DashboardPeriod.week:
-        return '7 dias';
+        return '7 d\u00edas';
       case DashboardPeriod.month:
-        return '30 dias';
+        return '30 d\u00edas';
       case DashboardPeriod.all:
         return 'Todo';
     }

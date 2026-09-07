@@ -68,7 +68,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       builder: (dialogContext) => AlertDialog(
         title: const Text('Cancelar orden'),
         content: Text(
-          'Vas a cancelar la orden ${_order?.orderNumber ?? ''}. Esta accion no se puede deshacer.',
+          'Vas a cancelar la orden ${_order?.orderNumber ?? ''}. Esta acci\u00f3n no se puede deshacer.',
         ),
         actions: [
           TextButton(
@@ -113,7 +113,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         if (order != null)
           IconButton(
             icon: const Icon(Icons.copy_rounded, size: 20),
-            tooltip: 'Copiar numero',
+            tooltip: 'Copiar n\u00famero',
             onPressed: _copyNumber,
           ),
         if (order != null)
@@ -187,8 +187,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 children: [
                   const SizedBox(height: 18),
                   const AppSectionHeader(
-                    title: 'Envio',
-                    subtitle: 'Guia asociada a la orden',
+                    title: 'Env\u00edo',
+                    subtitle: 'Gu\u00eda asociada a la orden',
                   ),
                   if (shipment != null)
                     OrderShipmentCard(shipment: shipment)
@@ -196,7 +196,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     OrderShippingCard(order: order),
                   if (invoice != null) ...[
                     const SizedBox(height: 18),
-                    const AppSectionHeader(title: 'Facturacion'),
+                    const AppSectionHeader(title: 'Facturaci\u00f3n'),
                     OrderInvoiceCard(invoice: invoice),
                   ],
                 ],
@@ -212,7 +212,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 const Divider(height: 18),
                 AppKeyValueRow(label: 'Id externo', value: order.externalId.isEmpty ? '-' : order.externalId),
                 const Divider(height: 18),
-                AppKeyValueRow(label: 'Numero interno', value: order.internalNumber.isEmpty ? '-' : order.internalNumber),
+                AppKeyValueRow(label: 'N\u00famero interno', value: order.internalNumber.isEmpty ? '-' : order.internalNumber),
                 const Divider(height: 18),
                 AppKeyValueRow(label: 'Creada por', value: order.userName.isEmpty ? '-' : order.userName),
               ],

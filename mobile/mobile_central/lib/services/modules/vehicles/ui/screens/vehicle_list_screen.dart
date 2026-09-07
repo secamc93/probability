@@ -108,7 +108,7 @@ class _VehicleCard extends StatelessWidget {
                 Text(vehicle.licensePlate, style: theme.textTheme.titleSmall),
                 const SizedBox(height: 2),
                 Text(
-                  '${vehicle.brand} ${vehicle.model}  ·  ${vehicleTypeLabels[vehicle.type] ?? vehicle.type}',
+                  '${vehicle.brand} ${vehicle.model}  \u00b7  ${vehicleTypeLabels[vehicle.type] ?? vehicle.type}',
                   style: theme.textTheme.labelSmall,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

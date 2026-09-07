@@ -78,7 +78,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Future<void> _verifyCode() async {
     final code = _codeController.text.trim();
     if (code.length != 6) {
-      setState(() => _error = 'El codigo tiene 6 digitos');
+      setState(() => _error = 'El c\u00f3digo tiene 6 d\u00edgitos');
       return;
     }
     await _run(() async {
@@ -94,7 +94,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Future<void> _savePassword() async {
     final password = _passwordController.text;
     if (password.length < 6) {
-      setState(() => _error = 'Minimo 6 caracteres');
+      setState(() => _error = 'M\u00ednimo 6 caracteres');
       return;
     }
     if (password != _confirmController.text) {
@@ -182,7 +182,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     const SizedBox(height: 6),
                     TextButton(
                       onPressed: _busy ? null : _loadChannels,
-                      child: const Text('Reenviar codigo'),
+                      child: const Text('Reenviar c\u00f3digo'),
                     ),
                   ],
                 ],
@@ -212,7 +212,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       case _Step.email:
         return 'Recuperar acceso';
       case _Step.code:
-        return 'Verifica el codigo';
+        return 'Verifica el c\u00f3digo';
       case _Step.password:
         return 'Nueva contrase\u00F1a';
       case _Step.done:
@@ -223,7 +223,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   String _subtitleFor(_Step step) {
     switch (step) {
       case _Step.email:
-        return 'Escribe el correo de tu cuenta y te enviamos un codigo de verificacion.';
+        return 'Escribe el correo de tu cuenta y te enviamos un c\u00f3digo de verificaci\u00f3n.';
       case _Step.code:
         return 'Enviamos un codigo de 6 digitos a ${_maskedTarget()}.';
       case _Step.password:
@@ -236,13 +236,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   String _primaryLabelFor(_Step step) {
     switch (step) {
       case _Step.email:
-        return 'Enviar codigo';
+        return 'Enviar c\u00f3digo';
       case _Step.code:
         return 'Verificar';
       case _Step.password:
         return 'Guardar contrase\u00F1a';
       case _Step.done:
-        return 'Ir al inicio de sesion';
+        return 'Ir al inicio de sesi\u00f3n';
     }
   }
 

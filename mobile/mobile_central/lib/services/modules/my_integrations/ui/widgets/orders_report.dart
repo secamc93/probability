@@ -54,7 +54,7 @@ class OrdersReport extends StatelessWidget {
   ) {
     return [
         Text(
-          'Cuantas ordenes entraron por cada origen y en que estado van.',
+          'Cuantas \u00f3rdenes entraron por cada origen y en que estado van.',
           style: theme.textTheme.labelSmall,
         ),
         const SizedBox(height: 12),
@@ -99,7 +99,7 @@ class OrdersReport extends StatelessWidget {
         const SizedBox(height: 12),
         Text(
           'Cada barra usa la misma escala: la mas larga es el origen con mas '
-          'ordenes.',
+          '\u00f3rdenes.',
           style: theme.textTheme.labelSmall,
         ),
     ];
@@ -307,7 +307,7 @@ class _OriginRow extends StatelessWidget {
             Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                'Sin ordenes registradas',
+                'Sin \u00f3rdenes registradas',
                 style: theme.textTheme.labelSmall
                     ?.copyWith(fontSize: 10, fontStyle: FontStyle.italic),
               ),

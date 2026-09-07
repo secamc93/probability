@@ -40,9 +40,9 @@ class _ActionListScreenState extends State<ActionListScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Eliminar Acción'),
+        title: const Text('Eliminar Acci\u00f3n'),
         content: Text(
-            '¿Estás seguro de que deseas eliminar la acción "${action.name}"? Esta acción no se puede deshacer.'),
+            '\u00bfEst\u00e1s seguro de que deseas eliminar la acci\u00f3n "${action.name}"? Esta acci\u00f3n no se puede deshacer.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
@@ -62,13 +62,13 @@ class _ActionListScreenState extends State<ActionListScreen> {
           await context.read<ActionProvider>().deleteAction(action.id);
       if (success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Acción eliminada correctamente')),
+          const SnackBar(content: Text('Acci\u00f3n eliminada correctamente')),
         );
         _loadActions();
       } else if (mounted) {
         final error = context.read<ActionProvider>().error;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error ?? 'Error al eliminar la acción')),
+          SnackBar(content: Text(error ?? 'Error al eliminar la acci\u00f3n')),
         );
       }
     }
@@ -280,7 +280,7 @@ class _ActionFormDialogState extends State<_ActionFormDialog> {
       Navigator.pop(context, true);
     } else {
       setState(() {
-        _error = provider.error ?? 'Error al guardar la acción';
+        _error = provider.error ?? 'Error al guardar la acci\u00f3n';
         _saving = false;
       });
     }
@@ -289,7 +289,7 @@ class _ActionFormDialogState extends State<_ActionFormDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(_isEditing ? 'Editar Acción' : 'Crear Acción'),
+      title: Text(_isEditing ? 'Editar Acci\u00f3n' : 'Crear Acci\u00f3n'),
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -332,9 +332,9 @@ class _ActionFormDialogState extends State<_ActionFormDialog> {
               TextFormField(
                 controller: _descriptionCtrl,
                 decoration: const InputDecoration(
-                  labelText: 'Descripción',
+                  labelText: 'Descripci\u00f3n',
                   border: OutlineInputBorder(),
-                  hintText: 'Descripción de la acción',
+                  hintText: 'Descripci\u00f3n de la acci\u00f3n',
                 ),
                 maxLines: 3,
               ),

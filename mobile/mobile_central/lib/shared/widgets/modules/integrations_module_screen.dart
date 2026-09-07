@@ -12,7 +12,7 @@ class IntegrationsModuleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ModuleTabsScaffold(
       title: 'Integraciones',
-      subtitle: 'Canales, transporte y facturacion',
+      subtitle: 'Canales, transporte y facturaci\u00f3n',
       initialTab: initialTab,
       tabs: const ['Mis integraciones', 'Catalogo'],
       builder: (context, businessId) => [

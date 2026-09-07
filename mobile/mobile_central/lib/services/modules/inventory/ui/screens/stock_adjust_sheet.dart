@@ -44,7 +44,7 @@ class _StockAdjustFormState extends State<_StockAdjustForm> {
   static const List<String> _reasons = [
     'Ajuste por conteo',
     'Compra a proveedor',
-    'Devolucion de cliente',
+    'Devoluci\u00f3n de cliente',
     'Producto averiado',
     'Perdida o robo',
   ];
@@ -118,7 +118,7 @@ class _StockAdjustFormState extends State<_StockAdjustForm> {
           Text('Ajustar stock', style: theme.textTheme.titleLarge),
           const SizedBox(height: 4),
           Text(
-            '${level.productName ?? ''}  ·  ${level.warehouseName ?? ''}',
+            '${level.productName ?? ''}  \u00b7  ${level.warehouseName ?? ''}',
             style: theme.textTheme.bodySmall,
           ),
           const SizedBox(height: 18),

@@ -73,7 +73,7 @@ class _InventoryEnvironmentState extends State<InventoryEnvironment> {
         content: Text(
           'Se le va a preguntar su stock a ${provider.channels.length} canal'
           '${provider.channels.length == 1 ? '' : 'es'} para los productos de '
-          'esta pagina. Solo lee, no cambia nada en el canal.',
+          'esta p\u00e1gina. Solo lee, no cambia nada en el canal.',
         ),
         actions: [
           TextButton(
@@ -106,7 +106,7 @@ class _InventoryEnvironmentState extends State<InventoryEnvironment> {
             title: 'Sin canales para comparar',
             message:
                 'Ninguno de tus canales conectados permite comparar inventario '
-                'todavia.',
+                'todav\u00eda.',
           );
         }
 
@@ -188,7 +188,7 @@ class _Filters extends StatelessWidget {
             SearchField(
               key: 'all',
               label: 'Todo',
-              hint: 'SKU, producto o codigo de barras',
+              hint: 'SKU, producto o c\u00f3digo de barras',
             ),
             SearchField(key: 'sku', label: 'SKU', hint: 'Buscar por SKU'),
             SearchField(
@@ -198,8 +198,8 @@ class _Filters extends StatelessWidget {
             ),
             SearchField(
               key: 'barcode',
-              label: 'Codigo de barras',
-              hint: 'Buscar por codigo de barras',
+              label: 'C\u00f3digo de barras',
+              hint: 'Buscar por c\u00f3digo de barras',
             ),
           ],
           selectedField: provider.searchBy,

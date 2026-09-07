@@ -197,7 +197,7 @@ class _Filters extends StatelessWidget {
             SearchField(
               key: 'all',
               label: 'Todo',
-              hint: 'SKU, producto o codigo de barras',
+              hint: 'SKU, producto o c\u00f3digo de barras',
             ),
             SearchField(key: 'sku', label: 'SKU', hint: 'Buscar por SKU'),
             SearchField(
@@ -207,8 +207,8 @@ class _Filters extends StatelessWidget {
             ),
             SearchField(
               key: 'barcode',
-              label: 'Codigo de barras',
-              hint: 'Buscar por codigo de barras',
+              label: 'C\u00f3digo de barras',
+              hint: 'Buscar por c\u00f3digo de barras',
             ),
           ],
           selectedField: matrix.searchBy,

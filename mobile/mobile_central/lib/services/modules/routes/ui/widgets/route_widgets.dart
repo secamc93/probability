@@ -67,7 +67,7 @@ class RouteCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '${AppFormat.date(AppFormat.parseDate(route.date))}  ·  ${route.originAddress ?? ''}',
+                      '${AppFormat.date(AppFormat.parseDate(route.date))}  \u00b7  ${route.originAddress ?? ''}',
                       style: theme.textTheme.labelSmall,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

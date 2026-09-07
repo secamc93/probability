@@ -50,7 +50,7 @@ class RateCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '${rate.product}  ·  ${rate.deliveryDays} dias',
+                      '${rate.product}  \u00b7  ${rate.deliveryDays} d\u00edas',
                       style: theme.textTheme.labelSmall,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -83,13 +83,13 @@ class RateCard extends StatelessWidget {
               children: [
                 _Line(label: 'Flete', value: breakdown.flete),
                 if (breakdown.minimumInsurance > 0)
-                  _Line(label: 'Seguro minimo', value: breakdown.minimumInsurance),
+                  _Line(label: 'Seguro m\u00ednimo', value: breakdown.minimumInsurance),
                 if (breakdown.extraInsurance > 0)
                   _Line(label: 'Seguro extra', value: breakdown.extraInsurance),
                 const Divider(height: 14),
-                _Line(label: 'Costo de la guia', value: breakdown.guideCost, strong: true),
+                _Line(label: 'Costo de la gu\u00eda', value: breakdown.guideCost, strong: true),
                 if (appliesCod)
-                  _Line(label: 'Comision contra entrega', value: breakdown.carrierFee),
+                  _Line(label: 'Comisi\u00f3n contra entrega', value: breakdown.carrierFee),
               ],
             ),
           ),

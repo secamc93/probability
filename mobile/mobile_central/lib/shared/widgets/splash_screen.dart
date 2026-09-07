@@ -53,7 +53,9 @@ class _SplashScreenState extends State<SplashScreen>
   void didUpdateWidget(SplashScreen oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.hold && !widget.hold && _intro.isCompleted) {
-      widget.onFinished?.call();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) widget.onFinished?.call();
+      });
     }
   }
 

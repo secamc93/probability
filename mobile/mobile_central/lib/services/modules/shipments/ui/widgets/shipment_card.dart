@@ -7,7 +7,7 @@ import '../../domain/entities.dart';
 const Map<String, String> shipmentStatusLabels = {
   'created': 'Generada',
   'pending': 'Pendiente',
-  'in_transit': 'En transito',
+  'in_transit': 'En tr\u00e1nsito',
   'delivered': 'Entregada',
   'returned': 'Devuelta',
   'cancelled': 'Cancelada',
@@ -46,14 +46,14 @@ class ShipmentCard extends StatelessWidget {
                     Text(
                       shipment.trackingNumber?.isNotEmpty == true
                           ? shipment.trackingNumber!
-                          : 'Sin guia',
+                          : 'Sin gu\u00eda',
                       style: theme.textTheme.titleSmall,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '$carrier  ·  ${shipment.orderNumber ?? ''}',
+                      '$carrier  \u00b7  ${shipment.orderNumber ?? ''}',
                       style: theme.textTheme.bodySmall,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

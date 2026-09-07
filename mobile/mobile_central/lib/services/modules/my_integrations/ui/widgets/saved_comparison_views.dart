@@ -234,7 +234,7 @@ class InventorySnapshotView extends StatelessWidget {
       return const AppCard(
         child: Text(
           'Ninguno de tus canales conectados permite comparar inventario. '
-          'Los que si lo permiten muestran aqui la ultima comparacion guardada.',
+          'Los que si lo permiten muestran aqu\u00ed la ultima comparacion guardada.',
         ),
       );
     }
@@ -323,7 +323,7 @@ class _InventoryChannelCard extends StatelessWidget {
             Text(
               snapshot.loading
                   ? 'Leyendo la ultima comparacion'
-                  : 'Sin comparacion guardada todavia',
+                  : 'Sin comparacion guardada todav\u00eda',
               style: theme.textTheme.labelSmall,
             ),
           ] else ...[
@@ -413,7 +413,7 @@ class DataSummaryView extends StatelessWidget {
           const AppCard(
             child: Text(
               'Ningun canal tiene datos que puedan entrar a Probability: '
-              'todo lo que se puede traer ya esta aqui.',
+              'todo lo que se puede traer ya esta aqu\u00ed.',
             ),
           )
         else
