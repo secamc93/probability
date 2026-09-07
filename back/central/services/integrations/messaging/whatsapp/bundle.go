@@ -3,10 +3,15 @@ package whatsApp
 import (
 	"context"
 	"fmt"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/secamc93/probability/back/central/services/integrations/core"
+	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/app/usecaseconnection"
+	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/app/usecaseembedded"
 	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/app/usecasemessaging"
+	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/app/usecasenumbers"
+	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/app/usecasetemplates"
 	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/app/usecasetestconnection"
 	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/domain/dtos"
 	"github.com/secamc93/probability/back/central/services/integrations/messaging/whatsapp/internal/domain/entities"
@@ -63,17 +68,21 @@ func buildDiagnosticoResultTemplateMessage(phoneNumber, name, surveyTitle, level
 
 type bundle struct {
 	core.BaseIntegration
-	wa          ports.IWhatsApp
-	useCase     usecasemessaging.IUseCase
-	testUsecase usecasetestconnection.ITestConnectionUseCase
-	handler     handlers.IHandler
-	credsCache  cache.ICredentialsCacheMutable
+	wa               ports.IWhatsApp
+	useCase          usecasemessaging.IUseCase
+	testUsecase      usecasetestconnection.ITestConnectionUseCase
+	templatesUseCase usecasetemplates.IUseCase
+	connectionUC     usecaseconnection.IUseCaseMutable
+	numbersUC        usecasenumbers.IUseCaseMutable
+	embeddedUC       usecaseembedded.IUseCaseMutable
+	handler          handlers.IHandler
+	credsCache       cache.ICredentialsCacheMutable
 }
 
 func New(config env.IConfig, logger log.ILogger, rabbit rabbitmq.IQueue, redisClient redisclient.IRedis) core.IIntegrationContract {
 	logger = logger.WithModule("whatsapp")
 
-	convCache, credsCache := cache.New(redisClient, logger)
+	convCache, credsCache, templatesCache := cache.New(redisClient, logger)
 
 	persistPub := queue.NewPersistencePublisher(rabbit, logger)
 
@@ -115,10 +124,38 @@ func New(config env.IConfig, logger log.ILogger, rabbit rabbitmq.IQueue, redisCl
 
 	testUsecase := usecasetestconnection.New(config, logger)
 
-	handler := handlers.New(useCase, logger, config, rabbit)
+	templatesAPIFactory := func(baseURL string) ports.ITemplateAPI {
+		if baseURL == "" {
+			baseURL = whatsappURL
+		}
+		return client.NewTemplatesClient(baseURL, logger)
+	}
+
+	templatesUseCase := usecasetemplates.New(credsCache, templatesCache, templatesAPIFactory, logger)
+	connectionUseCase := usecaseconnection.New(credsCache, templatesAPIFactory, logger)
+
+	phoneNumbersAPIFactory := func(baseURL string) ports.IPhoneNumbersAPI {
+		if baseURL == "" {
+			baseURL = whatsappURL
+		}
+		return client.NewPhoneNumbersClient(baseURL, logger)
+	}
+
+	numbersUseCase := usecasenumbers.New(credsCache, phoneNumbersAPIFactory, logger)
+
+	embeddedSignupAPIFactory := func(baseURL string) ports.IEmbeddedSignupAPI {
+		if baseURL == "" {
+			baseURL = whatsappURL
+		}
+		return client.NewEmbeddedSignupClient(baseURL, logger)
+	}
+
+	embeddedUseCase := usecaseembedded.New(credsCache, embeddedSignupAPIFactory, phoneNumbersAPIFactory, logger)
+
+	handler := handlers.New(useCase, templatesUseCase, connectionUseCase, numbersUseCase, embeddedUseCase, logger, config, rabbit)
 
 	if rabbit != nil {
-		webhookConsumer := consumerwebhook.New(rabbit, useCase, logger)
+		webhookConsumer := consumerwebhook.New(rabbit, useCase, templatesUseCase, logger)
 		webhookConsumer.Start(context.Background())
 
 		orderConsumer := consumerorder.New(
@@ -177,11 +214,15 @@ func New(config env.IConfig, logger log.ILogger, rabbit rabbitmq.IQueue, redisCl
 	}
 
 	return &bundle{
-		wa:          wa,
-		useCase:     useCase,
-		testUsecase: testUsecase,
-		handler:     handler,
-		credsCache:  credsCache,
+		wa:               wa,
+		useCase:          useCase,
+		testUsecase:      testUsecase,
+		templatesUseCase: templatesUseCase,
+		connectionUC:     connectionUseCase,
+		numbersUC:        numbersUseCase,
+		embeddedUC:       embeddedUseCase,
+		handler:          handler,
+		credsCache:       credsCache,
 	}
 }
 
@@ -193,6 +234,15 @@ func (b *bundle) SetPlatformCredsGetter(getter ports.IPlatformCredentialsGetter)
 	b.handler.SetPlatformCredsGetter(getter)
 	if b.credsCache != nil {
 		b.credsCache.SetResolver(getter)
+	}
+	if b.connectionUC != nil {
+		b.connectionUC.SetResolver(getter)
+	}
+	if b.numbersUC != nil {
+		b.numbersUC.SetResolver(getter)
+	}
+	if b.embeddedUC != nil {
+		b.embeddedUC.SetResolver(getter)
 	}
 }
 
@@ -219,7 +269,42 @@ func (b *bundle) TestConnection(ctx context.Context, config map[string]interface
 		return client.New(baseURL, logger)
 	}
 
+	config, credentials = b.fillWithPlatformCredentials(ctx, config, credentials)
+
 	return b.testUsecase.TestConnection(ctx, config, credentials, clientFactory)
+}
+
+func (b *bundle) fillWithPlatformCredentials(
+	ctx context.Context,
+	config map[string]interface{},
+	credentials map[string]interface{},
+) (map[string]interface{}, map[string]interface{}) {
+	if config == nil {
+		config = map[string]interface{}{}
+	}
+	if credentials == nil {
+		credentials = map[string]interface{}{}
+	}
+
+	token, _ := credentials["access_token"].(string)
+	phoneID, _ := config["phone_number_id"].(string)
+	if token != "" && phoneID != "" {
+		return config, credentials
+	}
+
+	platform, err := b.credsCache.GetWhatsAppDefaultConfig(ctx)
+	if err != nil {
+		return config, credentials
+	}
+
+	if token == "" {
+		credentials["access_token"] = platform.AccessToken
+	}
+	if phoneID == "" && platform.PhoneNumberID != 0 {
+		config["phone_number_id"] = strconv.FormatUint(uint64(platform.PhoneNumberID), 10)
+	}
+
+	return config, credentials
 }
 
 func (b *bundle) GetWebhookURL(ctx context.Context, baseURL string, integrationID uint) (*core.WebhookInfo, error) {
