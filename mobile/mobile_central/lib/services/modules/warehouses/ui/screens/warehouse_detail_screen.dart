@@ -53,12 +53,12 @@ class _WarehouseDetailScreenState extends State<WarehouseDetailScreen> {
               children: [
                 _StatusCard(warehouse: warehouse),
                 const SizedBox(height: 18),
-                const AppSectionHeader(title: 'Direccion'),
+                const AppSectionHeader(title: 'Direcci\u00f3n'),
                 _AddressCard(warehouse: warehouse),
                 const SizedBox(height: 18),
                 const AppSectionHeader(
                   title: 'Contacto',
-                  subtitle: 'Datos que viajan al generar una guia',
+                  subtitle: 'Datos que viajan al generar una gu\u00eda',
                 ),
                 _ContactCard(warehouse: warehouse),
                 const SizedBox(height: 18),
@@ -132,19 +132,19 @@ class _AddressCard extends StatelessWidget {
     return AppCard(
       child: Column(
         children: [
-          AppKeyValueRow(label: 'Direccion', value: warehouse.address),
+          AppKeyValueRow(label: 'Direcci\u00f3n', value: warehouse.address),
           const Divider(height: 18),
           AppKeyValueRow(label: 'Barrio', value: warehouse.suburb.isEmpty ? '-' : warehouse.suburb),
           const Divider(height: 18),
           AppKeyValueRow(label: 'Ciudad', value: '${warehouse.city}, ${warehouse.state}'),
           const Divider(height: 18),
           AppKeyValueRow(
-            label: 'Codigo DANE',
+            label: 'C\u00f3digo DANE',
             value: warehouse.cityDaneCode.isEmpty ? '-' : warehouse.cityDaneCode,
           ),
           const Divider(height: 18),
           AppKeyValueRow(
-            label: 'Codigo postal',
+            label: 'C\u00f3digo postal',
             value: warehouse.postalCode.isEmpty ? warehouse.zipCode : warehouse.postalCode,
           ),
         ],
@@ -174,7 +174,7 @@ class _ContactCard extends StatelessWidget {
           ),
           const Divider(height: 18),
           AppKeyValueRow(
-            label: 'Telefono',
+            label: 'Tel\u00e9fono',
             value: warehouse.phone.isEmpty ? '-' : warehouse.phone,
           ),
           const Divider(height: 18),
@@ -196,7 +196,7 @@ class _ContactCard extends StatelessWidget {
                   const SizedBox(width: 9),
                   Expanded(
                     child: Text(
-                      'Sin telefono o correo la transportadora rechaza la guia',
+                      'Sin tel\u00e9fono o correo la transportadora rechaza la guia',
                       style: theme.textTheme.labelSmall?.copyWith(
                         color: const Color(0xFFB45309),
                         fontWeight: FontWeight.w600,
@@ -219,7 +219,7 @@ class _LocationsCard extends StatelessWidget {
   static const Map<String, String> _typeLabels = {
     'storage': 'Almacenamiento',
     'picking': 'Alistamiento',
-    'receiving': 'Recepcion',
+    'receiving': 'Recepci\u00f3n',
     'shipping': 'Despacho',
   };
 
@@ -267,7 +267,7 @@ class _LocationsCard extends StatelessWidget {
                           ),
                           const SizedBox(height: 2),
                           Text(
-                            '${provider.locations[i].code}  ·  ${_typeLabels[provider.locations[i].type] ?? provider.locations[i].type}',
+                            '${provider.locations[i].code}  \u00b7  ${_typeLabels[provider.locations[i].type] ?? provider.locations[i].type}',
                             style: Theme.of(context).textTheme.labelSmall,
                           ),
                         ],

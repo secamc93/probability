@@ -25,7 +25,7 @@ class _MyIntegrationsScreenState extends State<MyIntegrationsScreen> {
     'all': 'Todas',
     'ecommerce': 'Tiendas',
     'shipping': 'Transporte',
-    'invoicing': 'Facturacion',
+    'invoicing': 'Facturaci\u00f3n',
     'messaging': 'Mensajeria',
     'payment': 'Pagos',
     'platform': 'Plataforma',
@@ -170,7 +170,7 @@ class _IntegrationCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  integration.integrationTypeName ?? 'Integracion',
+                  integration.integrationTypeName ?? 'Integraci\u00f3n',
                   style: theme.textTheme.bodySmall,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,

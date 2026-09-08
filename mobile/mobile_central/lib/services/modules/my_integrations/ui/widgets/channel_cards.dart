@@ -49,7 +49,7 @@ class CoreCard extends StatelessWidget {
             children: [
               _CoreStat(
                 value: AppFormat.number(totals.ordersCount),
-                label: 'ordenes',
+                label: '\u00f3rdenes',
               ),
               Container(
                 width: 1,
@@ -167,9 +167,9 @@ enum ChannelAction {
       case ChannelAction.toggle:
         return 'Cambiando estado';
       case ChannelAction.test:
-        return 'Probando conexion';
+        return 'Probando conexi\u00f3n';
       case ChannelAction.sync:
-        return 'Sincronizando ordenes';
+        return 'Sincronizando \u00f3rdenes';
     }
   }
 
@@ -178,9 +178,9 @@ enum ChannelAction {
       case ChannelAction.toggle:
         return 'Estado actualizado';
       case ChannelAction.test:
-        return 'La conexion funciona';
+        return 'La conexi\u00f3n funciona';
       case ChannelAction.sync:
-        return 'Sincronizacion lanzada';
+        return 'Sincronizaci\u00f3n lanzada';
     }
   }
 }
@@ -278,7 +278,7 @@ class ChannelCard extends StatelessWidget {
                       children: [
                         Icon(Icons.wifi_tethering_rounded, size: 19),
                         SizedBox(width: 10),
-                        Text('Probar conexion'),
+                        Text('Probar conexi\u00f3n'),
                       ],
                     ),
                   ),
@@ -288,7 +288,7 @@ class ChannelCard extends StatelessWidget {
                       children: [
                         Icon(Icons.sync_rounded, size: 19),
                         SizedBox(width: 10),
-                        Text('Sincronizar ordenes'),
+                        Text('Sincronizar \u00f3rdenes'),
                       ],
                     ),
                   ),
@@ -302,7 +302,7 @@ class ChannelCard extends StatelessWidget {
               children: [
                 _MiniStat(
                   value: AppFormat.number(stats.ordersCount),
-                  label: 'ordenes',
+                  label: '\u00f3rdenes',
                 ),
                 const SizedBox(width: 20),
                 _MiniStat(

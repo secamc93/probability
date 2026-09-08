@@ -207,7 +207,7 @@ class _ChannelsCard extends StatelessWidget {
         if (integrations.isEmpty) {
           return AppCard(
             child: Text(
-              'Este producto no esta publicado en ningun canal',
+              'Este producto no esta publicado en ning\u00fan canal',
               style: Theme.of(context).textTheme.bodySmall,
             ),
           );

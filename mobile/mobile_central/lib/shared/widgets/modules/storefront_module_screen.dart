@@ -12,9 +12,9 @@ class StorefrontModuleScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ModuleTabsScaffold(
       title: 'Tienda online',
-      subtitle: 'Catalogo publico y sitio',
+      subtitle: 'Catalogo p\u00fablico y sitio',
       initialTab: initialTab,
-      tabs: const ['Catalogo', 'Configuracion'],
+      tabs: const ['Catalogo', 'Configuraci\u00f3n'],
       builder: (context, businessId) => [
         StorefrontScreen(key: ValueKey('storefront_$businessId'), businessId: businessId),
         WebsiteConfigScreen(key: ValueKey('website_$businessId'), businessId: businessId),

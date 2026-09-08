@@ -43,7 +43,7 @@ class _RechargeFormState extends State<_RechargeForm> {
   Future<void> _submit() async {
     final amount = double.tryParse(_controller.text) ?? 0;
     if (amount < 10000) {
-      setState(() => _error = 'El monto minimo de recarga es 10.000');
+      setState(() => _error = 'El monto m\u00ednimo de recarga es 10.000');
       return;
     }
 
@@ -82,7 +82,7 @@ class _RechargeFormState extends State<_RechargeForm> {
           Text('Recargar billetera', style: theme.textTheme.titleLarge),
           const SizedBox(height: 4),
           Text(
-            'El saldo se usa para pagar las guias que generes.',
+            'El saldo se usa para pagar las gu\u00edas que generes.',
             style: theme.textTheme.bodySmall,
           ),
           const SizedBox(height: 18),

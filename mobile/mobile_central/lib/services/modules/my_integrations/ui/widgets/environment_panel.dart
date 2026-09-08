@@ -74,7 +74,7 @@ class EnvironmentPanel extends StatelessWidget {
       return _Notice(
         icon: spec.icon,
         title: 'Facturar',
-        message: 'Facturacion desde el hub: proximamente.',
+        message: 'Facturaci\u00f3n desde el hub: pr\u00f3ximamente.',
       );
     }
 
@@ -424,7 +424,7 @@ class _RunCard extends StatelessWidget {
             icon: Icons.link_off_rounded,
             title: 'Sin canales que lo permitan',
             message:
-                'Ninguno de tus canales conectados soporta esta accion todavia.',
+                'Ninguno de tus canales conectados soporta esta acci\u00f3n todav\u00eda.',
           );
         }
 

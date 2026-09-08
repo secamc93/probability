@@ -45,7 +45,7 @@ class _WarehouseListScreenState extends State<WarehouseListScreen> {
           emptyIcon: Icons.warehouse_outlined,
           emptyTitle: 'Sin bodegas',
           emptyMessage:
-              'Crea la primera bodega para poder generar guias y controlar stock.',
+              'Crea la primera bodega para poder generar gu\u00edas y controlar stock.',
           itemBuilder: (context, warehouse, index) => _WarehouseCard(
             warehouse: warehouse,
             onTap: () => Navigator.of(context).push(
@@ -109,7 +109,7 @@ class _WarehouseCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      '${warehouse.code}  ·  ${warehouse.city}',
+                      '${warehouse.code}  \u00b7  ${warehouse.city}',
                       style: theme.textTheme.labelSmall,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,

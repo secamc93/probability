@@ -13,10 +13,10 @@ class OrdersModuleScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ModuleTabsScaffold(
-      title: 'Ordenes',
+      title: '\u00d3rdenes',
       subtitle: 'Pedidos de todos los canales',
       initialTab: initialTab,
-      tabs: const ['Ordenes', 'Envios', 'Cotizar', 'Estados'],
+      tabs: const ['\u00d3rdenes', 'Env\u00edos', 'Cotizar', 'Estados'],
       builder: (context, businessId) => [
         OrderListScreen(key: ValueKey('orders_$businessId'), businessId: businessId),
         ShipmentListScreen(key: ValueKey('shipments_$businessId'), businessId: businessId),

@@ -57,7 +57,7 @@ class _InvoiceDetailScreenState extends State<InvoiceDetailScreen> {
       builder: (dialogContext) => AlertDialog(
         title: const Text('Cancelar factura'),
         content: const Text(
-          'La factura se anula ante la DIAN. Esta accion no se puede deshacer.',
+          'La factura se anula ante la DIAN. Esta acci\u00f3n no se puede deshacer.',
         ),
         actions: [
           TextButton(
@@ -334,7 +334,7 @@ class _ItemsCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 3),
                       Text(
-                        'SKU ${items[i].productSku}  ·  IVA ${(items[i].taxRate ?? 0).toStringAsFixed(0)}%',
+                        'SKU ${items[i].productSku}  \u00b7  IVA ${(items[i].taxRate ?? 0).toStringAsFixed(0)}%',
                         style: theme.textTheme.labelSmall,
                       ),
                     ],

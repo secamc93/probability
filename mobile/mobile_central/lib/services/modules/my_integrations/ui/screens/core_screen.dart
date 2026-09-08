@@ -54,11 +54,11 @@ class _CoreScreenState extends State<CoreScreen> {
       final ok = await showDialog<bool>(
         context: context,
         builder: (ctx) => AlertDialog(
-          title: Text(item.isActive ? 'Desactivar integracion' : 'Activar integracion'),
+          title: Text(item.isActive ? 'Desactivar integraci\u00f3n' : 'Activar integraci\u00f3n'),
           content: Text(
             item.isActive
-                ? 'Dejara de sincronizar ordenes y productos hasta que la vuelvas a activar.'
-                : 'Volvera a sincronizar ordenes y productos.',
+                ? 'Dejara de sincronizar \u00f3rdenes y productos hasta que la vuelvas a activar.'
+                : 'Volvera a sincronizar \u00f3rdenes y productos.',
           ),
           actions: [
             TextButton(
@@ -95,7 +95,7 @@ class _CoreScreenState extends State<CoreScreen> {
     messenger.hideCurrentSnackBar();
     messenger.showSnackBar(
       SnackBar(
-        content: Text(done ? action.doneLabel : 'No se pudo completar la accion'),
+        content: Text(done ? action.doneLabel : 'No se pudo completar la acci\u00f3n'),
       ),
     );
     if (done) _load();
@@ -137,7 +137,7 @@ class _CoreScreenState extends State<CoreScreen> {
               icon: Icons.hub_outlined,
               title: 'Sin integraciones',
               message:
-                  'Cuando conectes una tienda o un facturador lo vas a ver aqui.',
+                  'Cuando conectes una tienda o un facturador lo vas a ver aqu\u00ed.',
               actionLabel: 'Actualizar',
               onAction: _load,
             );

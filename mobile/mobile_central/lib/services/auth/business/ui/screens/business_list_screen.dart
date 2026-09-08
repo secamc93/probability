@@ -448,7 +448,7 @@ class _BusinessListScreenState extends State<BusinessListScreen> {
         return AlertDialog(
           title: const Text('Eliminar Negocio'),
           content: Text(
-              '¿Eliminar "${business.name}"? Esta accion no se puede deshacer.'),
+              '\u00bfEliminar "${business.name}"? Esta acci\u00f3n no se puede deshacer.'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),

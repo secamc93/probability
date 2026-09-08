@@ -27,7 +27,7 @@ const List<EnvironmentSpec> coreEnvironments = <EnvironmentSpec>[
     environment: SyncEnvironment.overview,
     label: 'Vista general',
     icon: Icons.grid_view_rounded,
-    hint: 'Cuantas ordenes entraron por cada origen y en que estado van.',
+    hint: 'Cuantas \u00f3rdenes entraron por cada origen y en que estado van.',
   ),
   EnvironmentSpec(
     environment: SyncEnvironment.products,
@@ -40,7 +40,7 @@ const List<EnvironmentSpec> coreEnvironments = <EnvironmentSpec>[
     environment: SyncEnvironment.data,
     label: 'Actualizar productos',
     icon: Icons.download_rounded,
-    hint: 'Que dato del canal (nombre, imagen, categoria) puede entrar a Probability.',
+    hint: 'Que dato del canal (nombre, imagen, categor\u00eda) puede entrar a Probability.',
   ),
   EnvironmentSpec(
     environment: SyncEnvironment.inventory,
@@ -51,7 +51,7 @@ const List<EnvironmentSpec> coreEnvironments = <EnvironmentSpec>[
   ),
   EnvironmentSpec(
     environment: SyncEnvironment.ordersCompare,
-    label: 'Comparar ordenes',
+    label: 'Comparar \u00f3rdenes',
     icon: Icons.fact_check_outlined,
     hint: 'Que orden existe en el canal y no en Probability, y crearla aca.',
   ),
@@ -59,7 +59,7 @@ const List<EnvironmentSpec> coreEnvironments = <EnvironmentSpec>[
     environment: SyncEnvironment.invoicing,
     label: 'Facturar',
     icon: Icons.receipt_long_outlined,
-    hint: 'Facturacion desde el hub: proximamente.',
+    hint: 'Facturaci\u00f3n desde el hub: pr\u00f3ximamente.',
     enabled: false,
   ),
 ];

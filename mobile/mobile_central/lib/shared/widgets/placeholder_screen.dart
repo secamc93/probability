@@ -23,7 +23,7 @@ class PlaceholderScreen extends StatelessWidget {
             ),
             const SizedBox(height: 8),
             Text(
-              'Próximamente',
+              'Pr\u00f3ximamente',
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: Colors.grey[600],
                   ),

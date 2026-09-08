@@ -94,7 +94,7 @@ class _ActionsSheetState extends State<_ActionsSheet> {
           const SizedBox(height: 18),
           _ActionRow(
             icon: Icons.wifi_tethering_rounded,
-            label: 'Probar conexion',
+            label: 'Probar conexi\u00f3n',
             busy: _running == 'test',
             onTap: () => _run('test', () async {
               final response = await provider.testConnection(integration.id);
@@ -104,7 +104,7 @@ class _ActionsSheetState extends State<_ActionsSheet> {
           const Divider(height: 1),
           _ActionRow(
             icon: Icons.sync_rounded,
-            label: 'Sincronizar ordenes',
+            label: 'Sincronizar \u00f3rdenes',
             busy: _running == 'sync',
             onTap: () => _run('sync', () async {
               final response = await provider.syncOrders(integration.id);

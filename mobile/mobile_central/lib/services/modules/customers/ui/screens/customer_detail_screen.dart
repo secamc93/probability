@@ -87,7 +87,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                     children: [
                       Expanded(
                         child: AppKpiTile(
-                          label: 'Ordenes',
+                          label: '\u00d3rdenes',
                           value: AppFormat.number(detail.orderCount),
                           icon: Icons.receipt_long_outlined,
                         ),
@@ -109,7 +109,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                 _ContactCard(customer: customer, onCopy: _copy),
                 const SizedBox(height: 18),
                 AppSectionHeader(
-                  title: 'Ordenes recientes',
+                  title: '\u00d3rdenes recientes',
                   subtitle: _loadingOrders ? null : '${_orders.length} encontradas',
                 ),
                 if (_loadingOrders)
@@ -117,7 +117,7 @@ class _CustomerDetailScreenState extends State<CustomerDetailScreen> {
                 else if (_orders.isEmpty)
                   AppCard(
                     child: Text(
-                      'Este cliente todavia no tiene ordenes registradas',
+                      'Este cliente todavia no tiene \u00f3rdenes registradas',
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   )
@@ -215,9 +215,9 @@ class _ContactCard extends StatelessWidget {
           const Divider(height: 1),
           _Row(
             icon: Icons.phone_outlined,
-            label: 'Telefono',
+            label: 'Tel\u00e9fono',
             value: customer.phone.isEmpty ? '-' : customer.phone,
-            onCopy: customer.phone.isEmpty ? null : () => onCopy('Telefono', customer.phone),
+            onCopy: customer.phone.isEmpty ? null : () => onCopy('Tel\u00e9fono', customer.phone),
           ),
           const Divider(height: 1),
           _Row(

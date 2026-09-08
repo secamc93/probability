@@ -70,7 +70,7 @@ class AppModules {
     label: 'Inicio',
     route: '/dashboard',
     icon: Icons.space_dashboard_outlined,
-    description: 'Resumen de la operacion',
+    description: 'Resumen de la operaci\u00f3n',
   );
 
   static const List<AppModuleGroup> groups = [
@@ -78,12 +78,12 @@ class AppModules {
       title: 'Ventas',
       modules: [
         AppModule(
-          label: 'Ordenes',
+          label: '\u00d3rdenes',
           route: '/orders',
           icon: Icons.receipt_long_outlined,
           description: 'Pedidos de todos los canales',
           matchPrefix: true,
-          resources: ['Ordenes', 'Orders'],
+          resources: ['\u00d3rdenes', 'Orders'],
         ),
         AppModule(
           label: 'Clientes',
@@ -93,23 +93,23 @@ class AppModules {
           resources: ['Clientes', 'Customers'],
         ),
         AppModule(
-          label: 'Facturacion',
+          label: 'Facturaci\u00f3n',
           route: '/invoicing',
           icon: Icons.description_outlined,
-          description: 'Facturas y notas credito',
-          resources: ['Facturacion', 'Invoicing'],
+          description: 'Facturas y notas cr\u00e9dito',
+          resources: ['Facturaci\u00f3n', 'Invoicing'],
         ),
       ],
     ),
     AppModuleGroup(
-      title: 'Logistica',
+      title: 'Log\u00edstica',
       modules: [
         AppModule(
-          label: 'Envios',
+          label: 'Env\u00edos',
           route: '/orders/shipments',
           icon: Icons.local_shipping_outlined,
-          description: 'Guias y seguimiento',
-          resources: ['Envios', 'Shipments'],
+          description: 'Gu\u00edas y seguimiento',
+          resources: ['Env\u00edos', 'Shipments'],
         ),
         AppModule(
           label: 'Ultima milla',
@@ -189,7 +189,7 @@ class AppModules {
           label: 'Tienda online',
           route: '/storefront',
           icon: Icons.storefront_outlined,
-          description: 'Catalogo publico y sitio',
+          description: 'Catalogo p\u00fablico y sitio',
           matchPrefix: true,
           resources: ['Tienda', 'Storefront'],
         ),
@@ -307,7 +307,7 @@ const List<AppBottomTab> appBottomTabs = [
     activeIcon: Icons.space_dashboard,
   ),
   AppBottomTab(
-    label: 'Ordenes',
+    label: '\u00d3rdenes',
     route: '/orders',
     icon: Icons.receipt_long_outlined,
     activeIcon: Icons.receipt_long,
@@ -321,7 +321,7 @@ const List<AppBottomTab> appBottomTabs = [
     prefixes: ['/inventory'],
   ),
   AppBottomTab(
-    label: 'Mas',
+    label: 'M\u00e1s',
     route: '/more',
     icon: Icons.grid_view_outlined,
     activeIcon: Icons.grid_view,

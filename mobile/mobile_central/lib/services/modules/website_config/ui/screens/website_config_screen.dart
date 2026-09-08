@@ -71,7 +71,7 @@ class _WebsiteConfigScreenState extends State<WebsiteConfigScreen> {
         if (config == null) {
           return AppEmptyState(
             icon: Icons.web_outlined,
-            title: 'Sin configuracion',
+            title: 'Sin configuraci\u00f3n',
             message: 'Aun no hay un sitio configurado para este negocio.',
             actionLabel: 'Actualizar',
             onAction: _refresh,
@@ -169,7 +169,7 @@ class _WebsiteConfigScreenState extends State<WebsiteConfigScreen> {
                     const Divider(height: 1),
                     _SectionToggle(
                       icon: Icons.place_outlined,
-                      label: 'Ubicacion',
+                      label: 'Ubicaci\u00f3n',
                       detail: _stringFrom(config.locationContent, 'address'),
                       value: config.showLocation,
                       onChanged: (v) => _toggle(config, 'location', v),

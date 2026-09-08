@@ -38,7 +38,7 @@ class OrderHeaderCard extends StatelessWidget {
                     Text(order.orderNumber, style: theme.textTheme.titleLarge),
                     const SizedBox(height: 2),
                     Text(
-                      '$channel  ·  ${AppFormat.dateTime(AppFormat.parseDate(order.createdAt))}',
+                      '$channel  \u00b7  ${AppFormat.dateTime(AppFormat.parseDate(order.createdAt))}',
                       style: theme.textTheme.bodySmall,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -132,7 +132,7 @@ class OrderItemsCard extends StatelessWidget {
                       ),
                       const SizedBox(height: 3),
                       Text(
-                        'SKU ${items[i].sku}  ·  ${AppFormat.money(items[i].unitPrice)} c/u',
+                        'SKU ${items[i].sku}  \u00b7  ${AppFormat.money(items[i].unitPrice)} c/u',
                         style: theme.textTheme.labelSmall,
                       ),
                     ],
@@ -171,7 +171,7 @@ class OrderTotalsCard extends StatelessWidget {
               value: '- ${AppFormat.money(order.discount)}',
               dense: true,
             ),
-          AppKeyValueRow(label: 'Envio', value: AppFormat.money(order.shippingCost), dense: true),
+          AppKeyValueRow(label: 'Env\u00edo', value: AppFormat.money(order.shippingCost), dense: true),
           AppKeyValueRow(label: 'Impuestos', value: AppFormat.money(order.tax), dense: true),
           const Divider(height: 18),
           Row(
@@ -245,7 +245,7 @@ class OrderCustomerCard extends StatelessWidget {
           ),
           const Divider(height: 18),
           AppKeyValueRow(
-            label: 'Telefono',
+            label: 'Tel\u00e9fono',
             value: order.customerPhone.isEmpty ? '-' : order.customerPhone,
           ),
           const Divider(height: 18),
@@ -254,7 +254,7 @@ class OrderCustomerCard extends StatelessWidget {
             value: order.customerEmail.isEmpty ? '-' : order.customerEmail,
           ),
           const Divider(height: 18),
-          AppKeyValueRow(label: 'Direccion', value: address.isEmpty ? '-' : address),
+          AppKeyValueRow(label: 'Direcci\u00f3n', value: address.isEmpty ? '-' : address),
         ],
       ),
     );
@@ -273,7 +273,7 @@ class OrderShippingCard extends StatelessWidget {
       child: Column(
         children: [
           AppKeyValueRow(
-            label: 'Guia',
+            label: 'Gu\u00eda',
             value: (order.trackingNumber ?? '').isEmpty ? 'Sin generar' : order.trackingNumber!,
           ),
           const Divider(height: 18),
@@ -293,7 +293,7 @@ class OrderShippingCard extends StatelessWidget {
               child: OutlinedButton.icon(
                 onPressed: onOpenGuide,
                 icon: const Icon(Icons.description_outlined, size: 18),
-                label: const Text('Ver guia'),
+                label: const Text('Ver gu\u00eda'),
               ),
             ),
           ],

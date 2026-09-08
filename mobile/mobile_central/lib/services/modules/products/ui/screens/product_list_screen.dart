@@ -122,7 +122,7 @@ class _ProductListScreenState extends State<ProductListScreen> {
                 emptyTitle: 'Sin productos',
                 emptyMessage: filtering
                     ? 'Ningun producto coincide con los filtros aplicados.'
-                    : 'Cuando sincronices tu catalogo lo vas a ver aqui.',
+                    : 'Cuando sincronices tu catalogo lo vas a ver aqu\u00ed.',
                 itemBuilder: (context, product, index) => ProductCard(
                   product: product,
                   onTap: () => Navigator.of(context).push(

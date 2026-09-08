@@ -60,7 +60,7 @@ class _InventoryCompareScreenState extends State<InventoryCompareScreen> {
         content: Text(
           'Se le va a mandar a ${widget.channel.integrationTypeName ?? widget.channel.name} '
           'el stock de Probability para los $pending productos que quedaron '
-          'distintos. Es una accion que escribe en el canal.',
+          'distintos. Es una acci\u00f3n que escribe en el canal.',
         ),
         actions: [
           TextButton(
@@ -80,7 +80,7 @@ class _InventoryCompareScreenState extends State<InventoryCompareScreen> {
     if (!mounted) return;
 
     messenger.showSnackBar(
-      const SnackBar(content: Text('Sincronizacion lanzada')),
+      const SnackBar(content: Text('Sincronizaci\u00f3n lanzada')),
     );
     await rows.load(
       channel: widget.channel,
@@ -377,7 +377,7 @@ class _StockCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  _Qty(label: 'aqui', value: row.probabilityQty),
+                  _Qty(label: 'aqu\u00ed', value: row.probabilityQty),
                   const SizedBox(width: 10),
                   _Qty(
                     label: 'canal',
