@@ -186,9 +186,15 @@ const ProductFamilyList = forwardRef<ProductFamilyListHandle, ProductFamilyListP
 
         const familyDescription = modalVariants.find(v => v.description)?.description;
 
-        const renderVariantRow = (variant: Product, axesForRow: { key: string; label: string }[], showLabelFallback: boolean, showMedia: boolean = true) => {
+        const pluralizeLabel = (label: string, count: number) => {
+            if (count === 1) return label.toLowerCase();
+            const lower = label.toLowerCase();
+            return ['a', 'e', 'i', 'o', 'u'].includes(lower.slice(-1)) ? `${lower}s` : `${lower}es`;
+        };
+
+        const renderVariantRow = (variant: Product, axesForRow: { key: string; label: string }[], showLabelFallback: boolean, showMedia: boolean = true, showName: boolean = true) => {
             const isExpanded = expandedVariantId === variant.id;
-            const colCount = 6 + (axesForRow.length > 0 ? axesForRow.length : (showLabelFallback ? 1 : 0));
+            const colCount = 5 + (showName ? 1 : 0) + (axesForRow.length > 0 ? axesForRow.length : (showLabelFallback ? 1 : 0));
             return (
                 <Fragment key={variant.id}>
                     <tr
@@ -206,7 +212,7 @@ const ProductFamilyList = forwardRef<ProductFamilyListHandle, ProductFamilyListP
                             </button>
                         </td>
                         <td className="font-mono text-xs text-gray-600 dark:text-gray-300">{variant.sku}</td>
-                        <td className="text-sm text-gray-900 dark:text-white">{variant.name}</td>
+                        {showName && <td className="text-sm text-gray-900 dark:text-white">{variant.name}</td>}
                         {axesForRow.length > 0 ? (
                             axesForRow.map(ax => {
                                 const value = variant.variant_attributes?.[ax.key];
@@ -581,9 +587,9 @@ const ProductFamilyList = forwardRef<ProductFamilyListHandle, ProductFamilyListP
                                                     <thead>
                                                         <tr>
                                                             <th className="!bg-gray-100 dark:!bg-gray-700 w-8"></th>
-                                                            <th className="!bg-gray-100 dark:!bg-gray-700 !text-gray-600 dark:!text-gray-300 text-left">{familyAxes.find(ax => ax.key === groupAxisKey)?.label || 'Variante'}</th>
-                                                            <th className="!bg-gray-100 dark:!bg-gray-700 !text-gray-600 dark:!text-gray-300 text-center">Variantes</th>
-                                                            <th className="!bg-gray-100 dark:!bg-gray-700 !text-gray-600 dark:!text-gray-300 text-center">Stock total</th>
+                                                            <th className="!bg-gray-100 dark:!bg-gray-700 !text-gray-500 dark:!text-gray-400 text-left text-[11px] font-semibold uppercase tracking-wide">{familyAxes.find(ax => ax.key === groupAxisKey)?.label || 'Variante'}</th>
+                                                            <th className="!bg-gray-100 dark:!bg-gray-700 !text-gray-500 dark:!text-gray-400 text-center text-[11px] font-semibold uppercase tracking-wide">Variantes</th>
+                                                            <th className="!bg-gray-100 dark:!bg-gray-700 !text-gray-500 dark:!text-gray-400 text-center text-[11px] font-semibold uppercase tracking-wide">Stock total</th>
                                                         </tr>
                                                     </thead>
                                                     <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
@@ -594,9 +600,9 @@ const ProductFamilyList = forwardRef<ProductFamilyListHandle, ProductFamilyListP
                                                                 <Fragment key={group.key}>
                                                                     <tr
                                                                         onClick={() => setExpandedGroupKey(isGroupExpanded ? null : group.key)}
-                                                                        className="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors cursor-pointer"
+                                                                        className={`cursor-pointer transition-colors ${isGroupExpanded ? 'bg-indigo-50/60 dark:bg-indigo-900/20' : 'hover:bg-gray-50 dark:hover:bg-gray-700/50'}`}
                                                                     >
-                                                                        <td>
+                                                                        <td className="py-2.5">
                                                                             <button
                                                                                 type="button"
                                                                                 onClick={(e) => { e.stopPropagation(); setExpandedGroupKey(isGroupExpanded ? null : group.key); }}
@@ -606,15 +612,17 @@ const ProductFamilyList = forwardRef<ProductFamilyListHandle, ProductFamilyListP
                                                                                 {isGroupExpanded ? <ChevronDownIcon className="w-4 h-4" /> : <ChevronRightIcon className="w-4 h-4" />}
                                                                             </button>
                                                                         </td>
-                                                                        <td className="text-sm font-medium text-gray-900 dark:text-white">
-                                                                            <div className="flex items-center gap-2">
-                                                                                {group.variants[0]?.image_url && (
-                                                                                    <img src={group.variants[0].image_url} alt={group.label} className="w-8 h-8 rounded object-cover flex-shrink-0 border border-gray-200 dark:border-gray-700" />
+                                                                        <td className="py-2.5 text-sm font-semibold text-gray-900 dark:text-white">
+                                                                            <div className="flex items-center gap-3">
+                                                                                {group.variants[0]?.image_url ? (
+                                                                                    <img src={group.variants[0].image_url} alt={group.label} className="w-10 h-10 rounded-full object-cover flex-shrink-0 border-2 border-white dark:border-gray-800 shadow-sm ring-1 ring-gray-200 dark:ring-gray-600" />
+                                                                                ) : (
+                                                                                    <span className="w-10 h-10 rounded-full flex-shrink-0 bg-gray-100 dark:bg-gray-700 ring-1 ring-gray-200 dark:ring-gray-600" />
                                                                                 )}
                                                                                 {group.label}
                                                                             </div>
                                                                         </td>
-                                                                        <td className="text-center text-sm text-gray-600 dark:text-gray-300">{group.variants.length}</td>
+                                                                        <td className="text-center text-sm text-gray-500 dark:text-gray-400">{group.variants.length}</td>
                                                                         <td className="text-center">{stockBadge(totalStock)}</td>
                                                                     </tr>
                                                                     {isGroupExpanded && (
@@ -626,7 +634,6 @@ const ProductFamilyList = forwardRef<ProductFamilyListHandle, ProductFamilyListP
                                                                                             <tr>
                                                                                                 <th className="!bg-gray-50 dark:!bg-gray-800 w-8"></th>
                                                                                                 <th className="!bg-gray-50 dark:!bg-gray-800 !text-gray-500 dark:!text-gray-400 text-left">SKU</th>
-                                                                                                <th className="!bg-gray-50 dark:!bg-gray-800 !text-gray-500 dark:!text-gray-400 text-left">Nombre</th>
                                                                                                 {restAxes.length > 0 && restAxes.map(ax => (
                                                                                                     <th key={ax.key} className="!bg-gray-50 dark:!bg-gray-800 !text-gray-500 dark:!text-gray-400 text-left hidden sm:table-cell">{ax.label}</th>
                                                                                                 ))}
@@ -636,7 +643,7 @@ const ProductFamilyList = forwardRef<ProductFamilyListHandle, ProductFamilyListP
                                                                                             </tr>
                                                                                         </thead>
                                                                                         <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
-                                                                                            {group.variants.map(variant => renderVariantRow(variant, restAxes, false, false))}
+                                                                                            {group.variants.map(variant => renderVariantRow(variant, restAxes, false, false, false))}
                                                                                         </tbody>
                                                                                     </table>
                                                                                 </div>
@@ -673,7 +680,7 @@ const ProductFamilyList = forwardRef<ProductFamilyListHandle, ProductFamilyListP
                                         {(groupAxisKey ? groupTotalPages : modalTotalPages) > 1 && (
                                             <div className="flex items-center justify-between px-1">
                                                 <span className="text-xs text-gray-500">
-                                                    {groupAxisKey ? `${variantGroups.length} ${familyAxes.find(ax => ax.key === groupAxisKey)?.label.toLowerCase() || 'grupos'}` : `${modalVariants.length} variantes totales`}
+                                                    {groupAxisKey ? `${variantGroups.length} ${pluralizeLabel(familyAxes.find(ax => ax.key === groupAxisKey)?.label || 'grupo', variantGroups.length)}` : `${modalVariants.length} variantes totales`}
                                                 </span>
                                                 <div className="flex items-center gap-1">
                                                     <button
